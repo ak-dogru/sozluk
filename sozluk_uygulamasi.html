@@ -69,15 +69,19 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .ntab-content{display:none}
 .ntab-content.active{display:block}
 .note-list{display:flex;flex-direction:column;gap:12px}
-.note-card{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;overflow:hidden;transition:background .35s}
+.note-card{background:var(--surf);border-radius:10px;overflow:hidden;transition:background .35s;border-left:4px solid #888}
 .note-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--surf2);border-bottom:1px solid var(--brd-s);transition:background .35s}
-.note-card-title{font-family:var(--fh);font-size:13px;color:var(--txt);font-weight:600}
-.note-card-cat{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;background:var(--pb);color:var(--pc);border-radius:20px}
-.note-card-body{padding:14px 18px;font-size:14px;color:var(--txt-d);line-height:1.7;white-space:pre-wrap}
+.note-card-title{font-family:var(--fh);font-size:14px;color:var(--txt);font-weight:600}
+.note-card-cat{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-weight:600}
+.note-card-body{padding:14px 18px;font-size:14px;color:var(--txt-d);line-height:1.8;white-space:pre-wrap}
+.note-card-example{margin:10px 18px 14px;padding:10px 14px;background:var(--surf2);border-radius:6px;font-size:13px;color:var(--txt-d);border-left:3px solid var(--brd);font-style:italic}
 .note-actions{display:flex;gap:4px}
 .nebtn,.ndbtn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 7px;border-radius:4px;opacity:.5;transition:all .2s}
 .nebtn:hover{opacity:1;background:var(--pb);color:var(--acc)}
 .ndbtn:hover{opacity:1;background:rgba(180,60,60,.1);color:var(--bad)}
+.note-search{width:100%;background:var(--surf2);border:1.5px solid var(--brd);outline:none;padding:9px 14px;color:var(--txt);font-family:var(--fb);font-size:15px;border-radius:8px;margin-bottom:14px;transition:border-color .2s}
+.note-search:focus{border-color:var(--acc)}
+.cat-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
 
 .fsbtn{background:var(--surf2);border:1.5px solid var(--brd);color:var(--acc);font-family:var(--fh);font-size:11px;padding:6px 14px;cursor:pointer;border-radius:6px;transition:all .2s;letter-spacing:1px}
 .fsbtn:hover{border-color:var(--acc);background:var(--pb)}
@@ -465,6 +469,8 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- Kural Listesi -->
     <div class="ntab-content active" id="ntab-list-panel">
+      <input type="text" class="note-search" id="noteSearch" placeholder="Kural ara..." oninput="renderNotes()">
+      <div class="cat-filter-row" id="catFilterRow"></div>
       <div id="noteList" class="note-list"></div>
       <div id="noteEmpty" class="empty" style="display:none"><div class="big">◌</div>Henüz kural eklenmemiş.</div>
     </div>
@@ -491,9 +497,13 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
               <option value="Genel">Genel</option>
             </select>
           </div>
-          <div class="igroup">
+          <div class="igroup" style="margin-bottom:14px">
             <label class="ilabel">Açıklama / Kural</label>
-            <textarea class="winput" id="note_body" rows="6" style="resize:vertical;line-height:1.6" placeholder="Kural açıklaması, örnekler..."></textarea>
+            <textarea class="winput" id="note_body" rows="5" style="resize:vertical;line-height:1.6" placeholder="Kural açıklaması..."></textarea>
+          </div>
+          <div class="igroup">
+            <label class="ilabel">Örnek Kelime / Cümle</label>
+            <textarea class="winput" id="note_example" rows="3" style="resize:vertical;line-height:1.6" placeholder="ܐܒܐ (Aba) — Baba / Father&#10;ܐܡܐ (Ema) — Anne / Mother"></textarea>
           </div>
         </div>
         <div style="display:flex;gap:8px">
@@ -1268,29 +1278,63 @@ function switchNTab(id,el){
   if(id==='list') renderNotes();
 }
 
+const catColors={"İsim Kuralları": {"border": "#4a9eff", "bg": "rgba(74,158,255,.1)", "text": "#4a9eff"}, "Fiil Kuralları": {"border": "#ff7043", "bg": "rgba(255,112,67,.1)", "text": "#ff7043"}, "Zamir Kuralları": {"border": "#ab47bc", "bg": "rgba(171,71,188,.1)", "text": "#ab47bc"}, "Sayılar": {"border": "#26a69a", "bg": "rgba(38,166,154,.1)", "text": "#26a69a"}, "Cümle Yapısı": {"border": "#ffa726", "bg": "rgba(255,167,38,.1)", "text": "#ffa726"}, "Telaffuz": {"border": "#ec407a", "bg": "rgba(236,64,122,.1)", "text": "#ec407a"}, "Genel": {"border": "#78909c", "bg": "rgba(120,144,156,.1)", "text": "#78909c"}};
+let activeCatFilter='hepsi';
+function setCatFilter(cat,el){
+  activeCatFilter=cat;
+  document.querySelectorAll('.cat-fbtn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderNotes();
+}
+
 function renderNotes(){
   const list=document.getElementById('noteList');
   const empty=document.getElementById('noteEmpty');
-  if(!notes.length){list.innerHTML='';empty.style.display='block';return;}
+  const q=(document.getElementById('noteSearch')&&document.getElementById('noteSearch').value||'').toLowerCase();
+
+  // Build category filter buttons
+  const catRow=document.getElementById('catFilterRow');
+  if(catRow){
+    const allCats=[...new Set(notes.map(n=>n.cat||'Genel'))];
+    catRow.innerHTML='<button class="pool-filter cat-fbtn'+(activeCatFilter==='hepsi'?' on':'')+'" onclick="setCatFilter('hepsi',this)">Hepsi</button>'
+      +allCats.map(c=>{
+        const col=catColors[c]||catColors['Genel'];
+        return '<button class="pool-filter cat-fbtn'+(activeCatFilter===c?' on':'')+'" onclick="setCatFilter(''+c+'',this)" style="border-color:'+col.border+';color:'+col.text+(activeCatFilter===c?';background:'+col.bg:'')+'">'+(c.replace(' Kuralları',''))+'</button>';
+      }).join('');
+  }
+
+  let filtered=notes.filter(n=>{
+    const matchCat=activeCatFilter==='hepsi'||(n.cat||'Genel')===activeCatFilter;
+    const matchQ=!q||(n.title||'').toLowerCase().includes(q)||(n.body||'').toLowerCase().includes(q)||(n.example||'').toLowerCase().includes(q);
+    return matchCat&&matchQ;
+  });
+
+  if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  // Group by category
+
   const cats={};
-  notes.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
-  list.innerHTML=Object.entries(cats).map(([cat,items])=>`
-    <div style="margin-bottom:6px">
-      <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px;opacity:.7">${cat}</div>
-      ${items.map(n=>`
-        <div class="note-card" style="margin-bottom:8px">
-          <div class="note-card-hdr">
-            <span class="note-card-title">${n.title}</span>
-            <div class="note-actions">
-              <button class="nebtn" onclick="editNote(${n.id})" title="Düzenle">✏️</button>
-              <button class="ndbtn" onclick="deleteNote(${n.id})" title="Sil">✕</button>
-            </div>
-          </div>
-          <div class="note-card-body">${n.body}</div>
-        </div>`).join('')}
-    </div>`).join('');
+  filtered.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
+
+  list.innerHTML=Object.entries(cats).map(([cat,items])=>{
+    const col=catColors[cat]||catColors['Genel'];
+    return '<div style="margin-bottom:20px">'
+      +'<div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+col.text+';margin-bottom:10px;display:flex;align-items:center;gap:8px">'
+      +'<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat+'</div>'
+      +items.map(n=>'<div class="note-card" style="margin-bottom:10px;border-left-color:'+col.border+'">'
+        +'<div class="note-card-hdr">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<span class="note-card-cat" style="background:'+col.bg+';color:'+col.text+'">'+cat+'</span>'
+        +'<span class="note-card-title">'+n.title+'</span>'
+        +'</div>'
+        +'<div class="note-actions">'
+        +'<button class="nebtn" onclick="editNote('+n.id+')" title="Düzenle">✏️</button>'
+        +'<button class="ndbtn" onclick="deleteNote('+n.id+')" title="Sil">✕</button>'
+        +'</div></div>'
+        +(n.body?'<div class="note-card-body">'+n.body+'</div>':'')
+        +(n.example?'<div class="note-card-example"><span style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px">ÖRNEK</span>'+n.example+'</div>':'')
+        +'</div>').join('')
+      +'</div>';
+  }).join('');
 }
 
 let noteNextId=1;
@@ -1298,14 +1342,15 @@ function saveNote(){
   const title=document.getElementById('note_title').value.trim();
   const body=document.getElementById('note_body').value.trim();
   const cat=document.getElementById('note_cat').value||'Genel';
+  const example=document.getElementById('note_example').value.trim();
   if(!title&&!body){showToast('⚠ Başlık veya açıklama girin');return;}
   if(editingNoteId){
     const n=notes.find(x=>x.id===editingNoteId);
-    if(n){n.title=title;n.body=body;n.cat=cat;}
+    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;}
     editingNoteId=null;
     document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   } else {
-    notes.push({id:noteNextId++,title,body,cat});
+    notes.push({id:noteNextId++,title,body,cat,example});
   }
   if(useCloud){
     if(editingNoteId){const n=notes.find(x=>x.id===editingNoteId);if(n&&n.sbId)sbUpdateNote(n.sbId,n).catch(e=>console.error(e));}
@@ -1326,6 +1371,7 @@ function editNote(id){
   document.getElementById('note_title').value=n.title;
   document.getElementById('note_body').value=n.body;
   document.getElementById('note_cat').value=n.cat||'Genel';
+  document.getElementById('note_example').value=n.example||'';
   document.getElementById('noteFormTitle').textContent='Kural Düzenle';
   switchNTab('edit',document.getElementById('ntab-edit'));
 }
@@ -1343,6 +1389,7 @@ function cancelNoteEdit(){
   document.getElementById('note_title').value='';
   document.getElementById('note_body').value='';
   document.getElementById('note_cat').value='';
+  document.getElementById('note_example').value='';
   document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   switchNTab('list',document.getElementById('ntab-list'));
 }
