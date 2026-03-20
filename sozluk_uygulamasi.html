@@ -1091,36 +1091,71 @@ function setTense(t,el){
   document.querySelectorAll('.tense-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
 }
+function sortBySyntax(words, lang){
+  // Classify words by type
+  const zamir=words.find(w=>w.type==='zamir');
+  const fiil=words.find(w=>w.type==='fiil');
+  const isim=words.find(w=>w.type==='isim'||w.type==='sıfat');
+  const rest=words.filter(w=>w!==zamir&&w!==fiil&&w!==isim);
+  let sorted=[];
+  if(lang==='tr'){
+    // SOV: Özne(zamir) → Nesne(isim) → Fiil
+    if(zamir) sorted.push(zamir);
+    if(isim) sorted.push(isim);
+    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
+    if(fiil) sorted.push(fiil);
+  } else if(lang==='sy'){
+    // VSO: Fiil → Özne(zamir) → Nesne(isim)
+    if(fiil) sorted.push(fiil);
+    if(zamir) sorted.push(zamir);
+    if(isim) sorted.push(isim);
+    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
+  } else {
+    // SVO: Özne(zamir) → Fiil → Nesne(isim)
+    if(zamir) sorted.push(zamir);
+    if(fiil) sorted.push(fiil);
+    if(isim) sorted.push(isim);
+    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
+  }
+  // Add any remaining unsorted words
+  words.forEach(w=>{ if(!sorted.includes(w)) sorted.push(w); });
+  return sorted;
+}
+
 function buildSentence(){
   if(!sentence.length){showToast('⚠ Önce kelime seçin');return;}
-  const trWords=sentence.map(w=>w.tr).join(' ');
-  const enWords=sentence.map(w=>w.en.replace(/^to /i,'')).join(' ');
-  const syWords=sentence.map(w=>(w.sy||'').split('(')[0].trim()).join(' ');
   const tl=tenseLabels[activeTense];
   const ts=tenseSuffix[activeTense];
   const langLabels={tr:'Türkçe (SOV)',sy:'Süryanice (VSO)',en:'İngilizce (SVO)'};
   const primary=activeLang;
+  const others=['tr','sy','en'].filter(l=>l!==primary);
+
+  // Sort by each language's syntax
+  const sortedTr=sortBySyntax([...sentence],'tr');
+  const sortedSy=sortBySyntax([...sentence],'sy');
+  const sortedEn=sortBySyntax([...sentence],'en');
+
+  const trWords=sortedTr.map(w=>w.tr).join(' ');
+  const syWords=sortedSy.map(w=>(w.sy||'').split('(')[0].trim()).join(' ');
+  const enWords=sortedEn.map(w=>w.en.replace(/^to /i,'')).join(' ');
+
   const val={
-    tr:`${trWords} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.tr}]</span>`,
-    sy:`${syWords||'—'} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.sy}]</span>`,
-    en:`${enWords.charAt(0).toUpperCase()+enWords.slice(1)} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.en}]</span>`,
+    tr:trWords+' <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">['+ts.tr+']</span>',
+    sy:(syWords||'—')+' <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">['+ts.sy+']</span>',
+    en:enWords.charAt(0).toUpperCase()+enWords.slice(1)+' <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">['+ts.en+']</span>',
   };
   const cls={tr:'sent-tr',sy:'sent-sy',en:'sent-en'};
-  const others=['tr','sy','en'].filter(l=>l!==primary);
   const res=document.getElementById('sentResult');
-  res.innerHTML=`
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div style="background:var(--pb);border-radius:8px;padding:16px 18px">
-        <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:8px">${langLabels[primary]} · ${tl[primary]}</div>
-        <div style="font-size:22px;font-family:var(--fh);color:var(--txt);line-height:1.4">${val[primary]}</div>
-      </div>
-      ${others.map(l=>`
-        <div style="padding:12px 18px;border-left:3px solid var(--brd)">
-          <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">${langLabels[l]} · ${tl[l]}</div>
-          <div class="${cls[l]}" style="font-size:16px">${val[l]}</div>
-        </div>`).join('')}
-    </div>
-  `;
+  res.innerHTML='<div style="display:flex;flex-direction:column;gap:16px">'
+    +'<div style="background:var(--pb);border-radius:8px;padding:16px 18px">'
+    +'<div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:8px">'+langLabels[primary]+' · '+tl[primary]+'</div>'
+    +'<div style="font-size:22px;font-family:var(--fh);color:var(--txt);line-height:1.4">'+val[primary]+'</div>'
+    +'</div>'
+    +others.map(l=>'<div style="padding:12px 18px;border-left:3px solid var(--brd)">'
+      +'<div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">'+langLabels[l]+' · '+tl[l]+'</div>'
+      +'<div class="'+cls[l]+'" style="font-size:16px">'+val[l]+'</div>'
+      +'</div>').join('')
+    +'</div>';
   document.getElementById('resultBox').style.display='block';
 }
 
