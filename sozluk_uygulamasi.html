@@ -258,8 +258,17 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="add-inner">
       <div class="add-ttl">Yeni Kelime Ekle</div>
       <div class="igrid">
-        <div class="igroup"><label class="ilabel">Türkçe</label><input type="text" class="winput" id="inp_tr" placeholder="Türkçe kelime..."></div>
-        <div class="igroup"><label class="ilabel">Süryanice</label><input type="text" class="winput" id="inp_sy" placeholder="ܣܘܪܝܝܐ ..."></div>
+        <div class="igroup">
+          <label class="ilabel">Türkçe</label>
+          <input type="text" class="winput" id="inp_tr" placeholder="Türkçe kelime..." oninput="scheduleAutoFetch()">
+        </div>
+        <div class="igroup">
+          <label class="ilabel">Süryanice</label>
+          <div style="position:relative">
+            <input type="text" class="winput" id="inp_sy" placeholder="ܣܘܪܝܝܐ ..." style="padding-right:90px">
+            <button type="button" onclick="fetchSyriac()" id="fetchSyBtn" class="chbtn" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;padding:3px 8px;white-space:nowrap">ܐ Getir</button>
+          </div>
+        </div>
         <div class="igroup">
           <label class="ilabel">Transliterasyon</label>
           <div style="position:relative">
@@ -1349,6 +1358,38 @@ function saveApiKey(){
   showToast('✦ API Key kaydedildi');
 }
 document.getElementById('apiKeyModal').addEventListener('click',function(e){if(e.target===this)closeApiKeyModal();});
+
+let autoFetchTimer=null;
+function scheduleAutoFetch(){
+  clearTimeout(autoFetchTimer);
+  const val=document.getElementById('inp_tr').value.trim();
+  if(!val){return;}
+  autoFetchTimer=setTimeout(()=>fetchSyriac(),1000);
+}
+
+async function fetchSyriac(){
+  const key=getClaudeKey();
+  if(!key){showToast('⚠ Önce API Key girin (🔑 butonu)');return;}
+  const word=document.getElementById('inp_tr').value.trim()||document.getElementById('inp_en').value.trim();
+  if(!word){showToast('⚠ Önce Türkçe veya İngilizce yazın');return;}
+  const btn=document.getElementById('fetchSyBtn');
+  btn.textContent='⏳';btn.disabled=true;
+  try{
+    const data=await askClaude(word);
+    // Fill Syriac field (script only, no transliteration)
+    const syScript=(data.sy||'').split('(')[0].trim();
+    const syTranslit=(data.sy||'').match(/\(([^)]+)\)/)?.[1]||'';
+    if(syScript) document.getElementById('inp_sy').value=syScript;
+    if(syTranslit&&!document.getElementById('inp_tr2').value) document.getElementById('inp_tr2').value=syTranslit;
+    if(data.en&&!document.getElementById('inp_en').value) document.getElementById('inp_en').value=data.en;
+    if(data.type) document.getElementById('inp_type').value=data.type;
+    showToast('✦ Süryanice getirildi');
+  }catch(e){
+    showToast('⚠ '+e.message);
+  }finally{
+    btn.textContent='ܐ Getir';btn.disabled=false;
+  }
+}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
