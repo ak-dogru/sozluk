@@ -251,6 +251,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <button class="abtn" onclick="document.getElementById('imp').click()"><span>⬆</span>Excel Yükle</button>
     <input type="file" id="imp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
     <button class="abtn danger" onclick="clearAll()"><span>⊘</span>Tümünü Sil</button>
+    <button class="abtn" onclick="showApiKeyModal()" style="margin-left:4px" title="Claude API Key"><span>🔑</span>API Key</button>
   </div>
 
   <div class="add-wrap" id="addWrap">
@@ -307,12 +308,21 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <button class="sclear" id="clearBtn" onclick="clearSearch()">×</button>
     </div>
     <div class="ac-box" id="acBox"></div>
+    <div id="aiBox" style="display:none;margin-top:8px;background:var(--surf);border:1.5px solid var(--acc);border-radius:8px;padding:14px 16px">
+      <div style="font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px">☁ Yapay Zeka Sonucu</div>
+      <div id="aiResult"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-p" onclick="addAiWord()" id="aiAddBtn">+ Sözlüğe Ekle</button>
+        <button class="btn btn-s" onclick="closeAi()">Kapat</button>
+      </div>
+    </div>
     <div class="frow">
       <button class="fbtn active" onclick="setFilter('all',this)">Tümü</button>
       <button class="fbtn" onclick="setFilter('tr',this)">Türkçe</button>
       <button class="fbtn" onclick="setFilter('sy',this)">Süryanice</button>
       <button class="fbtn" onclick="setFilter('en',this)">İngilizce</button>
       <button class="fbtn" onclick="setFilter('type',this)">Türe Göre</button>
+      <button class="fbtn" id="aiSearchBtn" onclick="aiSearch()" style="display:none;border-color:var(--acc);color:var(--acc)">✨ Yapay Zeka ile Ara</button>
     </div>
   </div>
 
@@ -530,9 +540,43 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
   </div>
 </div>
+<!-- API Key Modal -->
+<div id="apiKeyModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+  <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(460px,90vw)">
+    <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:6px">Claude API Key</div>
+    <p style="font-size:13px;color:var(--txt-d);margin-bottom:16px;line-height:1.6">Yapay zeka kelime araması için Anthropic API key gerekli. Key <strong>yalnızca bu cihazda</strong> saklanır, dosyaya yazılmaz.</p>
+    <div class="igroup" style="margin-bottom:16px">
+      <label class="ilabel">API Key</label>
+      <input type="password" class="winput" id="apiKeyInput" placeholder="sk-ant-api03-...">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-p" onclick="saveApiKey()">Kaydet</button>
+      <button class="btn btn-s" onclick="closeApiKeyModal()">İptal</button>
+      <a href="https://console.anthropic.com" target="_blank" style="font-family:var(--fm);font-size:9px;color:var(--acc-d);letter-spacing:1px;margin-left:auto">Key al →</a>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 const SKEY='sozluk_v7';
+function getClaudeKey(){return localStorage.getItem('claude_api_key')||'';}
+async function askClaude(word){
+  const CLAUDE_KEY=getClaudeKey();
+  if(!CLAUDE_KEY){showApiKeyModal();throw new Error('API key girilmedi');}
+  const prompt=`Sen Süryanice-Türkçe-İngilizce sözlük uzmanısın. "${word}" kelimesinin Süryanice, Türkçe ve İngilizce karşılıklarını bul.
+Sadece JSON formatında yanıt ver, başka hiçbir şey yazma:
+{"tr":"Türkçe karşılık","sy":"ܣܘܪܝܝܐ (transliterasyon)","en":"English meaning","type":"isim/fiil/sıfat/zamir/zarf/edat/bağlaç/ünlem/deyim/diğer"}`;
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok) throw new Error('API hatası: '+r.status);
+  const data=await r.json();
+  const text=data.content[0].text.trim();
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
+}
+
 
 /* ── SUPABASE ─────────────────────────────── */
 const SB_URL='https://nbjxzasnluytdszqsxys.supabase.co';
@@ -870,7 +914,12 @@ function render(){
   document.getElementById('todayCount').textContent=words.filter(w=>w.date===today).length;
   document.getElementById('resLabel').textContent=f.length+' kelime';
   const tbody=document.getElementById('tbody');
-  if(!f.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="big">◌</div>${q?'Aramanızla eşleşen kelime bulunamadı.':'Henüz kelime eklenmemiş.'}</div></td></tr>`;return;}
+  if(!f.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="big">◌</div>${q?'Aramanızla eşleşen kelime bulunamadı.':'Henüz kelime eklenmemiş.'}</div></td></tr>`;
+    if(q) document.getElementById('aiSearchBtn').style.display='inline-flex';
+    return;
+  }
+  document.getElementById('aiSearchBtn').style.display='none';
   tbody.innerHTML=f.map((w,i)=>`<tr>
     <td>${i+1}</td><td>${hl(w.tr,q)||'—'}</td>
     <td class="tsy">${hl(w.sy,q)||'—'}</td>
@@ -1222,6 +1271,75 @@ function togglePool(){
   arrow.style.transform=poolOpen?'rotate(0deg)':'rotate(-90deg)';
 }
 
+
+let aiWordData=null;
+function aiSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){showToast('⚠ Önce bir kelime girin');return;}
+  const btn=document.getElementById('aiSearchBtn');
+  btn.textContent='⏳ Aranıyor...';
+  btn.disabled=true;
+  document.getElementById('aiBox').style.display='none';
+  askClaude(q).then(data=>{
+    aiWordData=data;
+    const res=document.getElementById('aiResult');
+    res.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
+        <div><div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--txt-d);margin-bottom:3px">TÜRKÇE</div><div style="font-size:15px;color:var(--txt)">${data.tr||'—'}</div></div>
+        <div><div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--txt-d);margin-bottom:3px">İNGİLİZCE</div><div style="font-size:14px;color:var(--txt-d)">${data.en||'—'}</div></div>
+        <div><div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--txt-d);margin-bottom:3px">SÜRYANİCE</div><div style="font-size:14px;color:var(--txt-d);font-style:italic">${data.sy||'—'}</div></div>
+        <div><div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--txt-d);margin-bottom:3px">TÜR</div><div><span class="tpill">${data.type||'diğer'}</span></div></div>
+      </div>`;
+    document.getElementById('aiBox').style.display='block';
+    btn.textContent='✨ Yapay Zeka ile Ara';
+    btn.disabled=false;
+  }).catch(e=>{
+    showToast('⚠ Hata: '+e.message);
+    btn.textContent='✨ Yapay Zeka ile Ara';
+    btn.disabled=false;
+  });
+}
+
+async function addAiWord(){
+  if(!aiWordData) return;
+  const newWord={id:nextId++,tr:aiWordData.tr||'',sy:aiWordData.sy||'',en:aiWordData.en||'',type:aiWordData.type||'diğer',date:today};
+  words.push(newWord);
+  save();
+  if(useCloud){
+    try{const res=await sbAddWord(newWord);if(res&&res[0]){newWord.sbId=res[0].id;save();}}catch(e){console.error(e);}
+  }
+  render();
+  closeAi();
+  showToast('✦ Kelime sözlüğe eklendi');
+}
+
+function closeAi(){
+  document.getElementById('aiBox').style.display='none';
+  aiWordData=null;
+}
+
+// Show AI button when search has no results
+const _origRender=render;
+
+function showApiKeyModal(){
+  const modal=document.getElementById('apiKeyModal');
+  modal.style.display='flex';
+  const existing=getClaudeKey();
+  if(existing) document.getElementById('apiKeyInput').value=existing;
+  setTimeout(()=>document.getElementById('apiKeyInput').focus(),100);
+}
+function closeApiKeyModal(){
+  document.getElementById('apiKeyModal').style.display='none';
+}
+function saveApiKey(){
+  const key=document.getElementById('apiKeyInput').value.trim();
+  if(!key){showToast('⚠ Key boş olamaz');return;}
+  if(!key.startsWith('sk-ant-')){showToast('⚠ Geçersiz key formatı');return;}
+  localStorage.setItem('claude_api_key',key);
+  closeApiKeyModal();
+  showToast('✦ API Key kaydedildi');
+}
+document.getElementById('apiKeyModal').addEventListener('click',function(e){if(e.target===this)closeApiKeyModal();});
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
