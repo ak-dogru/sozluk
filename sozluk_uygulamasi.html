@@ -1289,51 +1289,103 @@ function renderNotes(){
   const list=document.getElementById('noteList');
   const empty=document.getElementById('noteEmpty');
   const searchEl=document.getElementById('noteSearch');
-  const q=(searchEl?searchEl.value:'').toLowerCase();
+  const q=searchEl?searchEl.value.toLowerCase():'';
   const catRow=document.getElementById('catFilterRow');
+
   if(catRow){
     const allCats=[...new Set(notes.map(n=>n.cat||'Genel'))];
-    let html='<button class="pool-filter cat-fbtn'+(activeCatFilter==='hepsi'?' on':'')+'" onclick="setCatFilter(this,'hepsi')">Hepsi</button>';
-    allCats.forEach(c=>{
-      const col=catColors[c]||catColors['Genel'];
-      const isActive=activeCatFilter===c;
-      html+='<button class="pool-filter cat-fbtn'+(isActive?' on':'')+'" onclick="setCatFilter(this,\''+c+'\')" style="border-color:'+col.border+';color:'+col.text+(isActive?';background:'+col.bg:'')+'">'+(c.replace(' Kuralları',''))+'</button>';
-    });
-    catRow.innerHTML=html;
+    catRow.innerHTML='';
+    const makeBtn=(label,cat)=>{
+      const b=document.createElement('button');
+      b.className='pool-filter cat-fbtn'+(activeCatFilter===cat?' on':'');
+      b.textContent=label;
+      if(cat!=='hepsi'){
+        const col=catColors[cat]||catColors.Genel;
+        b.style.borderColor=col.border;
+        b.style.color=col.text;
+        if(activeCatFilter===cat) b.style.background=col.bg;
+      }
+      b.onclick=function(){activeCatFilter=cat;renderNotes();};
+      catRow.appendChild(b);
+    };
+    makeBtn('Hepsi','hepsi');
+    allCats.forEach(c=>makeBtn(c.replace(' Kuralları',''),c));
   }
-  let filtered=notes.filter(n=>{
+
+  const filtered=notes.filter(n=>{
     const matchCat=activeCatFilter==='hepsi'||(n.cat||'Genel')===activeCatFilter;
     const matchQ=!q||(n.title||'').toLowerCase().includes(q)||(n.body||'').toLowerCase().includes(q)||(n.example||'').toLowerCase().includes(q);
     return matchCat&&matchQ;
   });
+
   if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
+  list.innerHTML='';
+
   const cats={};
   filtered.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
-  let html='';
-  Object.entries(cats).forEach(([cat,items])=>{
-    const col=catColors[cat]||catColors['Genel'];
-    html+='<div style="margin-bottom:20px">'
-      +'<div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+col.text+';margin-bottom:10px;display:flex;align-items:center;gap:8px">'
-      +'<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat+'</div>';
-    items.forEach(n=>{
-      html+='<div class="note-card" style="margin-bottom:10px;border-left-color:'+col.border+'">'
-        +'<div class="note-card-hdr">'
-        +'<div style="display:flex;align-items:center;gap:10px">'
-        +'<span class="note-card-cat" style="background:'+col.bg+';color:'+col.text+'">'+cat+'</span>'
-        +'<span class="note-card-title">'+n.title+'</span>'
-        +'</div>'
-        +'<div class="note-actions">'
-        +'<button class="nebtn" onclick="editNote('+n.id+')" title="Düzenle">✏️</button>'
-        +'<button class="ndbtn" onclick="deleteNote('+n.id+')" title="Sil">✕</button>'
-        +'</div></div>'
-        +(n.body?'<div class="note-card-body">'+n.body+'</div>':'')
-        +(n.example?'<div class="note-card-example"><span style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px">ÖRNEK</span>'+n.example+'</div>':'')
-        +'</div>';
+
+  Object.entries(cats).forEach(function(entry){
+    const cat=entry[0], items=entry[1];
+    const col=catColors[cat]||catColors.Genel;
+    const group=document.createElement('div');
+    group.style.marginBottom='20px';
+    const hd=document.createElement('div');
+    hd.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+col.text+';margin-bottom:10px;display:flex;align-items:center;gap:8px';
+    hd.innerHTML='<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat;
+    group.appendChild(hd);
+    items.forEach(function(n){
+      const card=document.createElement('div');
+      card.className='note-card';
+      card.style.borderLeftColor=col.border;
+      card.style.marginBottom='10px';
+      const cardHdr=document.createElement('div');
+      cardHdr.className='note-card-hdr';
+      const catBadge=document.createElement('span');
+      catBadge.className='note-card-cat';
+      catBadge.style.background=col.bg;
+      catBadge.style.color=col.text;
+      catBadge.textContent=cat;
+      const titleSpan=document.createElement('span');
+      titleSpan.className='note-card-title';
+      titleSpan.textContent=n.title;
+      const leftDiv=document.createElement('div');
+      leftDiv.style.cssText='display:flex;align-items:center;gap:10px';
+      leftDiv.appendChild(catBadge);
+      leftDiv.appendChild(titleSpan);
+      const actions=document.createElement('div');
+      actions.className='note-actions';
+      const editBtn=document.createElement('button');
+      editBtn.className='nebtn';
+      editBtn.textContent='✏️';
+      editBtn.title='Düzenle';
+      editBtn.onclick=function(){editNote(n.id);};
+      const delBtn=document.createElement('button');
+      delBtn.className='ndbtn';
+      delBtn.textContent='✕';
+      delBtn.title='Sil';
+      delBtn.onclick=function(){deleteNote(n.id);};
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      cardHdr.appendChild(leftDiv);
+      cardHdr.appendChild(actions);
+      card.appendChild(cardHdr);
+      if(n.body){const body=document.createElement('div');body.className='note-card-body';body.textContent=n.body;card.appendChild(body);}
+      if(n.example){
+        const ex=document.createElement('div');
+        ex.className='note-card-example';
+        const exLabel=document.createElement('span');
+        exLabel.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px';
+        exLabel.textContent='ÖRNEK';
+        ex.appendChild(exLabel);
+        const exText=document.createTextNode(n.example);
+        ex.appendChild(exText);
+        card.appendChild(ex);
+      }
+      group.appendChild(card);
     });
-    html+='</div>';
+    list.appendChild(group);
   });
-  list.innerHTML=html;
 }
 
 
