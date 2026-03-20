@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-[data-theme="gece"]{--bg:#111113;--surf:#1c1c1f;--surf2:#242428;--surf3:#2e2e33;--acc:#e0e0e0;--acc-l:#ffffff;--acc-d:#999999;--txt:#f5f5f5;--txt-d:#888888;--bad:#cc4444;--brd:rgba(255,255,255,.15);--brd-s:rgba(255,255,255,.07);--pb:rgba(255,255,255,.07);--pc:#ffffff;--fh:'Cinzel',serif;--fb:'Cormorant Garamond',Georgia,serif;--fm:'IBM Plex Mono',monospace}
+[data-theme="gece"]{--bg:#f8f8f8;--surf:#ffffff;--surf2:#f0f0f0;--surf3:#e8e8e8;--acc:#2c2c2c;--acc-l:#000000;--acc-d:#666666;--txt:#1a1a1a;--txt-d:#666666;--bad:#cc3333;--brd:rgba(0,0,0,.15);--brd-s:rgba(0,0,0,.07);--pb:rgba(0,0,0,.06);--pc:#1a1a1a;--fh:'Cinzel',serif;--fb:'Cormorant Garamond',Georgia,serif;--fm:'IBM Plex Mono',monospace}
 [data-theme="krem"]{--bg:#faf6ee;--surf:#ffffff;--surf2:#f5efe3;--surf3:#ece4d4;--acc:#8b5e2a;--acc-l:#5c3a10;--acc-d:#c49050;--txt:#2a1f0e;--txt-d:#7a6040;--bad:#aa3333;--brd:rgba(139,94,42,.22);--brd-s:rgba(139,94,42,.1);--pb:rgba(139,94,42,.1);--pc:#5c3a10;--fh:'Cinzel',serif;--fb:'Cormorant Garamond',Georgia,serif;--fm:'IBM Plex Mono',monospace}
 [data-theme="bahar"]{--bg:#f0faf2;--surf:#ffffff;--surf2:#e6f5ea;--surf3:#d4ecda;--acc:#1a7a3a;--acc-l:#0e5228;--acc-d:#4aaa6a;--txt:#0e2a18;--txt-d:#4a7055;--bad:#aa3333;--brd:rgba(26,122,58,.22);--brd-s:rgba(26,122,58,.1);--pb:rgba(26,122,58,.1);--pc:#0e5228;--fh:'Playfair Display',serif;--fb:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace}
 [data-theme="batim"]{--bg:#fff8f0;--surf:#ffffff;--surf2:#fff0e0;--surf3:#ffe4c8;--acc:#c04808;--acc-l:#7a2800;--acc-d:#e07030;--txt:#2a1008;--txt-d:#7a4020;--bad:#1a6a8a;--brd:rgba(192,72,8,.22);--brd-s:rgba(192,72,8,.1);--pb:rgba(192,72,8,.1);--pc:#7a2800;--fh:'Playfair Display',serif;--fb:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace}
@@ -30,7 +30,7 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .theme-card:hover{transform:translateY(-3px)}
 .theme-card.active{border-color:var(--acc)!important}
 .theme-card.active::after{content:'✓';position:absolute;bottom:4px;right:7px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
-.tc-gece{background:linear-gradient(135deg,#111113 50%,#e0e0e0 50%);border-color:#444}
+.tc-gece{background:linear-gradient(135deg,#f8f8f8 50%,#2c2c2c 50%);border-color:#ccc}
 .tc-krem{background:linear-gradient(135deg,#faf6ee 50%,#8b5e2a 50%);border-color:#d4c0a0}
 .tc-bahar{background:linear-gradient(135deg,#f0faf2 50%,#1a7a3a 50%);border-color:#b0d8b8}
 .tc-batim{background:linear-gradient(135deg,#fff8f0 50%,#c04808 50%);border-color:#e0c0a0}
@@ -222,7 +222,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <div>
         <div class="theme-label">Tema Seçin</div>
         <div class="theme-grid">
-          <div class="theme-card tc-gece"    onclick="setTheme('gece',this)"    title="Gece"><div class="tc-name">Gece</div></div>
+          <div class="theme-card tc-gece"    onclick="setTheme('gece',this)"    title="Beyaz"><div class="tc-name">Beyaz</div></div>
           <div class="theme-card tc-krem"    onclick="setTheme('krem',this)"    title="Krem"><div class="tc-name">Krem</div></div>
           <div class="theme-card tc-bahar"   onclick="setTheme('bahar',this)"   title="Bahar"><div class="tc-name">Bahar</div></div>
           <div class="theme-card tc-batim"   onclick="setTheme('batim',this)"   title="Gün Batımı"><div class="tc-name">Batım</div></div>
@@ -807,7 +807,7 @@ function setTheme(t,el){
 }
 (function(){
   document.body.dataset.theme=curTheme;
-  const m={gece:'Gece',krem:'Krem',okyanus:'Okyanus',bahar:'Bahar',batim:'Gün Batımı',mor:'Mor Gece'};
+  const m={gece:'Beyaz',krem:'Krem',okyanus:'Okyanus',bahar:'Bahar',batim:'Gün Batımı',mor:'Mor Gece'};
   document.querySelectorAll('.theme-card').forEach(c=>{if(c.getAttribute('title')===m[curTheme])c.classList.add('active');});
 })();
 function toggleAdd(){const w=document.getElementById('addWrap');w.classList.toggle('open');if(w.classList.contains('open'))document.getElementById('inp_tr').focus();}
@@ -935,14 +935,25 @@ function exportExcel(){
   XLSX.utils.book_append_sheet(wb,ws,'Sözlük');XLSX.writeFile(wb,'sozluk.xlsx');
   showToast('✦ Excel indirildi');
 }
-function importExcel(event){
+async function importExcel(event){
   const file=event.target.files[0];if(!file)return;
   const r=new FileReader();
-  r.onload=e=>{try{
+  r.onload=async e=>{try{
     const wb=XLSX.read(e.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];
-    const rows=XLSX.utils.sheet_to_json(ws,{header:1});let added=0;
-    rows.slice(1).forEach(r=>{if(r[1]||r[2]||r[3]){words.push({id:nextId++,tr:r[1]||'',sy:r[2]||'',en:r[3]||'',type:r[4]||'',date:r[5]||today});added++;}});
-    save();render();showToast(`✦ ${added} kelime yüklendi`);
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1});
+    const newWords=[];
+    rows.slice(1).forEach(r=>{if(r[1]||r[2]||r[3]){newWords.push({id:nextId++,tr:r[1]||'',sy:r[2]||'',en:r[3]||'',type:r[4]||'',date:r[5]||today});}});
+    words.push(...newWords);
+    save();render();
+    if(useCloud&&newWords.length>0){
+      showToast(`✦ ${newWords.length} kelime yükleniyor...`);
+      for(const w of newWords){
+        try{const res=await sbAddWord(w);if(res&&res[0])w.sbId=res[0].id;}catch(e){console.error(e);}
+      }
+      save();showToast(`✦ ${newWords.length} kelime buluta eklendi`);
+    } else {
+      showToast(`✦ ${newWords.length} kelime yüklendi`);
+    }
   }catch(err){showToast('⚠ Excel okunamadı');}};
   r.readAsBinaryString(file);event.target.value='';
 }
