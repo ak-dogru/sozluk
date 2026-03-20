@@ -422,10 +422,26 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="cb-section">
       <div class="cb-title">3 · Cümleyi Kur</div>
       <div id="langHint" class="struct-hint" style="margin-bottom:10px">Türkçe sözdizimi: Özne → Nesne → Fiil (SOV)</div>
-      <div class="slot-row" id="sentenceSlots"></div>
-      <div class="cb-hint">Kelimeye tıklayarak çıkar • Sürükleyerek sırala</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
+        <!-- Seçilen kelimeler (serbest sıra) -->
+        <div>
+          <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px;opacity:.7">Seçilen Kelimeler</div>
+          <div class="slot-row" id="sentenceSlots" style="min-height:48px"></div>
+          <div class="cb-hint">Tıklayarak çıkar • Sürükleyerek sırala</div>
+        </div>
+        <!-- Canlı önizleme (dile göre otomatik sıra) -->
+        <div>
+          <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px;opacity:.7">Cümle Önizleme</div>
+          <div id="livePreview" style="min-height:48px;padding:10px 14px;background:var(--surf2);border:1.5px solid var(--acc);border-radius:8px;font-size:15px;color:var(--txt);line-height:1.6">
+            <span style="color:var(--txt-d);font-style:italic;font-size:13px;opacity:.5">Kelime seçince burada görünür...</span>
+          </div>
+          <div class="cb-hint" id="previewOrder"></div>
+        </div>
+      </div>
+
       <div class="cb-actions" style="margin-top:14px">
-        <button class="abtn hl" onclick="buildSentence()"><span>→</span>Cümleyi Oluştur</button>
+        <button class="abtn hl" onclick="buildSentence()"><span>→</span>Tam Sonucu Göster</button>
         <button class="abtn" onclick="clearSentence()"><span>⊘</span>Temizle</button>
       </div>
     </div>
@@ -1007,15 +1023,66 @@ function removeFromSentence(id){
   document.getElementById('resultBox').style.display='none';
 }
 
+// Type order definitions for each language
+const typeOrder={
+  tr:['zamir','isim','sıfat','zarf','fiil','bağlaç','edat','soru','diğer'],
+  sy:['fiil','zamir','isim','sıfat','zarf','bağlaç','edat','soru','diğer'],
+  en:['zamir','fiil','isim','sıfat','zarf','bağlaç','edat','soru','diğer'],
+};
+const typeLabels={
+  tr:{zamir:'Özne',isim:'Nesne',sıfat:'Nesne',fiil:'Fiil',zarf:'Zarf',bağlaç:'Bağlaç',edat:'Edat',soru:'Soru'},
+  sy:{fiil:'Fiil',zamir:'Özne',isim:'Nesne',sıfat:'Nesne',zarf:'Zarf',bağlaç:'Bağlaç',edat:'Edat',soru:'Soru'},
+  en:{zamir:'Özne',fiil:'Fiil',isim:'Nesne',sıfat:'Nesne',zarf:'Zarf',bağlaç:'Bağlaç',edat:'Edat',soru:'Soru'},
+};
+
+function getSortedSentence(lang){
+  const order=typeOrder[lang]||typeOrder.en;
+  return [...sentence].sort((a,b)=>{
+    const ai=order.indexOf(a.type);
+    const bi=order.indexOf(b.type);
+    return (ai===-1?99:ai)-(bi===-1?99:bi);
+  });
+}
+
+function updateLivePreview(){
+  const preview=document.getElementById('livePreview');
+  const orderDiv=document.getElementById('previewOrder');
+  if(!sentence.length){
+    preview.innerHTML='<span style="color:var(--txt-d);font-style:italic;font-size:13px;opacity:.5">Kelime seçince burada görünür...</span>';
+    if(orderDiv) orderDiv.textContent='';
+    return;
+  }
+  const sorted=getSortedSentence(activeLang);
+  const wordSpans=sorted.map(w=>{
+    const lbl=typeLabels[activeLang]&&typeLabels[activeLang][w.type]||w.type;
+    const syScript=(w.sy||'').split('(')[0].trim();
+    let displayWord=activeLang==='sy'?(syScript||w.tr):activeLang==='en'?w.en.replace(/^to /i,''):w.tr;
+    return '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px 4px;vertical-align:middle">'
+      +'<span style="font-size:15px;color:var(--txt)">'+(displayWord||w.tr)+'</span>'
+      +'<span style="font-family:var(--fm);font-size:7px;color:var(--acc-d);letter-spacing:1px;text-transform:uppercase">'+lbl+'</span>'
+      +'</span>';
+  }).join('<span style="color:var(--acc-d);margin:0 2px;font-size:18px">→</span>');
+  preview.innerHTML=wordSpans;
+  if(orderDiv){
+    const orderStr=sorted.map(w=>(typeLabels[activeLang]&&typeLabels[activeLang][w.type])||w.type).join(' → ');
+    orderDiv.textContent=orderStr;
+  }
+}
+
 function renderSlots(){
   const el=document.getElementById('sentenceSlots');
-  if(!sentence.length){el.innerHTML='<span style="color:var(--txt-d);font-style:italic;font-size:13px;opacity:.5">Kelime havuzundan seç...</span>';return;}
+  if(!sentence.length){
+    el.innerHTML='<span style="color:var(--txt-d);font-style:italic;font-size:13px;opacity:.5">Kelime havuzundan seç...</span>';
+    updateLivePreview();
+    return;
+  }
   el.innerHTML=sentence.map((w,i)=>`
     <div class="slot-word" draggable="true"
       ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="dropWord(event,${i})" ondragleave="dragLeave(event)"
       onclick="removeFromSentence(${w.id})" title="Çıkarmak için tıkla">
       ${w.tr}<span class="rm">✕</span>
     </div>`).join('');
+  updateLivePreview();
 }
 
 let dragIdx=null;
@@ -1044,7 +1111,7 @@ function switchLangTab(lang, el){
   el.classList.add('active');
   const hint=document.getElementById('langHint');
   if(hint) hint.textContent=langHints[lang]||'';
-  sentence=[];renderSlots();renderPool();
+  renderSlots();renderPool();
   document.getElementById('resultBox').style.display='none';
 }
 
@@ -1091,37 +1158,6 @@ function setTense(t,el){
   document.querySelectorAll('.tense-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
 }
-function sortBySyntax(words, lang){
-  // Classify words by type
-  const zamir=words.find(w=>w.type==='zamir');
-  const fiil=words.find(w=>w.type==='fiil');
-  const isim=words.find(w=>w.type==='isim'||w.type==='sıfat');
-  const rest=words.filter(w=>w!==zamir&&w!==fiil&&w!==isim);
-  let sorted=[];
-  if(lang==='tr'){
-    // SOV: Özne(zamir) → Nesne(isim) → Fiil
-    if(zamir) sorted.push(zamir);
-    if(isim) sorted.push(isim);
-    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
-    if(fiil) sorted.push(fiil);
-  } else if(lang==='sy'){
-    // VSO: Fiil → Özne(zamir) → Nesne(isim)
-    if(fiil) sorted.push(fiil);
-    if(zamir) sorted.push(zamir);
-    if(isim) sorted.push(isim);
-    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
-  } else {
-    // SVO: Özne(zamir) → Fiil → Nesne(isim)
-    if(zamir) sorted.push(zamir);
-    if(fiil) sorted.push(fiil);
-    if(isim) sorted.push(isim);
-    rest.forEach(w=>{ if(w!==zamir&&w!==isim&&w!==fiil) sorted.push(w); });
-  }
-  // Add any remaining unsorted words
-  words.forEach(w=>{ if(!sorted.includes(w)) sorted.push(w); });
-  return sorted;
-}
-
 function buildSentence(){
   if(!sentence.length){showToast('⚠ Önce kelime seçin');return;}
   const tl=tenseLabels[activeTense];
@@ -1130,10 +1166,9 @@ function buildSentence(){
   const primary=activeLang;
   const others=['tr','sy','en'].filter(l=>l!==primary);
 
-  // Sort by each language's syntax
-  const sortedTr=sortBySyntax([...sentence],'tr');
-  const sortedSy=sortBySyntax([...sentence],'sy');
-  const sortedEn=sortBySyntax([...sentence],'en');
+  const sortedTr=getSortedSentence('tr');
+  const sortedSy=getSortedSentence('sy');
+  const sortedEn=getSortedSentence('en');
 
   const trWords=sortedTr.map(w=>w.tr).join(' ');
   const syWords=sortedSy.map(w=>(w.sy||'').split('(')[0].trim()).join(' ');
