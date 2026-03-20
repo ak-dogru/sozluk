@@ -363,89 +363,77 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
   <!-- CÜMLE KUR PANELİ -->
   <div class="tab-content" id="tab-cumle">
+
+    <!-- ADIM 1: Dil + Zaman -->
+    <div class="cb-section">
+      <div class="cb-title">1 · Dil ve Zaman Seçin</div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+        <!-- Dil -->
+        <div style="flex:1;min-width:200px">
+          <div class="struct-hint">Cümle dili ve sözdizimi</div>
+          <div class="lang-tabs" style="flex-direction:column;gap:6px">
+            <button class="lang-tab active" id="ltab-tr" onclick="switchLangTab('tr',this)">
+              🇹🇷 Türkçe <span class="lang-tag">Özne → Nesne → Fiil</span>
+            </button>
+            <button class="lang-tab" id="ltab-sy" onclick="switchLangTab('sy',this)">
+              ܣܘܪ Süryanice <span class="lang-tag">Fiil → Özne → Nesne</span>
+            </button>
+            <button class="lang-tab" id="ltab-en" onclick="switchLangTab('en',this)">
+              🇬🇧 İngilizce <span class="lang-tag">Özne → Fiil → Nesne</span>
+            </button>
+          </div>
+        </div>
+        <!-- Zaman -->
+        <div style="flex:1;min-width:200px">
+          <div class="struct-hint">Fiil zamanı</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="tense-btn active" id="tense-past"    onclick="setTense('past',this)">⏮ Geçmiş Zaman</button>
+            <button class="tense-btn"        id="tense-present" onclick="setTense('present',this)">⏵ Şimdiki Zaman</button>
+            <button class="tense-btn"        id="tense-future"  onclick="setTense('future',this)">⏭ Gelecek Zaman</button>
+            <button class="tense-btn"        id="tense-imp"     onclick="setTense('imperative',this)">⚡ Emir Kipi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADIM 2: Kelime Havuzu -->
     <div class="cb-section">
       <div class="cb-title" onclick="togglePool()" style="cursor:pointer;user-select:none">
-        Kelime Havuzu
+        2 · Kelime Havuzu
         <span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px">▼</span>
       </div>
       <div id="poolBody" style="transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:9000px;opacity:1">
         <div class="filter-pool">
           <button class="pool-filter on" onclick="setPoolFilter('hepsi',this)">Hepsi</button>
-          <button class="pool-filter" onclick="setPoolFilter('isim',this)">İsim</button>
-          <button class="pool-filter" onclick="setPoolFilter('fiil',this)">Fiil</button>
-          <button class="pool-filter" onclick="setPoolFilter('sıfat',this)">Sıfat</button>
           <button class="pool-filter" onclick="setPoolFilter('zamir',this)">Zamir</button>
+          <button class="pool-filter" onclick="setPoolFilter('fiil',this)">Fiil</button>
+          <button class="pool-filter" onclick="setPoolFilter('isim',this)">İsim</button>
+          <button class="pool-filter" onclick="setPoolFilter('sıfat',this)">Sıfat</button>
           <button class="pool-filter" onclick="setPoolFilter('zarf',this)">Zarf</button>
           <button class="pool-filter" onclick="setPoolFilter('bağlaç',this)">Bağlaç</button>
           <button class="pool-filter" onclick="setPoolFilter('soru',this)">Soru</button>
         </div>
         <div class="word-pool" id="wordPool"></div>
-        <div class="cb-hint">Kelimeye tıklayarak cümleye ekle</div>
+        <div class="cb-hint">Kelimeye tıklayarak cümleye ekle • Kullanılanlar soluklaşır</div>
       </div>
     </div>
 
+    <!-- ADIM 3: Cümle Alanı -->
     <div class="cb-section">
-      <div class="cb-title">Cümle Yapısı</div>
-
-      <!-- Dil sekmeleri -->
-      <div class="lang-tabs">
-        <button class="lang-tab active" id="ltab-tr" onclick="switchLangTab('tr',this)">🇹🇷 Türkçe <span class="lang-tag">SOV</span></button>
-        <button class="lang-tab" id="ltab-sy" onclick="switchLangTab('sy',this)">ܣܘܪ Süryanice <span class="lang-tag">VSO</span></button>
-        <button class="lang-tab" id="ltab-en" onclick="switchLangTab('en',this)">🇬🇧 İngilizce <span class="lang-tag">SVO</span></button>
-      </div>
-
-      <!-- Türkçe kalıpları (SOV) -->
-      <div class="lang-structs active" id="lstructs-tr">
-        <div class="struct-hint">Türkçe sözdizimi: Özne → Nesne → Fiil</div>
-        <div class="struct-btns">
-          <button class="struct-btn" onclick="applyStruct('SOV')">Özne + Nesne + Fiil</button>
-          <button class="struct-btn" onclick="applyStruct('SO')">Özne + Nesne</button>
-          <button class="struct-btn" onclick="applyStruct('SAdjV')">Özne + Sıfat + Fiil</button>
-          <button class="struct-btn" onclick="applyStruct('SV_tr')">Özne + Fiil</button>
-        </div>
-      </div>
-
-      <!-- Süryanice kalıpları (VSO) -->
-      <div class="lang-structs" id="lstructs-sy">
-        <div class="struct-hint">Süryanice sözdizimi: Fiil → Özne → Nesne</div>
-        <div class="struct-btns">
-          <button class="struct-btn" onclick="applyStruct('VSO')">Fiil + Özne + Nesne</button>
-          <button class="struct-btn" onclick="applyStruct('VS')">Fiil + Özne</button>
-          <button class="struct-btn" onclick="applyStruct('VSAdj')">Fiil + Özne + Sıfat</button>
-          <button class="struct-btn" onclick="applyStruct('VOS')">Fiil + Nesne + Özne</button>
-        </div>
-      </div>
-
-      <!-- İngilizce kalıpları (SVO) -->
-      <div class="lang-structs" id="lstructs-en">
-        <div class="struct-hint">İngilizce sözdizimi: Özne → Fiil → Nesne</div>
-        <div class="struct-btns">
-          <button class="struct-btn" onclick="applyStruct('SVO')">Özne + Fiil + Nesne</button>
-          <button class="struct-btn" onclick="applyStruct('SV')">Özne + Fiil</button>
-          <button class="struct-btn" onclick="applyStruct('SVAdj')">Özne + Fiil + Sıfat</button>
-        </div>
-      </div>
-
-      <div style="margin-top:16px;margin-bottom:4px">
-        <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);margin-bottom:8px;opacity:.6">Zaman Seçin</div>
-        <div class="tense-row">
-          <button class="tense-btn active" id="tense-past"    onclick="setTense('past',this)">⏮ Geçmiş</button>
-          <button class="tense-btn"        id="tense-present" onclick="setTense('present',this)">⏵ Şimdiki</button>
-          <button class="tense-btn"        id="tense-future"  onclick="setTense('future',this)">⏭ Gelecek</button>
-          <button class="tense-btn"        id="tense-imp"     onclick="setTense('imperative',this)">⚡ Emir</button>
-        </div>
-      </div>
-      <div class="slot-row" id="sentenceSlots" style="margin-top:14px"></div>
-      <div class="cb-hint">Eklenen kelimeye tekrar tıklayarak çıkar • Sürükleyerek sırala</div>
-      <div class="cb-actions">
+      <div class="cb-title">3 · Cümleyi Kur</div>
+      <div id="langHint" class="struct-hint" style="margin-bottom:10px">Türkçe sözdizimi: Özne → Nesne → Fiil (SOV)</div>
+      <div class="slot-row" id="sentenceSlots"></div>
+      <div class="cb-hint">Kelimeye tıklayarak çıkar • Sürükleyerek sırala</div>
+      <div class="cb-actions" style="margin-top:14px">
         <button class="abtn hl" onclick="buildSentence()"><span>→</span>Cümleyi Oluştur</button>
         <button class="abtn" onclick="clearSentence()"><span>⊘</span>Temizle</button>
       </div>
     </div>
 
+    <!-- ADIM 4: Sonuç -->
     <div class="cb-section" id="resultBox" style="display:none">
-      <div class="cb-title">Sonuç</div>
-      <div class="sentence-result" id="sentResult"></div>
+      <div class="cb-title">4 · Sonuç</div>
+      <div id="sentResult"></div>
     </div>
 
   </div><!-- /tab-cumle -->
@@ -996,9 +984,10 @@ function renderPool(){
   if(poolFilter!=='hepsi') list=list.filter(w=>w.type===poolFilter);
   pool.innerHTML=list.map(w=>{
     const used=sentence.find(s=>s.id===w.id);
-    const sy=w.sy?w.sy.replace(/\s*\([^)]*\)/,''):'';
-    return `<div class="pool-word${used?' used':''}" onclick="addToSentence(${w.id})" title="${w.en}">
-      <span>${w.tr}</span>${sy?`<span style="font-size:11px;opacity:.5;margin-left:4px">${sy}</span>`:''}
+    const syScript=(w.sy||'').split('(')[0].trim();
+    return `<div class="pool-word${used?' used':''}" onclick="addToSentence(${w.id})" title="${w.en||''}">
+      <span style="font-weight:600">${w.tr}</span>
+      ${syScript?`<span style="font-size:12px;color:var(--acc-d);margin-left:5px">${syScript}</span>`:''}
     </div>`;
   }).join('');
 }
@@ -1044,12 +1033,17 @@ function dropWord(e,i){
 }
 
 let activeLang='tr';
+const langHints={
+  tr:'Türkçe sözdizimi: Özne → Nesne → Fiil (SOV)',
+  sy:'Süryanice sözdizimi: Fiil → Özne → Nesne (VSO)',
+  en:'İngilizce sözdizimi: Özne → Fiil → Nesne (SVO)'
+};
 function switchLangTab(lang, el){
   activeLang=lang;
   document.querySelectorAll('.lang-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.lang-structs').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('lstructs-'+lang).classList.add('active');
+  const hint=document.getElementById('langHint');
+  if(hint) hint.textContent=langHints[lang]||'';
   sentence=[];renderSlots();renderPool();
   document.getElementById('resultBox').style.display='none';
 }
@@ -1115,14 +1109,15 @@ function buildSentence(){
   const others=['tr','sy','en'].filter(l=>l!==primary);
   const res=document.getElementById('sentResult');
   res.innerHTML=`
-    <div style="display:inline-block;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 10px;background:var(--pb);color:var(--acc);border-radius:20px;margin-bottom:12px">${tl[primary]}</div>
-    <div class="sent-label">${langLabels[primary]} — Ana Kalıp</div>
-    <div class="${cls[primary]}" style="font-size:18px;margin-bottom:14px;color:var(--txt)">${val[primary]}</div>
-    <div style="border-top:1px solid var(--brd-s);padding-top:12px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:var(--pb);border-radius:8px;padding:16px 18px">
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:8px">${langLabels[primary]} · ${tl[primary]}</div>
+        <div style="font-size:22px;font-family:var(--fh);color:var(--txt);line-height:1.4">${val[primary]}</div>
+      </div>
       ${others.map(l=>`
-        <div>
-          <div class="sent-label">${langLabels[l]} — ${tl[l]}</div>
-          <div class="${cls[l]}">${val[l]}</div>
+        <div style="padding:12px 18px;border-left:3px solid var(--brd)">
+          <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">${langLabels[l]} · ${tl[l]}</div>
+          <div class="${cls[l]}" style="font-size:16px">${val[l]}</div>
         </div>`).join('')}
     </div>
   `;
