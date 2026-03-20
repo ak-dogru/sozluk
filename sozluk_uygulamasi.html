@@ -564,9 +564,9 @@ async function askClaude(word){
   const CLAUDE_KEY=getClaudeKey();
   if(!CLAUDE_KEY){showApiKeyModal();throw new Error('API key girilmedi');}
   const prompt='Sen Süryanice-Türkçe-İngilizce sözlük uzmanısın. "'+word+'" kelimesinin Süryanice, Türkçe ve İngilizce karşılıklarını bul. Süryanice yazıyı hem Süryanice alfabesiyle hem de Latin transliterasyonuyla ver. Sadece JSON formatında yanıt ver, başka hiçbir şey yazma, markdown kullanma: {"tr":"Türkçe karşılık","sy":"ܣܘܪܝܝܐ (transliterasyon)","en":"English meaning","type":"isim"}';
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
+  const r=await fetch('https://sozluk-proxy.mksdosyalar.workers.dev',{
     method:'POST',
-    headers:{'x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+    headers:{'x-api-key':CLAUDE_KEY,'content-type':'application/json'},
     body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:300,messages:[{role:'user',content:prompt}]})
   });
   if(!r.ok){const err=await r.json().catch(()=>({}));throw new Error((err.error&&err.error.message)||'API hatası: '+r.status);}
