@@ -645,7 +645,7 @@ async function initCloud(){
       // Load notes from cloud
       const ns=await sbGetNotes();
       if(ns&&ns.length>0){
-        notes=ns.map(n=>({id:n.id,sbId:n.id,title:n.title||'',body:n.body||'',cat:n.cat||'Genel'}));
+        notes=ns.map(n=>({id:n.id,sbId:n.id,title:n.title||'',body:n.body||'',cat:n.cat||'Genel',example:n.example||''}));
         noteNextId=Math.max(...notes.map(n=>n.id))+1;
         saveNotes();
       } else if(notes.length>0){
@@ -1280,47 +1280,44 @@ function switchNTab(id,el){
 
 const catColors={"İsim Kuralları": {"border": "#4a9eff", "bg": "rgba(74,158,255,.1)", "text": "#4a9eff"}, "Fiil Kuralları": {"border": "#ff7043", "bg": "rgba(255,112,67,.1)", "text": "#ff7043"}, "Zamir Kuralları": {"border": "#ab47bc", "bg": "rgba(171,71,188,.1)", "text": "#ab47bc"}, "Sayılar": {"border": "#26a69a", "bg": "rgba(38,166,154,.1)", "text": "#26a69a"}, "Cümle Yapısı": {"border": "#ffa726", "bg": "rgba(255,167,38,.1)", "text": "#ffa726"}, "Telaffuz": {"border": "#ec407a", "bg": "rgba(236,64,122,.1)", "text": "#ec407a"}, "Genel": {"border": "#78909c", "bg": "rgba(120,144,156,.1)", "text": "#78909c"}};
 let activeCatFilter='hepsi';
-function setCatFilter(cat,el){
+function setCatFilter(el,cat){
   activeCatFilter=cat;
-  document.querySelectorAll('.cat-fbtn').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
   renderNotes();
 }
 
 function renderNotes(){
   const list=document.getElementById('noteList');
   const empty=document.getElementById('noteEmpty');
-  const q=(document.getElementById('noteSearch')&&document.getElementById('noteSearch').value||'').toLowerCase();
-
-  // Build category filter buttons
+  const searchEl=document.getElementById('noteSearch');
+  const q=(searchEl?searchEl.value:'').toLowerCase();
   const catRow=document.getElementById('catFilterRow');
   if(catRow){
     const allCats=[...new Set(notes.map(n=>n.cat||'Genel'))];
-    catRow.innerHTML='<button class="pool-filter cat-fbtn'+(activeCatFilter==='hepsi'?' on':'')+'" onclick="setCatFilter('hepsi',this)">Hepsi</button>'
-      +allCats.map(c=>{
-        const col=catColors[c]||catColors['Genel'];
-        return '<button class="pool-filter cat-fbtn'+(activeCatFilter===c?' on':'')+'" onclick="setCatFilter(''+c+'',this)" style="border-color:'+col.border+';color:'+col.text+(activeCatFilter===c?';background:'+col.bg:'')+'">'+(c.replace(' Kuralları',''))+'</button>';
-      }).join('');
+    let html='<button class="pool-filter cat-fbtn'+(activeCatFilter==='hepsi'?' on':'')+'" onclick="setCatFilter(this,'hepsi')">Hepsi</button>';
+    allCats.forEach(c=>{
+      const col=catColors[c]||catColors['Genel'];
+      const isActive=activeCatFilter===c;
+      html+='<button class="pool-filter cat-fbtn'+(isActive?' on':'')+'" onclick="setCatFilter(this,\''+c+'\')" style="border-color:'+col.border+';color:'+col.text+(isActive?';background:'+col.bg:'')+'">'+(c.replace(' Kuralları',''))+'</button>';
+    });
+    catRow.innerHTML=html;
   }
-
   let filtered=notes.filter(n=>{
     const matchCat=activeCatFilter==='hepsi'||(n.cat||'Genel')===activeCatFilter;
     const matchQ=!q||(n.title||'').toLowerCase().includes(q)||(n.body||'').toLowerCase().includes(q)||(n.example||'').toLowerCase().includes(q);
     return matchCat&&matchQ;
   });
-
   if(!filtered.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-
   const cats={};
   filtered.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
-
-  list.innerHTML=Object.entries(cats).map(([cat,items])=>{
+  let html='';
+  Object.entries(cats).forEach(([cat,items])=>{
     const col=catColors[cat]||catColors['Genel'];
-    return '<div style="margin-bottom:20px">'
+    html+='<div style="margin-bottom:20px">'
       +'<div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+col.text+';margin-bottom:10px;display:flex;align-items:center;gap:8px">'
-      +'<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat+'</div>'
-      +items.map(n=>'<div class="note-card" style="margin-bottom:10px;border-left-color:'+col.border+'">'
+      +'<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat+'</div>';
+    items.forEach(n=>{
+      html+='<div class="note-card" style="margin-bottom:10px;border-left-color:'+col.border+'">'
         +'<div class="note-card-hdr">'
         +'<div style="display:flex;align-items:center;gap:10px">'
         +'<span class="note-card-cat" style="background:'+col.bg+';color:'+col.text+'">'+cat+'</span>'
@@ -1332,12 +1329,14 @@ function renderNotes(){
         +'</div></div>'
         +(n.body?'<div class="note-card-body">'+n.body+'</div>':'')
         +(n.example?'<div class="note-card-example"><span style="font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px">ÖRNEK</span>'+n.example+'</div>':'')
-        +'</div>').join('')
-      +'</div>';
-  }).join('');
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  list.innerHTML=html;
 }
 
-let noteNextId=1;
+
 function saveNote(){
   const title=document.getElementById('note_title').value.trim();
   const body=document.getElementById('note_body').value.trim();
