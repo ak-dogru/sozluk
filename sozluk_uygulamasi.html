@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sözlük · Türkçe / Süryanice / İngilizce</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+[data-theme="gece"]{--bg:#111113;--surf:#1c1c1f;--surf2:#242428;--surf3:#2e2e33;--acc:#e0e0e0;--acc-l:#ffffff;--acc-d:#999999;--txt:#f5f5f5;--txt-d:#888888;--bad:#cc4444;--brd:rgba(255,255,255,.15);--brd-s:rgba(255,255,255,.07);--pb:rgba(255,255,255,.07);--pc:#ffffff;--fh:'Cinzel',serif;--fb:'Cormorant Garamond',Georgia,serif;--fm:'IBM Plex Mono',monospace}
+[data-theme="krem"]{--bg:#faf6ee;--surf:#ffffff;--surf2:#f5efe3;--surf3:#ece4d4;--acc:#8b5e2a;--acc-l:#5c3a10;--acc-d:#c49050;--txt:#2a1f0e;--txt-d:#7a6040;--bad:#aa3333;--brd:rgba(139,94,42,.22);--brd-s:rgba(139,94,42,.1);--pb:rgba(139,94,42,.1);--pc:#5c3a10;--fh:'Cinzel',serif;--fb:'Cormorant Garamond',Georgia,serif;--fm:'IBM Plex Mono',monospace}
+[data-theme="bahar"]{--bg:#f0faf2;--surf:#ffffff;--surf2:#e6f5ea;--surf3:#d4ecda;--acc:#1a7a3a;--acc-l:#0e5228;--acc-d:#4aaa6a;--txt:#0e2a18;--txt-d:#4a7055;--bad:#aa3333;--brd:rgba(26,122,58,.22);--brd-s:rgba(26,122,58,.1);--pb:rgba(26,122,58,.1);--pc:#0e5228;--fh:'Playfair Display',serif;--fb:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace}
+[data-theme="batim"]{--bg:#fff8f0;--surf:#ffffff;--surf2:#fff0e0;--surf3:#ffe4c8;--acc:#c04808;--acc-l:#7a2800;--acc-d:#e07030;--txt:#2a1008;--txt-d:#7a4020;--bad:#1a6a8a;--brd:rgba(192,72,8,.22);--brd-s:rgba(192,72,8,.1);--pb:rgba(192,72,8,.1);--pc:#7a2800;--fh:'Playfair Display',serif;--fb:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
+.app{max-width:1100px;margin:0 auto;padding:0 24px 64px}
+header{text-align:center;padding:48px 0 30px;border-bottom:1px solid var(--brd);margin-bottom:32px}
+.horm{color:var(--acc-d);font-size:10px;letter-spacing:6px;text-transform:uppercase;font-family:var(--fm);margin-bottom:14px;opacity:.8}
+h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:var(--acc);letter-spacing:2px;margin-bottom:8px}
+.sub{font-size:15px;color:var(--txt-d);font-style:italic;font-weight:300;letter-spacing:1px}
+.lang-row{display:flex;justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.lbadge{padding:3px 12px;border:1px solid var(--brd);font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d)}
+.save-ind{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--txt-d);opacity:.6;text-transform:uppercase}
+.save-dot{width:6px;height:6px;border-radius:50%;background:#3a9a5a;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.theme-section{margin-bottom:28px}
+.theme-label{font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);margin-bottom:10px;opacity:.7}
+.theme-grid{display:flex;gap:10px;flex-wrap:wrap}
+.theme-card{position:relative;cursor:pointer;border:2.5px solid transparent;border-radius:10px;overflow:hidden;width:84px;height:60px;transition:transform .2s,border-color .2s;flex-shrink:0}
+.theme-card:hover{transform:translateY(-3px)}
+.theme-card.active{border-color:var(--acc)!important}
+.theme-card.active::after{content:'✓';position:absolute;bottom:4px;right:7px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.tc-gece{background:linear-gradient(135deg,#111113 50%,#e0e0e0 50%);border-color:#444}
+.tc-krem{background:linear-gradient(135deg,#faf6ee 50%,#8b5e2a 50%);border-color:#d4c0a0}
+.tc-bahar{background:linear-gradient(135deg,#f0faf2 50%,#1a7a3a 50%);border-color:#b0d8b8}
+.tc-batim{background:linear-gradient(135deg,#fff8f0 50%,#c04808 50%);border-color:#e0c0a0}
+.tc-name{position:absolute;bottom:0;left:0;right:0;font-family:var(--fm);font-size:8px;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:3px 2px;background:rgba(0,0,0,.55);color:#fff}
+.stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.stat-card{flex:1;min-width:120px;background:var(--surf);border:1px solid var(--brd-s);padding:16px 18px;position:relative;overflow:hidden;border-radius:8px;transition:background .35s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);opacity:.7}
+.stat-num{font-family:var(--fh);font-size:28px;color:var(--acc);line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:10px;color:var(--txt-d);letter-spacing:2px;text-transform:uppercase;font-family:var(--fm)}
+.actions-row{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+.abtn{display:flex;align-items:center;gap:7px;padding:9px 18px;border:1.5px solid var(--brd);background:transparent;color:var(--txt-d);cursor:pointer;font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;border-radius:6px}
+.abtn:hover{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.abtn.hl{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.abtn span{font-size:14px}
+.danger{margin-left:auto;border-color:rgba(180,60,60,.25)!important;color:rgba(200,80,80,.65)!important}
+.danger:hover{border-color:var(--bad)!important;color:#d05050!important;background:rgba(180,60,60,.07)!important}
+.add-wrap{background:var(--surf);border:1.5px solid var(--brd-s);border-radius:10px;margin-bottom:24px;overflow:hidden;transition:max-height .4s ease,background .35s,border-color .3s;max-height:0}
+.add-wrap.open{max-height:500px;border-color:var(--acc)}
+.add-inner{padding:22px 24px}
+.add-ttl{font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.add-ttl::after{content:'';flex:1;height:1px;background:var(--brd)}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:14px}
+.igroup{position:relative}
+.ilabel{position:absolute;top:-8px;left:10px;background:var(--surf);padding:0 5px;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);font-family:var(--fm);z-index:1;transition:background .35s}
+.winput,.wsel{width:100%;background:var(--surf2);border:1.5px solid var(--brd);outline:none;padding:10px 12px;color:var(--txt);font-family:var(--fb);font-size:15px;transition:border-color .2s,background .35s;border-radius:6px;-webkit-appearance:none;appearance:none}
+.wsel{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.winput:focus,.wsel:focus{border-color:var(--acc)}
+.char-btns{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
+.chbtn{background:var(--surf3);border:1px solid var(--brd);color:var(--acc);font-size:12px;padding:2px 6px;cursor:pointer;border-radius:4px;font-family:var(--fm);transition:background .15s,color .15s;line-height:1.4}
+.chbtn:hover{background:var(--acc);color:var(--bg)}
+/* ── NOTLAR ─────────────────────────────────── */
+.ntabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.ntab{padding:7px 18px;font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;transition:all .2s}
+.ntab:hover{border-color:var(--acc);color:var(--acc)}
+.ntab.active{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.ntab-content{display:none}
+.ntab-content.active{display:block}
+.note-list{display:flex;flex-direction:column;gap:12px}
+.note-card{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;overflow:hidden;transition:background .35s}
+.note-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--surf2);border-bottom:1px solid var(--brd-s);transition:background .35s}
+.note-card-title{font-family:var(--fh);font-size:13px;color:var(--txt);font-weight:600}
+.note-card-cat{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;background:var(--pb);color:var(--pc);border-radius:20px}
+.note-card-body{padding:14px 18px;font-size:14px;color:var(--txt-d);line-height:1.7;white-space:pre-wrap}
+.note-actions{display:flex;gap:4px}
+.nebtn,.ndbtn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 7px;border-radius:4px;opacity:.5;transition:all .2s}
+.nebtn:hover{opacity:1;background:var(--pb);color:var(--acc)}
+.ndbtn:hover{opacity:1;background:rgba(180,60,60,.1);color:var(--bad)}
+
+.fsbtn{background:var(--surf2);border:1.5px solid var(--brd);color:var(--acc);font-family:var(--fh);font-size:11px;padding:6px 14px;cursor:pointer;border-radius:6px;transition:all .2s;letter-spacing:1px}
+.fsbtn:hover{border-color:var(--acc);background:var(--pb)}
+.fslbl{font-family:var(--fm);font-size:10px;color:var(--txt-d);min-width:36px;text-align:center}
+.brow{display:flex;gap:8px;margin-top:14px}
+.btn{padding:10px 24px;border:none;cursor:pointer;font-family:var(--fh);font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;border-radius:6px}
+.btn-p{background:var(--acc);color:var(--bg);font-weight:600}
+.btn-p:hover{filter:brightness(1.12)}
+.btn-s{background:transparent;color:var(--txt-d);border:1.5px solid var(--brd)}
+.btn-s:hover{border-color:var(--acc-d);color:var(--txt)}
+.search-sec{margin-bottom:22px;position:relative}
+.swrap{position:relative;display:flex;align-items:center;background:var(--surf);border:1.5px solid var(--brd);transition:border-color .3s,background .35s;border-radius:8px}
+.swrap:focus-within{border-color:var(--acc)}
+.sicon{position:absolute;left:15px;color:var(--acc-d);font-size:17px;pointer-events:none}
+#searchInput{width:100%;background:transparent;border:none;outline:none;padding:13px 15px 13px 46px;color:var(--txt);font-family:var(--fb);font-size:16px;letter-spacing:.4px}
+#searchInput::placeholder{color:var(--txt-d);opacity:.55;font-style:italic}
+.sclear{position:absolute;right:12px;background:none;border:none;color:var(--txt-d);cursor:pointer;font-size:20px;padding:4px;opacity:0;transition:opacity .2s;line-height:1}
+.sclear.vis{opacity:1}
+.ac-box{position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:200;background:var(--surf);border:1.5px solid var(--acc);border-radius:8px;max-height:280px;overflow-y:auto;display:none;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.ac-box.show{display:block}
+.ac-item{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--brd-s);transition:background .12s;font-size:14px}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.sel{background:var(--pb)}
+.ac-lang{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);min-width:58px}
+.ac-txt{flex:1;color:var(--txt)}
+.ac-txt mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 2px;font-style:normal}
+.ac-tp{font-family:var(--fm);font-size:8px;padding:2px 7px;border:1px solid var(--brd);color:var(--txt-d);border-radius:20px}
+.frow{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.fbtn{background:transparent;border:1.5px solid var(--brd);color:var(--txt-d);padding:5px 14px;font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-radius:20px}
+.fbtn:hover,.fbtn.active{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.tbl-wrap{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;overflow:hidden;transition:background .35s}
+.tbl-hdr{cursor:pointer}
+.tbl-hdr:hover .tbl-ttl{color:var(--acc)}
+.tscroll{transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:9000px;opacity:1}
+.tscroll.collapsed{max-height:0;opacity:0}
+.tbl-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--brd-s);background:var(--surf2);transition:background .35s;cursor:pointer;user-select:none}
+.tbl-ttl{font-family:var(--fh);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d)}
+.res-lbl{font-family:var(--fm);font-size:9px;color:var(--txt-d)}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--surf2)}
+th{padding:11px 16px;text-align:left;font-family:var(--fh);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc-d);border-bottom:1px solid var(--brd);cursor:pointer;white-space:nowrap;user-select:none;transition:color .2s}
+th:hover{color:var(--acc)}
+th.sa::after{content:' ↑';color:var(--acc)}
+th.sd::after{content:' ↓';color:var(--acc)}
+tbody tr{border-bottom:1px solid var(--brd-s);transition:background .12s}
+tbody tr:hover{background:var(--pb)}
+td{padding:11px 16px;font-size:15px;color:var(--txt);vertical-align:middle}
+td:first-child{font-family:var(--fm);font-size:10px;color:var(--acc-d);width:42px}
+.tsy{font-size:14px;color:var(--txt-d);font-style:italic}
+.ten{font-size:14px;color:var(--txt-d)}
+.tdate{font-family:var(--fm);font-size:9px;color:var(--txt-d);opacity:.5;white-space:nowrap}
+.tpill{display:inline-block;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;background:var(--pb);color:var(--pc);border-radius:20px}
+.dbtn,.ebtn{background:none;border:none;cursor:pointer;opacity:0;font-size:14px;transition:opacity .2s;padding:3px 7px;border-radius:4px}
+.dbtn{color:var(--bad)}
+.ebtn{color:var(--acc-d)}
+tbody tr:hover .dbtn,tbody tr:hover .ebtn{opacity:.6}
+.dbtn:hover{opacity:1!important;background:rgba(180,60,60,.1)}
+.ebtn:hover{opacity:1!important;background:var(--pb)}
+mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-style:normal}
+.empty{text-align:center;padding:52px 20px;color:var(--txt-d);font-style:italic;font-size:16px}
+.empty .big{font-size:34px;margin-bottom:10px;opacity:.4}
+.toast{position:fixed;bottom:26px;right:26px;background:var(--surf3);border:1.5px solid var(--acc);color:var(--acc-l);padding:11px 20px;font-family:var(--fm);font-size:10px;letter-spacing:1px;transform:translateY(80px);opacity:0;transition:all .3s ease;z-index:300;border-radius:8px}
+.toast.show{transform:translateY(0);opacity:1}
+/* ── TABS ───────────────────────────────────── */
+.tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--brd)}
+.tab{padding:10px 28px;font-family:var(--fh);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab:hover{color:var(--acc)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── CÜMLE KUR ──────────────────────────────── */
+.cb-section{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;padding:22px 24px;margin-bottom:20px;transition:background .35s}
+.cb-title{font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.cb-title::after{content:'';flex:1;height:1px;background:var(--brd)}
+.word-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px}
+.pool-word{padding:6px 14px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:20px;cursor:pointer;font-family:var(--fb);font-size:14px;color:var(--txt);transition:all .2s;user-select:none}
+.pool-word:hover{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.pool-word.used{opacity:.3;pointer-events:none}
+.slot-row{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;background:var(--surf2);border:1.5px dashed var(--brd);border-radius:8px;align-items:center}
+.slot-word{padding:7px 14px;background:var(--acc);color:var(--bg);border-radius:20px;font-family:var(--fb);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;transition:filter .2s}
+.slot-word:hover{filter:brightness(1.15)}
+.slot-word .rm{font-size:11px;opacity:.7}
+.slot-word.drag-over{outline:2px solid var(--acc-l)}
+.sentence-result{margin-top:18px;padding:18px 20px;background:var(--surf2);border-radius:8px;border-left:3px solid var(--acc)}
+.sent-en{font-family:var(--fb);font-size:17px;color:var(--txt);margin-bottom:8px}
+.sent-sy{font-size:15px;color:var(--txt-d);font-style:italic;margin-bottom:8px}
+.sent-tr{font-family:var(--fm);font-size:11px;color:var(--acc-d);letter-spacing:1px}
+.sent-label{font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);margin-bottom:4px;opacity:.6}
+.filter-pool{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pool-filter{background:transparent;border:1px solid var(--brd);color:var(--txt-d);padding:3px 10px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .2s}
+.pool-filter:hover,.pool-filter.on{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.cb-hint{font-family:var(--fm);font-size:9px;color:var(--txt-d);opacity:.5;letter-spacing:1px;margin-top:8px}
+.struct-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.struct-btn{background:var(--surf2);border:1px solid var(--brd);color:var(--txt-d);padding:4px 12px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .2s}
+.struct-btn:hover{border-color:var(--acc);color:var(--acc)}
+.lang-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.lang-tab{padding:6px 16px;font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;transition:all .2s;display:flex;align-items:center;gap:6px}
+.lang-tab:hover{border-color:var(--acc);color:var(--acc)}
+.lang-tab.active{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.lang-tag{font-size:7px;padding:1px 5px;background:var(--surf3);border-radius:3px;opacity:.7}
+.lang-structs{display:none}
+.lang-structs.active{display:block}
+.struct-hint{font-family:var(--fm);font-size:9px;color:var(--txt-d);opacity:.6;letter-spacing:1px;margin-bottom:10px}
+.tense-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tense-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:20px;transition:all .2s}
+.tense-btn:hover{border-color:var(--acc);color:var(--acc)}
+.tense-btn.active{border-color:var(--acc);color:var(--acc);background:var(--pb);font-weight:600}
+
+
+.cb-actions{display:flex;gap:8px;margin-top:14px}
+
+</style>
+</head>
+<body data-theme="gece">
+<div class="app">
+  <header>
+    <div class="horm">✦ Lexicon ✦</div>
+    <h1>ܡܠܬܐ · Sözcük · Word</h1>
+    <p class="sub">Türkçe — Süryanice — İngilizce Sözlük</p>
+    <div class="lang-row">
+      <span class="lbadge">Türkçe</span>
+      <span class="lbadge">ܣܘܪܝܝܐ Süryanice</span>
+      <span class="lbadge">English</span>
+    </div>
+    <div class="save-ind"><span class="save-dot"></span>Veriler tarayıcıda kalıcı kaydediliyor</div>
+    <div class="save-ind" style="margin-top:4px"><span id="cloudInd" style="font-family:var(--fm);font-size:9px;letter-spacing:2px">☁ Buluta bağlanıyor...</span></div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('sozluk',this)">📖 Sözlük</button>
+    <button class="tab" onclick="switchTab('cumle',this)">✏️ Cümle Kur</button>
+    <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
+  </div>
+
+  <!-- SÖZLÜK PANELİ -->
+  <div class="tab-content active" id="tab-sozluk">
+  <div class="theme-section">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div>
+        <div class="theme-label">Tema Seçin</div>
+        <div class="theme-grid">
+          <div class="theme-card tc-gece"    onclick="setTheme('gece',this)"    title="Gece"><div class="tc-name">Gece</div></div>
+          <div class="theme-card tc-krem"    onclick="setTheme('krem',this)"    title="Krem"><div class="tc-name">Krem</div></div>
+          <div class="theme-card tc-bahar"   onclick="setTheme('bahar',this)"   title="Bahar"><div class="tc-name">Bahar</div></div>
+          <div class="theme-card tc-batim"   onclick="setTheme('batim',this)"   title="Gün Batımı"><div class="tc-name">Batım</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="theme-label">Yazı Boyutu</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="fsbtn" onclick="changeFont(-1)" title="Küçült">A−</button>
+          <span class="fslbl" id="fsLabel">100%</span>
+          <button class="fsbtn" onclick="changeFont(1)" title="Büyüt">A+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-lbl">Toplam Kelime</div></div>
+    <div class="stat-card"><div class="stat-num" id="filteredCount">0</div><div class="stat-lbl">Gösterilen</div></div>
+    <div class="stat-card"><div class="stat-num" id="todayCount">0</div><div class="stat-lbl">Bugün Eklenen</div></div>
+  </div>
+
+  <div class="actions-row">
+    <button class="abtn hl" onclick="toggleAdd()"><span>＋</span>Kelime Ekle</button>
+    <button class="abtn" onclick="exportExcel()"><span>⬇</span>Excel İndir</button>
+    <button class="abtn" onclick="document.getElementById('imp').click()"><span>⬆</span>Excel Yükle</button>
+    <input type="file" id="imp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+    <button class="abtn danger" onclick="clearAll()"><span>⊘</span>Tümünü Sil</button>
+  </div>
+
+  <div class="add-wrap" id="addWrap">
+    <div class="add-inner">
+      <div class="add-ttl">Yeni Kelime Ekle</div>
+      <div class="igrid">
+        <div class="igroup"><label class="ilabel">Türkçe</label><input type="text" class="winput" id="inp_tr" placeholder="Türkçe kelime..."></div>
+        <div class="igroup"><label class="ilabel">Süryanice</label><input type="text" class="winput" id="inp_sy" placeholder="ܣܘܪܝܝܐ ..."></div>
+        <div class="igroup">
+          <label class="ilabel">Transliterasyon</label>
+          <div style="position:relative">
+            <input type="text" class="winput" id="inp_tr2" placeholder="örn: ʕEdta, Ktava ..." style="padding-right:130px">
+            <div class="char-btns" id="charBtns">
+              <button type="button" class="chbtn" onclick="insChar('ʕ')" title="Ayn">ʕ</button>
+              <button type="button" class="chbtn" onclick="insChar('ḥ')" title="Het">ḥ</button>
+              <button type="button" class="chbtn" onclick="insChar('ṭ')" title="Tet">ṭ</button>
+              <button type="button" class="chbtn" onclick="insChar('ṣ')" title="Tsade">ṣ</button>
+              <button type="button" class="chbtn" onclick="insChar('š')" title="Shin">š</button>
+            </div>
+          </div>
+        </div>
+        <div class="igroup"><label class="ilabel">İngilizce</label><input type="text" class="winput" id="inp_en" placeholder="English word..."></div>
+        <div class="igroup">
+          <label class="ilabel">Kelime Türü</label>
+          <select class="wsel" id="inp_type">
+            <option value="">— Seçin —</option>
+            <option value="isim">İsim (Noun)</option>
+            <option value="fiil">Fiil (Verb)</option>
+            <option value="sıfat">Sıfat (Adjective)</option>
+            <option value="zarf">Zarf (Adverb)</option>
+            <option value="zamir">Zamir (Pronoun)</option>
+            <option value="edat">Edat (Preposition)</option>
+            <option value="bağlaç">Bağlaç (Conjunction)</option>
+            <option value="ünlem">Ünlem (Interjection)</option>
+            <option value="deyim">Deyim (Idiom)</option>
+            <option value="diğer">Diğer (Other)</option>
+            <option value="birleşik">Birleşik (Compound)</option>
+            <option value="soru">Soru (Question)</option>
+          </select>
+        </div>
+      </div>
+      <div class="brow">
+        <button class="btn btn-p" onclick="addWord()">Ekle</button>
+        <button class="btn btn-s" onclick="toggleAdd()">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-sec" id="searchSec">
+    <div class="swrap">
+      <span class="sicon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Kelime ara — tüm dillerde..." autocomplete="off"
+        oninput="onSearch(this.value)" onkeydown="acKey(event)" onfocus="showAc()">
+      <button class="sclear" id="clearBtn" onclick="clearSearch()">×</button>
+    </div>
+    <div class="ac-box" id="acBox"></div>
+    <div class="frow">
+      <button class="fbtn active" onclick="setFilter('all',this)">Tümü</button>
+      <button class="fbtn" onclick="setFilter('tr',this)">Türkçe</button>
+      <button class="fbtn" onclick="setFilter('sy',this)">Süryanice</button>
+      <button class="fbtn" onclick="setFilter('en',this)">İngilizce</button>
+      <button class="fbtn" onclick="setFilter('type',this)">Türe Göre</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-hdr" onclick="toggleTable()">
+      <span class="tbl-ttl">Kelime Listesi</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="res-lbl" id="resLabel"></span>
+        <span id="tblArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block">▼</span>
+      </div>
+    </div>
+    <div class="tscroll" id="tblScroll">
+      <table>
+        <thead><tr>
+          <th>#</th>
+          <th onclick="sortT('tr')">Türkçe</th>
+          <th onclick="sortT('sy')">Süryanice</th>
+          <th onclick="sortT('en')">İngilizce</th>
+          <th onclick="sortT('type')">Tür</th>
+          <th onclick="sortT('date')">Tarih</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+  </div><!-- /tab-sozluk -->
+
+  <!-- CÜMLE KUR PANELİ -->
+  <div class="tab-content" id="tab-cumle">
+    <div class="cb-section">
+      <div class="cb-title" onclick="togglePool()" style="cursor:pointer;user-select:none">
+        Kelime Havuzu
+        <span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px">▼</span>
+      </div>
+      <div id="poolBody" style="transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:9000px;opacity:1">
+        <div class="filter-pool">
+          <button class="pool-filter on" onclick="setPoolFilter('hepsi',this)">Hepsi</button>
+          <button class="pool-filter" onclick="setPoolFilter('isim',this)">İsim</button>
+          <button class="pool-filter" onclick="setPoolFilter('fiil',this)">Fiil</button>
+          <button class="pool-filter" onclick="setPoolFilter('sıfat',this)">Sıfat</button>
+          <button class="pool-filter" onclick="setPoolFilter('zamir',this)">Zamir</button>
+          <button class="pool-filter" onclick="setPoolFilter('zarf',this)">Zarf</button>
+          <button class="pool-filter" onclick="setPoolFilter('bağlaç',this)">Bağlaç</button>
+          <button class="pool-filter" onclick="setPoolFilter('soru',this)">Soru</button>
+        </div>
+        <div class="word-pool" id="wordPool"></div>
+        <div class="cb-hint">Kelimeye tıklayarak cümleye ekle</div>
+      </div>
+    </div>
+
+    <div class="cb-section">
+      <div class="cb-title">Cümle Yapısı</div>
+
+      <!-- Dil sekmeleri -->
+      <div class="lang-tabs">
+        <button class="lang-tab active" id="ltab-tr" onclick="switchLangTab('tr',this)">🇹🇷 Türkçe <span class="lang-tag">SOV</span></button>
+        <button class="lang-tab" id="ltab-sy" onclick="switchLangTab('sy',this)">ܣܘܪ Süryanice <span class="lang-tag">VSO</span></button>
+        <button class="lang-tab" id="ltab-en" onclick="switchLangTab('en',this)">🇬🇧 İngilizce <span class="lang-tag">SVO</span></button>
+      </div>
+
+      <!-- Türkçe kalıpları (SOV) -->
+      <div class="lang-structs active" id="lstructs-tr">
+        <div class="struct-hint">Türkçe sözdizimi: Özne → Nesne → Fiil</div>
+        <div class="struct-btns">
+          <button class="struct-btn" onclick="applyStruct('SOV')">Özne + Nesne + Fiil</button>
+          <button class="struct-btn" onclick="applyStruct('SO')">Özne + Nesne</button>
+          <button class="struct-btn" onclick="applyStruct('SAdjV')">Özne + Sıfat + Fiil</button>
+          <button class="struct-btn" onclick="applyStruct('SV_tr')">Özne + Fiil</button>
+        </div>
+      </div>
+
+      <!-- Süryanice kalıpları (VSO) -->
+      <div class="lang-structs" id="lstructs-sy">
+        <div class="struct-hint">Süryanice sözdizimi: Fiil → Özne → Nesne</div>
+        <div class="struct-btns">
+          <button class="struct-btn" onclick="applyStruct('VSO')">Fiil + Özne + Nesne</button>
+          <button class="struct-btn" onclick="applyStruct('VS')">Fiil + Özne</button>
+          <button class="struct-btn" onclick="applyStruct('VSAdj')">Fiil + Özne + Sıfat</button>
+          <button class="struct-btn" onclick="applyStruct('VOS')">Fiil + Nesne + Özne</button>
+        </div>
+      </div>
+
+      <!-- İngilizce kalıpları (SVO) -->
+      <div class="lang-structs" id="lstructs-en">
+        <div class="struct-hint">İngilizce sözdizimi: Özne → Fiil → Nesne</div>
+        <div class="struct-btns">
+          <button class="struct-btn" onclick="applyStruct('SVO')">Özne + Fiil + Nesne</button>
+          <button class="struct-btn" onclick="applyStruct('SV')">Özne + Fiil</button>
+          <button class="struct-btn" onclick="applyStruct('SVAdj')">Özne + Fiil + Sıfat</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;margin-bottom:4px">
+        <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);margin-bottom:8px;opacity:.6">Zaman Seçin</div>
+        <div class="tense-row">
+          <button class="tense-btn active" id="tense-past"    onclick="setTense('past',this)">⏮ Geçmiş</button>
+          <button class="tense-btn"        id="tense-present" onclick="setTense('present',this)">⏵ Şimdiki</button>
+          <button class="tense-btn"        id="tense-future"  onclick="setTense('future',this)">⏭ Gelecek</button>
+          <button class="tense-btn"        id="tense-imp"     onclick="setTense('imperative',this)">⚡ Emir</button>
+        </div>
+      </div>
+      <div class="slot-row" id="sentenceSlots" style="margin-top:14px"></div>
+      <div class="cb-hint">Eklenen kelimeye tekrar tıklayarak çıkar • Sürükleyerek sırala</div>
+      <div class="cb-actions">
+        <button class="abtn hl" onclick="buildSentence()"><span>→</span>Cümleyi Oluştur</button>
+        <button class="abtn" onclick="clearSentence()"><span>⊘</span>Temizle</button>
+      </div>
+    </div>
+
+    <div class="cb-section" id="resultBox" style="display:none">
+      <div class="cb-title">Sonuç</div>
+      <div class="sentence-result" id="sentResult"></div>
+    </div>
+
+  </div><!-- /tab-cumle -->
+
+  <!-- NOTLAR PANELİ -->
+  <div class="tab-content" id="tab-notlar">
+
+    <!-- Alt sekmeler -->
+    <div class="ntabs">
+      <button class="ntab active" id="ntab-list" onclick="switchNTab('list',this)">📋 Kurallar</button>
+      <button class="ntab" id="ntab-edit" onclick="switchNTab('edit',this)">＋ Kural Ekle</button>
+    </div>
+
+    <!-- Kural Listesi -->
+    <div class="ntab-content active" id="ntab-list-panel">
+      <div id="noteList" class="note-list"></div>
+      <div id="noteEmpty" class="empty" style="display:none"><div class="big">◌</div>Henüz kural eklenmemiş.</div>
+    </div>
+
+    <!-- Kural Ekle / Düzenle -->
+    <div class="ntab-content" id="ntab-edit-panel">
+      <div class="cb-section">
+        <div class="cb-title" id="noteFormTitle">Yeni Kural Ekle</div>
+        <div style="margin-bottom:14px">
+          <div class="igroup" style="margin-bottom:14px">
+            <label class="ilabel">Başlık</label>
+            <input type="text" class="winput" id="note_title" placeholder="Kural başlığı...">
+          </div>
+          <div class="igroup" style="margin-bottom:14px">
+            <label class="ilabel">Kategori</label>
+            <select class="wsel" id="note_cat">
+              <option value="">— Seçin —</option>
+              <option value="İsim Kuralları">İsim Kuralları</option>
+              <option value="Fiil Kuralları">Fiil Kuralları</option>
+              <option value="Zamir Kuralları">Zamir Kuralları</option>
+              <option value="Sayılar">Sayılar</option>
+              <option value="Cümle Yapısı">Cümle Yapısı</option>
+              <option value="Telaffuz">Telaffuz</option>
+              <option value="Genel">Genel</option>
+            </select>
+          </div>
+          <div class="igroup">
+            <label class="ilabel">Açıklama / Kural</label>
+            <textarea class="winput" id="note_body" rows="6" style="resize:vertical;line-height:1.6" placeholder="Kural açıklaması, örnekler..."></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-p" onclick="saveNote()">Kaydet</button>
+          <button class="btn btn-s" onclick="cancelNoteEdit()">İptal</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-notlar -->
+
+<div id="editModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+  <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(520px,92vw);max-height:90vh;overflow-y:auto">
+    <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      Kelime Düzenle <span style="flex:1;height:1px;background:var(--brd);display:block"></span>
+      <button onclick="closeEdit()" style="background:none;border:none;color:var(--txt-d);cursor:pointer;font-size:20px;padding:0 4px;line-height:1">×</button>
+    </div>
+    <div class="igrid" style="margin-bottom:14px">
+      <div class="igroup"><label class="ilabel">Türkçe</label><input type="text" class="winput" id="edit_tr" placeholder="Türkçe kelime..."></div>
+      <div class="igroup"><label class="ilabel">Süryanice</label><input type="text" class="winput" id="edit_sy" placeholder="ܣܘܪܝܝܐ ..."></div>
+      <div class="igroup">
+        <label class="ilabel">Transliterasyon</label>
+        <div style="position:relative">
+          <input type="text" class="winput" id="edit_tr2" placeholder="örn: ʕEdta ..." style="padding-right:130px">
+          <div class="char-btns">
+            <button type="button" class="chbtn" onclick="insCharEdit('ʕ')">ʕ</button>
+            <button type="button" class="chbtn" onclick="insCharEdit('ḥ')">ḥ</button>
+            <button type="button" class="chbtn" onclick="insCharEdit('ṭ')">ṭ</button>
+            <button type="button" class="chbtn" onclick="insCharEdit('ṣ')">ṣ</button>
+            <button type="button" class="chbtn" onclick="insCharEdit('š')">š</button>
+          </div>
+        </div>
+      </div>
+      <div class="igroup"><label class="ilabel">İngilizce</label><input type="text" class="winput" id="edit_en" placeholder="English word..."></div>
+      <div class="igroup">
+        <label class="ilabel">Kelime Türü</label>
+        <select class="wsel" id="edit_type">
+          <option value="">— Seçin —</option>
+          <option value="isim">İsim (Noun)</option>
+          <option value="fiil">Fiil (Verb)</option>
+          <option value="sıfat">Sıfat (Adjective)</option>
+          <option value="zarf">Zarf (Adverb)</option>
+          <option value="zamir">Zamir (Pronoun)</option>
+          <option value="edat">Edat (Preposition)</option>
+          <option value="bağlaç">Bağlaç (Conjunction)</option>
+          <option value="ünlem">Ünlem (Interjection)</option>
+          <option value="deyim">Deyim (Idiom)</option>
+          <option value="birleşik">Birleşik (Compound)</option>
+          <option value="soru">Soru (Question)</option>
+          <option value="diğer">Diğer (Other)</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="btn btn-p" onclick="saveEdit()">Kaydet</button>
+      <button class="btn btn-s" onclick="closeEdit()">İptal</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SKEY='sozluk_v7';
+
+/* ── SUPABASE ─────────────────────────────── */
+const SB_URL='https://nbjxzasnluytdszqsxys.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ianh6YXNubHV5dGRzenFzeHlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjMyMDYsImV4cCI6MjA4OTU5OTIwNn0.-tUgVySz45ejpmAGSA13zFUKXsVXxxQ3Auoqq1KUhZU';
+async function sbFetch(path,method='GET',body=null){
+  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+path,opts);
+  if(!r.ok) throw new Error(await r.text());
+  const txt=await r.text();
+  return txt?JSON.parse(txt):[];
+}
+async function sbGetWords(){return sbFetch('/rest/v1/words?select=*&order=id.asc');}
+async function sbAddWord(w){return sbFetch('/rest/v1/words','POST',{tr:w.tr,sy:w.sy,en:w.en,type:w.type,date:w.date});}
+async function sbUpdateWord(id,w){return sbFetch('/rest/v1/words?id=eq.'+id,'PATCH',{tr:w.tr,sy:w.sy,en:w.en,type:w.type});}
+async function sbDeleteWord(id){return sbFetch('/rest/v1/words?id=eq.'+id,'DELETE');}
+async function sbGetNotes(){return sbFetch('/rest/v1/notes?select=*&order=id.asc');}
+async function sbAddNote(n){return sbFetch('/rest/v1/notes','POST',{title:n.title,body:n.body,cat:n.cat});}
+async function sbUpdateNote(id,n){return sbFetch('/rest/v1/notes?id=eq.'+id,'PATCH',{title:n.title,body:n.body,cat:n.cat});}
+async function sbDeleteNote(id){return sbFetch('/rest/v1/notes?id=eq.'+id,'DELETE');}
+
+let useCloud=false;
+async function initCloud(){
+  try{
+    const ws=await sbGetWords();
+    if(ws&&Array.isArray(ws)){
+      // Sync: if cloud empty and we have local words, push to cloud
+      if(ws.length===0&&words.length>0){
+        showToast('☁ Kelimeler buluta yükleniyor...');
+        for(const w of words){
+          const res=await sbAddWord(w);
+          if(res&&res[0]) w.sbId=res[0].id;
+        }
+        save();
+      } else if(ws.length>0){
+        // Load from cloud
+        words=ws.map(w=>({id:w.id,sbId:w.id,tr:w.tr||'',sy:w.sy||'',en:w.en||'',type:w.type||'',date:w.date||today}));
+        nextId=Math.max(...words.map(w=>w.id))+1;
+        save();
+      }
+      // Load notes from cloud
+      const ns=await sbGetNotes();
+      if(ns&&ns.length>0){
+        notes=ns.map(n=>({id:n.id,sbId:n.id,title:n.title||'',body:n.body||'',cat:n.cat||'Genel'}));
+        noteNextId=Math.max(...notes.map(n=>n.id))+1;
+        saveNotes();
+      } else if(notes.length>0){
+        for(const n of notes){
+          const res=await sbAddNote(n);
+          if(res&&res[0]) n.sbId=res[0].id;
+        }
+        saveNotes();
+      }
+      useCloud=true;
+      document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
+      document.getElementById('cloudInd').style.color='#3a9a5a';
+      render();renderNotes();
+    }
+  } catch(e){
+    console.error('Cloud init error:',e);
+    document.getElementById('cloudInd').textContent='⚠ Çevrimdışı';
+    document.getElementById('cloudInd').style.color='var(--txt-d)';
+  }
+}
+
+const today=new Date().toISOString().split('T')[0];
+const defaults=[
+  {id:7,tr:"Su",sy:"ܡܝܐ (Maya)",en:"Water",type:"isim",date:"2026-03-20"},
+  {id:8,tr:"Ekmek",sy:"ܠܚܡܐ (Lahmo)",en:"Bread",type:"isim",date:"2026-03-20"},
+  {id:9,tr:"Güneş",sy:"ܫܡܫܐ (Shemsha)",en:"Sun",type:"isim",date:"2026-03-20"},
+  {id:10,tr:"Ev",sy:"ܒܝܬܐ (Beta)",en:"House",type:"isim",date:"2026-03-20"},
+  {id:11,tr:"Gitmek",sy:"ܐܙܠ (Azal)",en:"To go",type:"fiil",date:"2026-03-20"},
+  {id:12,tr:"Güzel",sy:"ܫܦܝܪܐ (Shapira)",en:"Beautiful",type:"sıfat",date:"2026-03-20"},
+  {id:13,tr:"Baba",sy:"ܐܒܐ (Aba)",en:"Father",type:"isim",date:"2026-03-20"},
+  {id:14,tr:"Anne",sy:"ܐܡܐ (Ema)",en:"Mother",type:"isim",date:"2026-03-20"},
+  {id:15,tr:"Erkek Kardeş",sy:"ܐܚܐ (Aha)",en:"Brother",type:"isim",date:"2026-03-20"},
+  {id:16,tr:"Kız Kardeş",sy:"ܚܬܐ (Hata)",en:"Sister",type:"isim",date:"2026-03-20"},
+  {id:17,tr:"Oğul",sy:"ܒܪܐ (Bra)",en:"Son",type:"isim",date:"2026-03-20"},
+  {id:18,tr:"Kız / Kızı",sy:"ܒܪܬܐ (Brata)",en:"Daughter",type:"isim",date:"2026-03-20"},
+  {id:19,tr:"Adam / Erkek",sy:"ܓܒܪܐ (Gavra)",en:"Man",type:"isim",date:"2026-03-20"},
+  {id:20,tr:"Aslan",sy:"ܐܪܝܐ (Arya)",en:"Lion",type:"isim",date:"2026-03-20"},
+  {id:21,tr:"Dişi Aslan",sy:"ܐܪܝܘܬܐ (Aryuta)",en:"Lioness",type:"isim",date:"2026-03-20"},
+  {id:22,tr:"Koç",sy:"ܟܒܫܐ (Kawsha)",en:"Ram",type:"isim",date:"2026-03-20"},
+  {id:23,tr:"Koyun (dişi)",sy:"ܢܩܝܐ (Naqya)",en:"Ewe",type:"isim",date:"2026-03-20"},
+  {id:24,tr:"Keçi (erkek)",sy:"ܬܝܫܐ (Taysha)",en:"He-goat",type:"isim",date:"2026-03-20"},
+  {id:25,tr:"Keçi (dişi)",sy:"ܥܙܐ (Eza)",en:"She-goat",type:"isim",date:"2026-03-20"},
+  {id:26,tr:"Ağaç",sy:"ܐܝܠܢܐ (Ilana)",en:"Tree",type:"isim",date:"2026-03-20"},
+  {id:27,tr:"Sevgi / Aşk",sy:"ܚܘܒܐ (Huba)",en:"Love",type:"isim",date:"2026-03-20"},
+  {id:28,tr:"Yargı / Hüküm",sy:"ܕܝܢܐ (Dina)",en:"Judgement",type:"isim",date:"2026-03-20"},
+  {id:29,tr:"Kanat",sy:"ܐܒܪܐ (Abra)",en:"Wing",type:"isim",date:"2026-03-20"},
+  {id:30,tr:"Kol",sy:"ܕܪܥܐ (Draa)",en:"Arm",type:"isim",date:"2026-03-20"},
+  {id:31,tr:"Çene (üst)",sy:"ܠܘܓܡܐ (Lugma)",en:"Upper Jaw",type:"isim",date:"2026-03-20"},
+  {id:32,tr:"Dirsek",sy:"ܝܨܝܠ (Yatsil)",en:"Elbow",type:"isim",date:"2026-03-20"},
+  {id:33,tr:"Yanak",sy:"ܦܟܐ (Paka)",en:"Cheek",type:"isim",date:"2026-03-20"},
+  {id:34,tr:"Göğüs / Meme",sy:"ܬܕܐ (Tada)",en:"Breast",type:"isim",date:"2026-03-20"},
+  {id:35,tr:"Toprak / Yer",sy:"ܐܪܥܐ (Arqa)",en:"Earth",type:"isim",date:"2026-03-20"},
+  {id:36,tr:"Tarla",sy:"ܚܩܠܐ (Haqla)",en:"Field",type:"isim",date:"2026-03-20"},
+  {id:37,tr:"Yol",sy:"ܐܘܪܚܐ (Urha)",en:"Road",type:"isim",date:"2026-03-20"},
+  {id:38,tr:"Nehir",sy:"ܢܗܪܐ (Nahra)",en:"River",type:"isim",date:"2026-03-20"},
+  {id:39,tr:"Ülke / Şehir",sy:"ܐܬܪܐ (Atra)",en:"Country",type:"isim",date:"2026-03-20"},
+  {id:40,tr:"Şarkı / İlahi",sy:"ܙܡܝܪܬܐ (Zmirta)",en:"Song",type:"isim",date:"2026-03-20"},
+  {id:41,tr:"Yazı",sy:"ܟܬܝܒܬܐ (Ktivta)",en:"Writing",type:"isim",date:"2026-03-20"},
+  {id:42,tr:"Kilise",sy:"ܥܕܬܐ (Edta)",en:"Church",type:"isim",date:"2026-03-20"},
+  {id:43,tr:"Resim / Suret",sy:"ܨܘܪܬܐ (Surta)",en:"Picture",type:"isim",date:"2026-03-20"},
+  {id:44,tr:"Kitap",sy:"ܟܬܒܐ (Ktava)",en:"Book",type:"isim",date:"2026-03-20"},
+  {id:45,tr:"Nimet / İyilik",sy:"ܛܒܬܐ (Tavta)",en:"Grace/Goodness",type:"isim",date:"2026-03-20"},
+  {id:46,tr:"Öğretmen (e)",sy:"ܡܠܦܢܐ (Malfana)",en:"Instructor (m)",type:"isim",date:"2026-03-20"},
+  {id:47,tr:"Öğretmen (k)",sy:"ܡܠܦܢܝܬܐ (Malfanita)",en:"Instructor (f)",type:"isim",date:"2026-03-20"},
+  {id:48,tr:"Müdür (e)",sy:"ܡܕܒܪܢܐ (Madbarana)",en:"Manager (m)",type:"isim",date:"2026-03-20"},
+  {id:49,tr:"Müdür (k)",sy:"ܡܕܒܪܢܝܬܐ (Madbaranita)",en:"Manager (f)",type:"isim",date:"2026-03-20"},
+  {id:50,tr:"Arkadaş (e)",sy:"ܪܚܡܐ (Rahma)",en:"Friend (m)",type:"isim",date:"2026-03-20"},
+  {id:51,tr:"Arkadaş (k)",sy:"ܪܚܡܬܐ (Rahmta)",en:"Friend (f)",type:"isim",date:"2026-03-20"},
+  {id:52,tr:"İyi / Güzel",sy:"ܛܒܐ (Tava)",en:"Good",type:"sıfat",date:"2026-03-20"},
+  {id:53,tr:"Büyük / Yüce",sy:"ܪܒܐ (Raba)",en:"Great/High",type:"sıfat",date:"2026-03-20"},
+  {id:54,tr:"Zengin",sy:"ܥܬܝܪܐ (Atira)",en:"Rich",type:"sıfat",date:"2026-03-20"},
+  {id:55,tr:"Çalışkan / Aktif",sy:"ܟܫܝܪܐ (Kshira)",en:"Active",type:"sıfat",date:"2026-03-20"},
+  {id:56,tr:"Usta / Uzman",sy:"ܡܗܝܪܐ (Mahira)",en:"Expert",type:"sıfat",date:"2026-03-20"},
+  {id:57,tr:"Saf / Temiz",sy:"ܕܟܝܐ (Dkaya)",en:"Pure",type:"sıfat",date:"2026-03-20"},
+  {id:58,tr:"Kutsal / Pak",sy:"ܚܣܝܐ (Hasya)",en:"Holy/Clean",type:"sıfat",date:"2026-03-20"},
+  {id:59,tr:"Yüce / Yüksek",sy:"ܡܥܠܝܐ (Malya)",en:"High/Sublime",type:"sıfat",date:"2026-03-20"},
+  {id:60,tr:"Kaybolmuş / Sapkın",sy:"ܛܥܝܐ (Taya)",en:"Lost",type:"sıfat",date:"2026-03-20"},
+  {id:61,tr:"Seçilmiş",sy:"ܓܒܝܐ (Gavya)",en:"Selected/Chosen",type:"sıfat",date:"2026-03-20"},
+  {id:62,tr:"Zor / Güç",sy:"ܥܣܩܬܐ (Asaqta)",en:"Difficult",type:"sıfat",date:"2026-03-20"},
+  {id:63,tr:"Düzenli / Tertipli",sy:"ܬܩܢܬܐ (Taqanta)",en:"Ordered",type:"sıfat",date:"2026-03-20"},
+  {id:64,tr:"Güvenilir / Sadık",sy:"ܫܪܝܪܐ (Shrira)",en:"Trustful",type:"sıfat",date:"2026-03-20"},
+  {id:65,tr:"Ben",sy:"ܐܢܐ (Ana)",en:"I",type:"zamir",date:"2026-03-20"},
+  {id:66,tr:"Biz",sy:"ܚܢܢ (Hnan)",en:"We",type:"zamir",date:"2026-03-20"},
+  {id:67,tr:"Sen (erkek)",sy:"ܐܢܬ (Ant)",en:"You (m.sg)",type:"zamir",date:"2026-03-20"},
+  {id:68,tr:"Sen (kadın)",sy:"ܐܢܬܝ (Anti)",en:"You (f.sg)",type:"zamir",date:"2026-03-20"},
+  {id:69,tr:"Siz (erkek)",sy:"ܐܢܬܘܢ (Antun)",en:"You (m.pl)",type:"zamir",date:"2026-03-20"},
+  {id:70,tr:"Siz (kadın)",sy:"ܐܢܬܝܢ (Antin)",en:"You (f.pl)",type:"zamir",date:"2026-03-20"},
+  {id:71,tr:"O (erkek)",sy:"ܗܘ (Hu)",en:"He",type:"zamir",date:"2026-03-20"},
+  {id:72,tr:"O (kadın)",sy:"ܗܝ (Hi)",en:"She",type:"zamir",date:"2026-03-20"},
+  {id:73,tr:"Onlar (erkek)",sy:"ܗܢܘܢ (Hnun)",en:"They (m)",type:"zamir",date:"2026-03-20"},
+  {id:74,tr:"Onlar (kadın)",sy:"ܗܢܝܢ (Hnin)",en:"They (f)",type:"zamir",date:"2026-03-20"},
+  {id:75,tr:"Bir",sy:"ܚܕ (Had)",en:"One",type:"isim",date:"2026-03-20"},
+  {id:76,tr:"İki",sy:"ܬܪܝܢ (Trein)",en:"Two",type:"isim",date:"2026-03-20"},
+  {id:77,tr:"Üç",sy:"ܬܠܬܐ (Tlata)",en:"Three",type:"isim",date:"2026-03-20"},
+  {id:78,tr:"Dört",sy:"ܐܪܒܥܐ (Arba)",en:"Four",type:"isim",date:"2026-03-20"},
+  {id:79,tr:"Beş",sy:"ܚܡܫܐ (Hamsha)",en:"Five",type:"isim",date:"2026-03-20"},
+  {id:80,tr:"Altı",sy:"ܫܬܐ (Shta)",en:"Six",type:"isim",date:"2026-03-20"},
+  {id:81,tr:"Yedi",sy:"ܫܒܥܐ (Shwa)",en:"Seven",type:"isim",date:"2026-03-20"},
+  {id:82,tr:"Sekiz",sy:"ܬܡܢܝܐ (Tmanya)",en:"Eight",type:"isim",date:"2026-03-20"},
+  {id:83,tr:"Dokuz",sy:"ܬܫܥܐ (Tsha)",en:"Nine",type:"isim",date:"2026-03-20"},
+  {id:84,tr:"On",sy:"ܥܣܪܐ (Asra)",en:"Ten",type:"isim",date:"2026-03-20"},
+  {id:85,tr:"On Bir",sy:"ܚܕܥܣܪ (Hdesar)",en:"Eleven",type:"isim",date:"2026-03-20"},
+  {id:86,tr:"On İki",sy:"ܬܪܥܣܪ (Tresar)",en:"Twelve",type:"isim",date:"2026-03-20"},
+  {id:87,tr:"On Üç",sy:"ܬܠܬܥܣܪ (Tlatesar)",en:"Thirteen",type:"isim",date:"2026-03-20"},
+  {id:88,tr:"On Yedi",sy:"ܫܒܥܣܪ (Shwesar)",en:"Seventeen",type:"isim",date:"2026-03-20"},
+  {id:89,tr:"On Sekiz",sy:"ܬܡܢܥܣܪ (Tmanesar)",en:"Eighteen",type:"isim",date:"2026-03-20"},
+  {id:90,tr:"On Dokuz",sy:"ܬܫܥܣܪ (Tshesar)",en:"Nineteen",type:"isim",date:"2026-03-20"},
+  {id:91,tr:"Yirmi",sy:"ܥܣܪܝܢ (Esrin)",en:"Twenty",type:"isim",date:"2026-03-20"},
+  {id:92,tr:"Birinci",sy:"ܩܕܡܝܐ (Qadmaya)",en:"First",type:"sıfat",date:"2026-03-20"},
+  {id:93,tr:"İkinci",sy:"ܬܪܝܢܐ (Treyana)",en:"Second",type:"sıfat",date:"2026-03-20"},
+  {id:94,tr:"Üçüncü",sy:"ܬܠܝܬܝܐ (Tlitaya)",en:"Third",type:"sıfat",date:"2026-03-20"},
+  {id:95,tr:"Dördüncü",sy:"ܪܒܝܥܝܐ (Rviaya)",en:"Fourth",type:"sıfat",date:"2026-03-20"},
+  {id:96,tr:"Beşinci",sy:"ܚܡܝܫܝܐ (Hmishaya)",en:"Fifth",type:"sıfat",date:"2026-03-20"},
+  {id:97,tr:"Altıncı",sy:"ܫܬܝܬܝܐ (Shtitaya)",en:"Sixth",type:"sıfat",date:"2026-03-20"},
+  {id:98,tr:"Yedinci",sy:"ܫܒܝܥܝܐ (Shviaya)",en:"Seventh",type:"sıfat",date:"2026-03-20"},
+  {id:99,tr:"Sekizinci",sy:"ܬܡܝܢܝܐ (Tminaya)",en:"Eighth",type:"sıfat",date:"2026-03-20"},
+  {id:100,tr:"Dokuzuncu",sy:"ܬܫܝܥܝܐ (Tshiaya)",en:"Ninth",type:"sıfat",date:"2026-03-20"},
+  {id:101,tr:"Onuncu",sy:"ܥܣܝܪܝܐ (Asiraya)",en:"Tenth",type:"sıfat",date:"2026-03-20"},
+  {id:102,tr:"Yirminci",sy:"ܥܣܪܝܢܝܐ (Esrinaya)",en:"Twentieth",type:"sıfat",date:"2026-03-20"},
+  {id:103,tr:"Yazmak",sy:"ܟܬܒ (Ktav)",en:"To write",type:"fiil",date:"2026-03-20"},
+  {id:104,tr:"Açmak",sy:"ܦܬܚ (Ptah)",en:"To open",type:"fiil",date:"2026-03-20"},
+  {id:105,tr:"Çevirmek / Tercüme etmek",sy:"ܬܪܓܡ (Targem)",en:"To translate",type:"fiil",date:"2026-03-20"},
+  {id:106,tr:"Hata etmek / Günah işlemek",sy:"ܦܕ (Pad)",en:"To err/sin",type:"fiil",date:"2026-03-20"},
+  {id:107,tr:"Yargılamak",sy:"ܕܢ (Dan)",en:"To judge",type:"fiil",date:"2026-03-20"},
+  {id:108,tr:"Sormak",sy:"ܫܐܠ (Shael)",en:"To ask",type:"fiil",date:"2026-03-20"},
+  {id:109,tr:"Sevmek",sy:"ܪܚܡ (Rhem)",en:"To love",type:"fiil",date:"2026-03-20"},
+  {id:110,tr:"Işımak / Doğmak (güneş)",sy:"ܕܢܚ (Dnah)",en:"To shine/rise",type:"fiil",date:"2026-03-20"},
+  {id:111,tr:"Çıkmak",sy:"ܢܦܩ (Npaq)",en:"To exit/go out",type:"fiil",date:"2026-03-20"},
+  {id:112,tr:"Girmek",sy:"ܥܠ (Al)",en:"To enter",type:"fiil",date:"2026-03-20"},
+  {id:113,tr:"Dua etmek",sy:"ܨܠܝ (Tsli)",en:"To pray",type:"fiil",date:"2026-03-20"},
+  {id:114,tr:"Söylemek",sy:"ܐܡܪ (Amar)",en:"To say/tell",type:"fiil",date:"2026-03-20"},
+  {id:115,tr:"Kalkmak / Dikilmek",sy:"ܩܡ (Qam)",en:"To rise/stand up",type:"fiil",date:"2026-03-20"},
+  {id:116,tr:"Ölmek",sy:"ܡܝܬ (Mit)",en:"To die",type:"fiil",date:"2026-03-20"},
+  {id:117,tr:"Alçalmak / Alçaltmak",sy:"ܡܟ (Mak)",en:"To lower/humble",type:"fiil",date:"2026-03-20"},
+  {id:118,tr:"Sapmak",sy:"ܣܛܐ (Sta)",en:"To deviate/wander",type:"fiil",date:"2026-03-20"},
+  {id:119,tr:"Uçmak",sy:"ܦܪܚ (Prakh)",en:"To fly",type:"fiil",date:"2026-03-20"},
+  {id:120,tr:"Uyumak",sy:"ܢܡ (Nam)",en:"To sleep",type:"fiil",date:"2026-03-20"},
+  {id:121,tr:"İnmek / Yağmak",sy:"ܢܚܬ (Nhat)",en:"To descend",type:"fiil",date:"2026-03-20"},
+  {id:122,tr:"Taşınmak / Göç etmek",sy:"ܫܢܝ (Shni)",en:"To move/migrate",type:"fiil",date:"2026-03-20"},
+  {id:123,tr:"Dolmak",sy:"ܡܠܐ (Mla)",en:"To fill/be full",type:"fiil",date:"2026-03-20"},
+  {id:124,tr:"Galip gelmek",sy:"ܚܣܢ (Hsan)",en:"To prevail/overcome",type:"fiil",date:"2026-03-20"},
+  {id:125,tr:"Aydınlatmak",sy:"ܐܢܗܪ (Anhar)",en:"To illuminate",type:"fiil",date:"2026-03-20"},
+  {id:126,tr:"Rüya görmek",sy:"ܚܠܡ (Hlam)",en:"To dream",type:"fiil",date:"2026-03-20"},
+  {id:127,tr:"Doğmak / Doğurmak",sy:"ܝܠܕ (Ylad)",en:"To be born/give birth",type:"fiil",date:"2026-03-20"},
+  {id:128,tr:"Resmetmek / Tasvir etmek",sy:"ܨܘܪ (Tsur)",en:"To portray/depict",type:"fiil",date:"2026-03-20"},
+  {id:129,tr:"Geri dönmek",sy:"ܗܦܟ (Hfak)",en:"To return/turn back",type:"fiil",date:"2026-03-20"},
+  {id:130,tr:"Bozulmak / Bozmak",sy:"ܣܪܚ (Srakh)",en:"To corrupt/spoil",type:"fiil",date:"2026-03-20"},
+  {id:131,tr:"Azalmak / Eksik olmak",sy:"ܒܨܪ (Btsar)",en:"To decrease/lack",type:"fiil",date:"2026-03-20"},
+  {id:132,tr:"Tamamlamak",sy:"ܓܡܪ (Gmar)",en:"To complete/finish",type:"fiil",date:"2026-03-20"},
+  {id:133,tr:"Sevinmek / Mutlu olmak",sy:"ܚܕܝ (Hdi)",en:"To rejoice/be glad",type:"fiil",date:"2026-03-20"},
+  {id:134,tr:"insan",sy:"ܐܢܫܐ (Ansha)",en:"human",type:"isim",date:"2026-03-20"},
+  {id:135,tr:"erkek",sy:"ܕܟܪܐ (Dkara)",en:"male",type:"isim",date:"2026-03-20"},
+  {id:136,tr:"kadın",sy:"ܢܩܒܬܐ (Naqveta)",en:"female",type:"isim",date:"2026-03-20"},
+  {id:137,tr:"isim",sy:"ܫܡܐ (Shma)",en:"noun",type:"isim",date:"2026-03-20"},
+  {id:138,tr:"sıfat",sy:"ܫܘܡܗܐ (Shumaha)",en:"adjective",type:"isim",date:"2026-03-20"},
+  {id:139,tr:"fiil",sy:"ܡܠܬܐ (Milta)",en:"verb",type:"isim",date:"2026-03-20"},
+  {id:140,tr:"zaman",sy:"ܙܒܢܐ (Zavna)",en:"time",type:"isim",date:"2026-03-20"},
+  {id:141,tr:"şehir",sy:"ܡܕܝܢܬܐ (Mdinta)",en:"city",type:"isim",date:"2026-03-20"},
+  {id:142,tr:"köy",sy:"ܩܪܝܬܐ (Qrita)",en:"village",type:"isim",date:"2026-03-20"},
+  {id:143,tr:"yapmak",sy:"ܥܒܕ (ʕvad)",en:"to do",type:"fiil",date:"2026-03-20"},
+  {id:144,tr:"görmek",sy:"ܚܙܐ (Heza)",en:"to see",type:"fiil",date:"2026-03-20"},
+  {id:145,tr:"gelmek",sy:"ܐܬܐ (Eta)",en:"to come",type:"fiil",date:"2026-03-20"},
+  {id:146,tr:"yemek",sy:"ܐܟܠ (Akhal)",en:"to eat",type:"fiil",date:"2026-03-20"},
+  {id:147,tr:"bilmek",sy:"ܝܕܥ (Yda)",en:"to know",type:"fiil",date:"2026-03-20"},
+  {id:148,tr:"duymak",sy:"ܫܡܥ (Shmaʕ)",en:"to hear",type:"fiil",date:"2026-03-20"},
+  {id:149,tr:"almak",sy:"ܢܣܒ (Nsav)",en:"to take",type:"fiil",date:"2026-03-20"},
+  {id:150,tr:"vermek",sy:"ܝܗܒ (Yhav)",en:"to give",type:"fiil",date:"2026-03-20"},
+  {id:151,tr:"yazıyor",sy:"ܢܟܬܘܒ (Nktuv)",en:"writes",type:"fiil",date:"2026-03-20"},
+  {id:152,tr:"açıyor",sy:"ܢܦܬܚ (Nftah)",en:"opens",type:"fiil",date:"2026-03-20"},
+  {id:153,tr:"yapıyor",sy:"ܢܥܒܕ (Nʕvad)",en:"does",type:"fiil",date:"2026-03-20"},
+  {id:154,tr:"seviyor",sy:"ܢܪܚܡ (Nrhem)",en:"loves",type:"fiil",date:"2026-03-20"},
+  {id:155,tr:"kitabım",sy:"ܟܬܒܝ (Ktavi)",en:"my book",type:"birleşik",date:"2026-03-20"},
+  {id:156,tr:"kitabımız",sy:"ܟܬܒܢ (Ktavan)",en:"our book",type:"birleşik",date:"2026-03-20"},
+  {id:157,tr:"kitabın",sy:"ܟܬܒܟ (Ktavakh)",en:"your book",type:"birleşik",date:"2026-03-20"},
+  {id:158,tr:"kitabı",sy:"ܟܬܒܗ (Ktaveh)",en:"his book",type:"birleşik",date:"2026-03-20"},
+];
+function load(){try{const r=localStorage.getItem(SKEY);if(r)return JSON.parse(r);}catch(e){}return{words:[...defaults],nextId:159,theme:'gece'};}
+function save(){try{localStorage.setItem(SKEY,JSON.stringify({words,nextId,theme:curTheme}));}catch(e){showToast('⚠ Kaydetme hatası');}}
+let{words,nextId,theme:st}=load();
+let curTheme=st||'gece',q='',filterLang='all',sortKey=null,sortDir=1,acIdx=-1;
+function setTheme(t,el){
+  curTheme=t;document.body.dataset.theme=t;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  save();
+}
+(function(){
+  document.body.dataset.theme=curTheme;
+  const m={gece:'Gece',krem:'Krem',okyanus:'Okyanus',bahar:'Bahar',batim:'Gün Batımı',mor:'Mor Gece'};
+  document.querySelectorAll('.theme-card').forEach(c=>{if(c.getAttribute('title')===m[curTheme])c.classList.add('active');});
+})();
+function toggleAdd(){const w=document.getElementById('addWrap');w.classList.toggle('open');if(w.classList.contains('open'))document.getElementById('inp_tr').focus();}
+function insChar(ch){
+  const el=document.getElementById('inp_tr2');
+  const s=el.selectionStart,e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+ch+el.value.slice(e);
+  el.selectionStart=el.selectionEnd=s+ch.length;
+  el.focus();
+}
+function addWord(){
+  const tr=document.getElementById('inp_tr').value.trim();
+  const syRaw=document.getElementById('inp_sy').value.trim();
+  const tr2=document.getElementById('inp_tr2').value.trim();
+  const sy=syRaw&&tr2?`${syRaw} (${tr2})`:syRaw||tr2;
+  const en=document.getElementById('inp_en').value.trim();
+  const type=document.getElementById('inp_type').value;
+  if(!tr&&!sy&&!en){showToast('⚠ En az bir alan doldurun');return;}
+  const newWord={id:nextId++,tr,sy,en,type,date:today};
+  words.push(newWord);save();
+  if(useCloud){sbAddWord(newWord).then(res=>{if(res&&res[0]){newWord.sbId=res[0].id;save();}}).catch(e=>console.error(e));}
+  ['inp_tr','inp_sy','inp_tr2','inp_en'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('inp_type').value='';
+  document.getElementById('addWrap').classList.remove('open');
+  render();showToast('✦ Kelime eklendi');
+}
+let fontSize=parseInt(localStorage.getItem('sozluk_fs')||'100');
+function applyFont(){
+  document.documentElement.style.fontSize=fontSize+'%';
+  document.getElementById('fsLabel').textContent=fontSize+'%';
+  localStorage.setItem('sozluk_fs',fontSize);
+}
+function changeFont(dir){
+  fontSize=Math.min(150,Math.max(70,fontSize+dir*10));
+  applyFont();
+}
+function deleteWord(id){
+  const w=words.find(x=>x.id===id);
+  if(w&&useCloud&&w.sbId) sbDeleteWord(w.sbId).catch(e=>console.error(e));
+  words=words.filter(x=>x.id!==id);save();render();showToast('Kelime silindi');
+}
+function clearAll(){if(!confirm('Tüm kelimeler silinecek. Emin misiniz?'))return;words=[];nextId=1;save();render();showToast('Tümü silindi');}
+function onSearch(v){
+  q=v;document.getElementById('clearBtn').classList.toggle('vis',v.length>0);acIdx=-1;
+  if(v.length>=1)buildAc(v);else hideAc();render();
+}
+applyFont();
+initCloud();
+function buildAc(v){
+  const vl=v.toLowerCase(),seen=new Set(),hits=[];
+  const ll={tr:'Türkçe',sy:'Süryanice',en:'İngilizce'};
+  words.forEach(w=>{['tr','sy','en'].forEach(lang=>{const txt=(w[lang]||''),k=w.id+'_'+lang;if(txt.toLowerCase().includes(vl)&&!seen.has(k)){seen.add(k);hits.push({w,lang,txt});}});});
+  const top=hits.slice(0,9);
+  const box=document.getElementById('acBox');
+  if(!top.length){hideAc();return;}
+  const esc=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  box.innerHTML=top.map((h,i)=>`<div class="ac-item" onclick="selAc('${h.txt.replace(/'/g,"\\'")}')">
+    <span class="ac-lang">${ll[h.lang]}</span>
+    <span class="ac-txt">${h.txt.replace(new RegExp(esc,'gi'),m=>`<mark>${m}</mark>`)}</span>
+    ${h.w.type?`<span class="ac-tp">${h.w.type}</span>`:''}
+  </div>`).join('');
+  box.classList.add('show');
+}
+function hideAc(){document.getElementById('acBox').classList.remove('show');acIdx=-1;}
+function showAc(){if(q.length>=1)buildAc(q);}
+function selAc(txt){document.getElementById('searchInput').value=txt;q=txt;document.getElementById('clearBtn').classList.add('vis');hideAc();render();}
+function acKey(e){
+  const box=document.getElementById('acBox');const items=box.querySelectorAll('.ac-item');
+  if(!box.classList.contains('show'))return;
+  if(e.key==='ArrowDown'){e.preventDefault();acIdx=Math.min(acIdx+1,items.length-1);hlAc(items);}
+  else if(e.key==='ArrowUp'){e.preventDefault();acIdx=Math.max(acIdx-1,0);hlAc(items);}
+  else if(e.key==='Enter'&&acIdx>=0){e.preventDefault();items[acIdx].click();}
+  else if(e.key==='Escape')hideAc();
+}
+function hlAc(items){items.forEach((it,i)=>it.classList.toggle('sel',i===acIdx));if(acIdx>=0)items[acIdx].scrollIntoView({block:'nearest'});}
+document.addEventListener('click',e=>{if(!document.getElementById('searchSec').contains(e.target))hideAc();});
+function clearSearch(){document.getElementById('searchInput').value='';document.getElementById('clearBtn').classList.remove('vis');q='';hideAc();render();}
+function setFilter(lang,el){filterLang=lang;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');render();}
+function sortT(key){
+  if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}
+  document.querySelectorAll('th').forEach(t=>t.classList.remove('sa','sd'));
+  const m={tr:1,sy:2,en:3,type:4,date:5};const ths=document.querySelectorAll('th');
+  if(m[key]!==undefined)ths[m[key]].classList.add(sortDir===1?'sa':'sd');render();
+}
+function getFiltered(){
+  let list=[...words];
+  if(q){const ql=q.toLowerCase();list=list.filter(w=>{
+    if(filterLang==='tr')return(w.tr||'').toLowerCase().includes(ql);
+    if(filterLang==='sy')return(w.sy||'').toLowerCase().includes(ql);
+    if(filterLang==='en')return(w.en||'').toLowerCase().includes(ql);
+    if(filterLang==='type')return(w.type||'').toLowerCase().includes(ql);
+    return(w.tr||'').toLowerCase().includes(ql)||(w.sy||'').toLowerCase().includes(ql)||(w.en||'').toLowerCase().includes(ql)||(w.type||'').toLowerCase().includes(ql);
+  });}
+  if(sortKey)list.sort((a,b)=>String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'tr')*sortDir);
+  return list;
+}
+function hl(t,q){if(!q||!t)return t||'';const esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return String(t).replace(new RegExp(esc,'gi'),m=>`<mark>${m}</mark>`);}
+function render(){
+  const f=getFiltered();
+  document.getElementById('totalCount').textContent=words.length;
+  document.getElementById('filteredCount').textContent=f.length;
+  document.getElementById('todayCount').textContent=words.filter(w=>w.date===today).length;
+  document.getElementById('resLabel').textContent=f.length+' kelime';
+  const tbody=document.getElementById('tbody');
+  if(!f.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="big">◌</div>${q?'Aramanızla eşleşen kelime bulunamadı.':'Henüz kelime eklenmemiş.'}</div></td></tr>`;return;}
+  tbody.innerHTML=f.map((w,i)=>`<tr>
+    <td>${i+1}</td><td>${hl(w.tr,q)||'—'}</td>
+    <td class="tsy">${hl(w.sy,q)||'—'}</td>
+    <td class="ten">${hl(w.en,q)||'—'}</td>
+    <td>${w.type?`<span class="tpill">${w.type}</span>`:''}</td>
+    <td class="tdate">${w.date||''}</td>
+    <td style="white-space:nowrap"><button class="ebtn" onclick="editWord(${w.id})" title="Düzenle">✏️</button><button class="dbtn" onclick="deleteWord(${w.id})" title="Sil">✕</button></td>
+  </tr>`).join('');
+}
+function exportExcel(){
+  const data=[['#','Türkçe','Süryanice','İngilizce','Kelime Türü','Tarih']];
+  words.forEach((w,i)=>data.push([i+1,w.tr,w.sy,w.en,w.type||'',w.date]));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:5},{wch:22},{wch:30},{wch:22},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'Sözlük');XLSX.writeFile(wb,'sozluk.xlsx');
+  showToast('✦ Excel indirildi');
+}
+function importExcel(event){
+  const file=event.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const wb=XLSX.read(e.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1});let added=0;
+    rows.slice(1).forEach(r=>{if(r[1]||r[2]||r[3]){words.push({id:nextId++,tr:r[1]||'',sy:r[2]||'',en:r[3]||'',type:r[4]||'',date:r[5]||today});added++;}});
+    save();render();showToast(`✦ ${added} kelime yüklendi`);
+  }catch(err){showToast('⚠ Excel okunamadı');}};
+  r.readAsBinaryString(file);event.target.value='';
+}
+
+/* ── TABS ─────────────────────────────────── */
+function switchTab(id, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='cumle') renderPool();
+}
+
+/* ── CÜMLE KUR ────────────────────────────── */
+let sentence=[], poolFilter='hepsi';
+
+function setPoolFilter(f, el){
+  poolFilter=f;
+  document.querySelectorAll('.pool-filter').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderPool();
+}
+
+function renderPool(){
+  const pool=document.getElementById('wordPool');
+  let list=words;
+  if(poolFilter!=='hepsi') list=list.filter(w=>w.type===poolFilter);
+  pool.innerHTML=list.map(w=>{
+    const used=sentence.find(s=>s.id===w.id);
+    const sy=w.sy?w.sy.replace(/\s*\([^)]*\)/,''):'';
+    return `<div class="pool-word${used?' used':''}" onclick="addToSentence(${w.id})" title="${w.en}">
+      <span>${w.tr}</span>${sy?`<span style="font-size:11px;opacity:.5;margin-left:4px">${sy}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function addToSentence(id){
+  const w=words.find(x=>x.id===id);
+  if(!w||sentence.find(s=>s.id===id)) return;
+  sentence.push(w);
+  renderSlots();
+  renderPool();
+}
+
+function removeFromSentence(id){
+  sentence=sentence.filter(s=>s.id!==id);
+  renderSlots();
+  renderPool();
+  document.getElementById('resultBox').style.display='none';
+}
+
+function renderSlots(){
+  const el=document.getElementById('sentenceSlots');
+  if(!sentence.length){el.innerHTML='<span style="color:var(--txt-d);font-style:italic;font-size:13px;opacity:.5">Kelime havuzundan seç...</span>';return;}
+  el.innerHTML=sentence.map((w,i)=>`
+    <div class="slot-word" draggable="true"
+      ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="dropWord(event,${i})" ondragleave="dragLeave(event)"
+      onclick="removeFromSentence(${w.id})" title="Çıkarmak için tıkla">
+      ${w.tr}<span class="rm">✕</span>
+    </div>`).join('');
+}
+
+let dragIdx=null;
+function dragStart(i){dragIdx=i;}
+function dragOver(e,i){e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function dragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function dropWord(e,i){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(dragIdx===null||dragIdx===i)return;
+  const moved=sentence.splice(dragIdx,1)[0];
+  sentence.splice(i,0,moved);
+  dragIdx=null;
+  renderSlots();
+  document.getElementById('resultBox').style.display='none';
+}
+
+let activeLang='tr';
+function switchLangTab(lang, el){
+  activeLang=lang;
+  document.querySelectorAll('.lang-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.lang-structs').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('lstructs-'+lang).classList.add('active');
+  sentence=[];renderSlots();renderPool();
+  document.getElementById('resultBox').style.display='none';
+}
+
+function applyStruct(type){
+  const zamir=words.filter(w=>w.type==='zamir');
+  const fiil=words.filter(w=>w.type==='fiil');
+  const isim=words.filter(w=>w.type==='isim');
+  const sifat=words.filter(w=>w.type==='sıfat');
+  sentence=[];
+  const ok=(arr)=>arr.length>0;
+  // Türkçe SOV
+  if(type==='SOV'&&ok(zamir)&&ok(isim)&&ok(fiil))         sentence=[zamir[0],isim[0],fiil[0]];
+  else if(type==='SO'&&ok(zamir)&&ok(isim))                sentence=[zamir[0],isim[0]];
+  else if(type==='SAdjV'&&ok(zamir)&&ok(sifat)&&ok(fiil)) sentence=[zamir[0],sifat[0],fiil[0]];
+  else if(type==='SV_tr'&&ok(zamir)&&ok(fiil))            sentence=[zamir[0],fiil[0]];
+  // İngilizce SVO
+  else if(type==='SVO'&&ok(zamir)&&ok(fiil)&&ok(isim))    sentence=[zamir[0],fiil[0],isim[0]];
+  else if(type==='SV'&&ok(zamir)&&ok(fiil))               sentence=[zamir[0],fiil[0]];
+  else if(type==='SVAdj'&&ok(zamir)&&ok(fiil)&&ok(sifat)) sentence=[zamir[0],fiil[0],sifat[0]];
+  // Süryanice VSO
+  else if(type==='VSO'&&ok(fiil)&&ok(zamir)&&ok(isim))    sentence=[fiil[0],zamir[0],isim[0]];
+  else if(type==='VS'&&ok(fiil)&&ok(zamir))               sentence=[fiil[0],zamir[0]];
+  else if(type==='VSAdj'&&ok(fiil)&&ok(zamir)&&ok(sifat)) sentence=[fiil[0],zamir[0],sifat[0]];
+  else if(type==='VOS'&&ok(fiil)&&ok(isim)&&ok(zamir))    sentence=[fiil[0],isim[0],zamir[0]];
+  else {showToast('⚠ Yeterli kelime yok');return;}
+  renderSlots();renderPool();
+  document.getElementById('resultBox').style.display='none';
+}
+
+let activeTense='past';
+const tenseLabels={
+  past:     {tr:'Geçmiş Zaman',    sy:'Geçmiş (ܥܒܪ)',   en:'Past Tense'},
+  present:  {tr:'Şimdiki Zaman',   sy:'Şimdiki (ܩܐܡ)',  en:'Present Tense'},
+  future:   {tr:'Gelecek Zaman',   sy:'Gelecek (ܥܬܝܕ)', en:'Future Tense'},
+  imperative:{tr:'Emir Kipi',      sy:'Emir (ܦܘܩܕܢܐ)', en:'Imperative'},
+};
+const tenseSuffix={
+  tr:{past:'dı/di/du/dü',present:'yor',future:'acak/ecek',imperative:'!'},
+  en:{past:'did',present:'is doing',future:'will',imperative:'(command)'},
+  sy:{past:'ܟܬܒ (ktav)',present:'ܢܟܬܘܒ (nktuv)',future:'ܢܟܬܘܒ (nktuv — gelecek)',imperative:'ܟܬܘܒ (ktuv)'},
+};
+function setTense(t,el){
+  activeTense=t;
+  document.querySelectorAll('.tense-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function buildSentence(){
+  if(!sentence.length){showToast('⚠ Önce kelime seçin');return;}
+  const trWords=sentence.map(w=>w.tr).join(' ');
+  const enWords=sentence.map(w=>w.en.replace(/^to /i,'')).join(' ');
+  const syWords=sentence.map(w=>(w.sy||'').split('(')[0].trim()).join(' ');
+  const tl=tenseLabels[activeTense];
+  const ts=tenseSuffix[activeTense];
+  const langLabels={tr:'Türkçe (SOV)',sy:'Süryanice (VSO)',en:'İngilizce (SVO)'};
+  const primary=activeLang;
+  const val={
+    tr:`${trWords} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.tr}]</span>`,
+    sy:`${syWords||'—'} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.sy}]</span>`,
+    en:`${enWords.charAt(0).toUpperCase()+enWords.slice(1)} <span style="font-family:var(--fm);font-size:11px;color:var(--acc);opacity:.8">[${ts.en}]</span>`,
+  };
+  const cls={tr:'sent-tr',sy:'sent-sy',en:'sent-en'};
+  const others=['tr','sy','en'].filter(l=>l!==primary);
+  const res=document.getElementById('sentResult');
+  res.innerHTML=`
+    <div style="display:inline-block;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:2px 10px;background:var(--pb);color:var(--acc);border-radius:20px;margin-bottom:12px">${tl[primary]}</div>
+    <div class="sent-label">${langLabels[primary]} — Ana Kalıp</div>
+    <div class="${cls[primary]}" style="font-size:18px;margin-bottom:14px;color:var(--txt)">${val[primary]}</div>
+    <div style="border-top:1px solid var(--brd-s);padding-top:12px;display:flex;flex-direction:column;gap:10px">
+      ${others.map(l=>`
+        <div>
+          <div class="sent-label">${langLabels[l]} — ${tl[l]}</div>
+          <div class="${cls[l]}">${val[l]}</div>
+        </div>`).join('')}
+    </div>
+  `;
+  document.getElementById('resultBox').style.display='block';
+}
+
+function clearSentence(){
+  sentence=[];renderSlots();renderPool();
+  document.getElementById('resultBox').style.display='none';
+}
+
+
+let tableOpen=true;
+function toggleTable(){
+  tableOpen=!tableOpen;
+  const sc=document.getElementById('tblScroll');
+  const ar=document.getElementById('tblArrow');
+  sc.classList.toggle('collapsed',!tableOpen);
+  ar.style.transform=tableOpen?'rotate(0deg)':'rotate(-90deg)';
+}
+
+let editingId=null;
+function editWord(id){
+  const w=words.find(x=>x.id===id);
+  if(!w) return;
+  editingId=id;
+  // Parse sy and transliteration
+  const syMatch=(w.sy||'').match(/^([^(]*)\s*(?:\(([^)]*)\))?/);
+  const syBase=syMatch?syMatch[1].trim():'';
+  const syTranslit=syMatch&&syMatch[2]?syMatch[2].trim():'';
+  document.getElementById('edit_tr').value=w.tr||'';
+  document.getElementById('edit_sy').value=syBase;
+  document.getElementById('edit_tr2').value=syTranslit;
+  document.getElementById('edit_en').value=w.en||'';
+  document.getElementById('edit_type').value=w.type||'';
+  const modal=document.getElementById('editModal');
+  modal.style.display='flex';
+  setTimeout(()=>document.getElementById('edit_tr').focus(),100);
+}
+function closeEdit(){
+  document.getElementById('editModal').style.display='none';
+  editingId=null;
+}
+function saveEdit(){
+  if(!editingId) return;
+  const w=words.find(x=>x.id===editingId);
+  if(!w) return;
+  const syRaw=document.getElementById('edit_sy').value.trim();
+  const tr2=document.getElementById('edit_tr2').value.trim();
+  w.tr=document.getElementById('edit_tr').value.trim();
+  w.sy=syRaw&&tr2?`${syRaw} (${tr2})`:syRaw||tr2;
+  w.en=document.getElementById('edit_en').value.trim();
+  w.type=document.getElementById('edit_type').value;
+  if(useCloud&&w.sbId) sbUpdateWord(w.sbId,w).catch(e=>console.error(e));
+  save();render();closeEdit();showToast('✦ Kelime güncellendi');
+}
+function insCharEdit(ch){
+  const el=document.getElementById('edit_tr2');
+  const s=el.selectionStart,e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+ch+el.value.slice(e);
+  el.selectionStart=el.selectionEnd=s+ch.length;
+  el.focus();
+}
+// Close modal on backdrop click
+document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeEdit();});
+
+/* ── NOTLAR ─────────────────────────────────── */
+let notes=[], editingNoteId=null;
+const NKEY='sozluk_notes_v1';
+function loadNotes(){try{const r=localStorage.getItem(NKEY);if(r)notes=JSON.parse(r);}catch(e){notes=[];}renderNotes();}
+function saveNotes(){try{localStorage.setItem(NKEY,JSON.stringify(notes));}catch(e){}}
+
+function switchNTab(id,el){
+  document.querySelectorAll('.ntab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ntab-'+id+'-panel').classList.add('active');
+  el.classList.add('active');
+  if(id==='list') renderNotes();
+}
+
+function renderNotes(){
+  const list=document.getElementById('noteList');
+  const empty=document.getElementById('noteEmpty');
+  if(!notes.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  // Group by category
+  const cats={};
+  notes.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
+  list.innerHTML=Object.entries(cats).map(([cat,items])=>`
+    <div style="margin-bottom:6px">
+      <div style="font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px;opacity:.7">${cat}</div>
+      ${items.map(n=>`
+        <div class="note-card" style="margin-bottom:8px">
+          <div class="note-card-hdr">
+            <span class="note-card-title">${n.title}</span>
+            <div class="note-actions">
+              <button class="nebtn" onclick="editNote(${n.id})" title="Düzenle">✏️</button>
+              <button class="ndbtn" onclick="deleteNote(${n.id})" title="Sil">✕</button>
+            </div>
+          </div>
+          <div class="note-card-body">${n.body}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+let noteNextId=1;
+function saveNote(){
+  const title=document.getElementById('note_title').value.trim();
+  const body=document.getElementById('note_body').value.trim();
+  const cat=document.getElementById('note_cat').value||'Genel';
+  if(!title&&!body){showToast('⚠ Başlık veya açıklama girin');return;}
+  if(editingNoteId){
+    const n=notes.find(x=>x.id===editingNoteId);
+    if(n){n.title=title;n.body=body;n.cat=cat;}
+    editingNoteId=null;
+    document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
+  } else {
+    notes.push({id:noteNextId++,title,body,cat});
+  }
+  if(useCloud){
+    if(editingNoteId){const n=notes.find(x=>x.id===editingNoteId);if(n&&n.sbId)sbUpdateNote(n.sbId,n).catch(e=>console.error(e));}
+    else{const n=notes[notes.length-1];sbAddNote(n).then(res=>{if(res&&res[0]){n.sbId=res[0].id;saveNotes();}}).catch(e=>console.error(e));}
+  }
+  saveNotes();
+  document.getElementById('note_title').value='';
+  document.getElementById('note_body').value='';
+  document.getElementById('note_cat').value='';
+  showToast('✦ Kural kaydedildi');
+  switchNTab('list',document.getElementById('ntab-list'));
+}
+
+function editNote(id){
+  const n=notes.find(x=>x.id===id);
+  if(!n) return;
+  editingNoteId=id;
+  document.getElementById('note_title').value=n.title;
+  document.getElementById('note_body').value=n.body;
+  document.getElementById('note_cat').value=n.cat||'Genel';
+  document.getElementById('noteFormTitle').textContent='Kural Düzenle';
+  switchNTab('edit',document.getElementById('ntab-edit'));
+}
+
+function deleteNote(id){
+  if(!confirm('Bu kural silinecek. Emin misiniz?')) return;
+  const dn=notes.find(x=>x.id===id);
+  if(dn&&useCloud&&dn.sbId) sbDeleteNote(dn.sbId).catch(e=>console.error(e));
+  notes=notes.filter(n=>n.id!==id);
+  saveNotes();renderNotes();showToast('Kural silindi');
+}
+
+function cancelNoteEdit(){
+  editingNoteId=null;
+  document.getElementById('note_title').value='';
+  document.getElementById('note_body').value='';
+  document.getElementById('note_cat').value='';
+  document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
+  switchNTab('list',document.getElementById('ntab-list'));
+}
+loadNotes();
+
+let poolOpen=true;
+function togglePool(){
+  poolOpen=!poolOpen;
+  const body=document.getElementById('poolBody');
+  const arrow=document.getElementById('poolArrow');
+  body.style.maxHeight=poolOpen?'9000px':'0';
+  body.style.opacity=poolOpen?'1':'0';
+  arrow.style.transform=poolOpen?'rotate(0deg)':'rotate(-90deg)';
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
+  if(e.key==='Escape'){clearSearch();document.getElementById('addWrap').classList.remove('open');}
+});
+render();
+</script>
+</body>
+</html>
