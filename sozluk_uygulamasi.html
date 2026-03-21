@@ -364,9 +364,9 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
 
 
-.wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
-.wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
+
+
+
 
 
 /* ── FAVORİLER ──────────────────────────────── */
@@ -391,28 +391,20 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
 
 
-/* ── BUGÜN KARTI ─────────────────────────────── */
-.bugun-kart{background:var(--surf2);border:1px solid var(--brd-s);border-radius:8px;padding:14px 12px;text-align:center}
-.bugun-kart-baslik{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px}
-.bugun-kart-sy{font-size:1.5rem;font-weight:700;color:var(--acc);margin-bottom:4px}
-.bugun-kart-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);margin-bottom:6px}
-.bugun-kart-tr{font-size:0.9rem;font-weight:700;color:var(--txt);margin-bottom:2px}
-.bugun-kart-en{font-size:0.78rem;color:var(--txt-d)}
-.bugun-kart-tur{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;border:1px solid transparent}
-@media(max-width:640px){#bugun-grid{grid-template-columns:repeat(2,1fr)!important;padding:12px!important}}
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body data-theme="krem">
 <div class="app">
   <header>
-    <div class="horm">✦ Lexicon ✦</div>
-    <h1>ܡܠܬܐ · Sözcük · Word</h1>
-    <p class="sub">Türkçe — Süryanice — İngilizce Sözlük</p>
-    <div class="lang-row">
-      <span class="lbadge">Türkçe</span>
-      <span class="lbadge">ܣܘܪܝܝܐ Süryanice</span>
-      <span class="lbadge">English</span>
-    </div>
     <div class="save-ind"><span class="save-dot"></span>Veriler tarayıcıda kalıcı kaydediliyor</div>
     <div style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
       <div id="userPanel" style="display:none;align-items:center;gap:8px;background:var(--surf2);border:1px solid var(--brd);border-radius:20px;padding:4px 12px 4px 8px">
@@ -468,32 +460,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- Karşılama -->
     <div style="text-align:center;padding:28px 20px 20px">
-      <div style="font-size:2.2rem;margin-bottom:10px">ܡܠܬܐ</div>
-      <div style="font-family:var(--fm);font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px">Sözcük · Word</div>
-      <p style="font-size:0.95rem;color:var(--txt-d);max-width:480px;margin:0 auto;line-height:1.7">
-        Türkçe, Süryanice ve İngilizce üç dilli dijital sözlük. Klasik Süryanice öğrenmek, kelime çalışmak ve dilbilgisi kurallarını keşfetmek için.
-      </p>
     </div>
-
-    <!-- Bugün -->
-    <div class="tbl-wrap" style="margin-bottom:16px">
-      <div class="tbl-hdr">
-        <span class="tbl-ttl">Bugün</span>
-        <span id="bugun-tarih" style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)"></span>
-      </div>
-      <div id="bugun-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 20px">
-        <div style="color:var(--txt-d);font-size:0.85rem;opacity:.5;grid-column:1/-1;text-align:center;padding:12px">Yükleniyor...</div>
-      </div>
-    </div>
-
-    <!-- Biliyor musun? -->
-    <div class="tbl-wrap" style="margin-bottom:16px">
-      <div class="tbl-hdr"><span class="tbl-ttl">💡 Biliyor musun?</span></div>
-      <div id="biliyor-musun" style="padding:16px 20px">
-        <div style="color:var(--txt-d);font-size:0.85rem;opacity:.5">Yükleniyor...</div>
-      </div>
-    </div>
-
     <!-- Bölümler -->
     <div class="tbl-wrap" style="margin-bottom:16px">
       <div class="tbl-hdr"><span class="tbl-ttl">Bölümler</span></div>
@@ -558,7 +525,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <div class="tbl-hdr"><span class="tbl-ttl">Sözlük Hakkında</span></div>
       <div style="padding:20px">
         <p style="font-size:0.95rem;color:var(--txt-d);line-height:1.8;margin:0">
-          Bu sözlük tamamen amatörce hazırlanmış olup, temel düzeyde öğrencilerin çalışmalarına destek vermeyi hedeflemiştir. Hazırlayan kişilerin hedeflerine ulaşmasından sonra yayından kaldırılacaktır.
+          Bu sözlük, Türkçe, Süryanice ve İngilizce üç dilli dijital sözlük. Klasik Süryanice öğrenmek, kelime çalışmak ve dilbilgisi kurallarını keşfetmek için tamamen amatörce hazırlanmış olup, temel düzeyde öğrencilerin çalışmalarına destek vermeyi hedeflemiştir. Hazırlayan kişilerin hedeflerine ulaşmasından sonra yayından kaldırılacaktır.
         </p>
       </div>
     </div>
@@ -1216,7 +1183,7 @@ async function initCloud(){
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
       document.getElementById('cloudInd').style.color='#3a9a5a';
-      render();renderNotes();renderHomeStats();renderBugun();renderBugun();    }
+      render();renderNotes();renderHomeStats();    }
   } catch(e){
     console.error('Cloud init error:',e);
     document.getElementById('cloudInd').textContent='⚠ Çevrimdışı';
@@ -1562,7 +1529,7 @@ function switchTab(id, el){
   if(id==='referans'){renderRef();}
   if(id==='istatistik') renderIstatistik();
   if(id==='flashcard'){document.getElementById('fcArea').style.display='none';document.getElementById('fcResult').style.display='none';}
-  if(id==='anasayfa'){renderHomeStats();renderBugun();}
+  if(id==='anasayfa'){renderHomeStats();}
   const iconBtn=document.getElementById('inb-'+id);
   if(iconBtn) iconBtn.classList.add('active');
 }
@@ -2956,61 +2923,6 @@ function renderHomeStats(){
   }
 }
 
-/* -- BUGUN ve BILIYOR MUSUN -- */
-function renderBugun(){
-  var grid=document.getElementById('bugun-grid');
-  var biliyorEl=document.getElementById('biliyor-musun');
-  var tarihEl=document.getElementById('bugun-tarih');
-  var bugun=new Date();
-  var aylar=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
-  if(tarihEl) tarihEl.textContent=bugun.getDate()+' '+aylar[bugun.getMonth()]+' '+bugun.getFullYear();
-  if(grid){
-    function kart(w,lbl){
-      if(!w) return '<div class="bugun-kart"><div class="bugun-kart-baslik">'+lbl+'</div><div class="bugun-kart-en" style="opacity:.4">---</div></div>';
-      var sy=w.sy||''; var p=sy.indexOf('(');
-      var sc=p>-1?sy.substring(0,p).trim():sy.trim();
-      var tr=p>-1?sy.substring(p+1).replace(')','').trim():'';
-      var c=(typeof typeColors!='undefined'&&typeColors[w.type])?typeColors[w.type]:'#888';
-      return '<div class="bugun-kart">'
-        +'<div class="bugun-kart-baslik">'+lbl+'</div>'
-        +(sc?'<div class="bugun-kart-sy">'+sc+'</div>':'')
-        +(tr?'<div class="bugun-kart-translit">'+tr+'</div>':'')
-        +'<div class="bugun-kart-tr">'+(w.tr||'---')+'</div>'
-        +(w.en?'<div class="bugun-kart-en">'+w.en+'</div>':'')
-        +(w.type?'<div class="bugun-kart-tur" style="background:'+c+'18;color:'+c+';border-color:'+c+'33">'+w.type+'</div>':'')
-        +'</div>';
-    }
-    if(!words||!words.length){
-      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--txt-d);opacity:.5">Yükleniyor...</div>';
-    } else {
-      var turler=[
-        ['isim','Günün İsmi'],['fiil','Günün Fiili'],
-        ['sıfat','Günün Sıfatı'],['bağlaç','Günün Bağlacı'],['edat','Günün Edatı']
-      ];
-      var html='';
-      turler.forEach(function(t){
-        var pool=words.filter(function(w){return w.type===t[0]||w.type===(t[0]==='sıfat'?'sıfat':t[0]==='bağlaç'?'bağlaç':t[0]);});
-        html+=kart(pool.length?pool[seed%pool.length]:null,t[1]);
-      });
-      html+=kart(words[Math.floor(Math.random()*words.length)],'Bu Ziyarette');
-      html+='<div class="bugun-kart" style="grid-column:1/-1;background:transparent;border:1.5px dashed var(--brd);display:flex;align-items:center;justify-content:center;padding:14px;gap:8px"><span>Bu kelimelerden kac farkli cumle kurabilirsin?</span></div>';
-      grid.innerHTML=html;
-    }
-  }
-  if(biliyorEl){
-    if(!notes||!notes.length){
-      biliyorEl.innerHTML='<div style="opacity:.5">Kural yok.</div>';
-    } else {
-      var k=notes[seed%notes.length];
-      var rc=(typeof catColors!='undefined'&&catColors[k.cat])?catColors[k.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
-      biliyorEl.innerHTML='<div style="margin-bottom:8px"><span style="padding:2px 10px;border-radius:20px;font-size:0.7rem;background:'+rc.bg+';color:'+rc.text+';border:1px solid '+rc.border+'">'+(k.cat||'Genel')+'</span></div>'
-        +'<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+(k.title||'')+'</div>'
-        +(k.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75;white-space:pre-wrap">'+k.body+'</div>':'')
-        +(k.example?'<div style="margin-top:8px;font-size:0.82rem;font-style:italic;border-left:3px solid var(--brd);padding-left:10px">'+k.example+'</div>':'');
-    }
-  }
-}
 
 
 /* ── BAŞLANGIÇ ──────────────────────────────── */
@@ -3019,7 +2931,6 @@ loadNotes();
 loadRef();
 render();
 renderHomeStats();
-renderBugun();
 initCloud();
 restoreSession();
 </script>
