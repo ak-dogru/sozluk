@@ -61,6 +61,15 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .char-btns{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
 .chbtn{background:var(--surf3);border:1px solid var(--brd);color:var(--acc);font-size:12px;padding:2px 6px;cursor:pointer;border-radius:4px;font-family:var(--fm);transition:background .15s,color .15s;line-height:1.4}
 .chbtn:hover{background:var(--acc);color:var(--bg)}
+.gram-hint-box{margin-top:14px;border:1.5px solid var(--brd);border-radius:8px;overflow:hidden;transition:all .3s}
+.gram-hint-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surf2);cursor:pointer;user-select:none}
+.gram-hint-hdr-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
+.gram-hint-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.gram-hint-item{display:flex;flex-direction:column;gap:3px;padding:8px 10px;background:var(--surf2);border-radius:6px;border-left:3px solid var(--acc-d)}
+.gram-hint-item-title{font-family:var(--fm);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--acc-d);margin-bottom:2px}
+.gram-hint-item-body{font-size:12px;color:var(--txt-d);line-height:1.6}
+.gram-hint-item-example{font-size:11px;color:var(--acc-d);font-style:italic;margin-top:3px;font-family:var(--fm)}
+
 /* ── REFERANS ───────────────────────────────── */
 .ref-section{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;margin-bottom:12px;overflow:hidden;transition:background .35s}
 .ref-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--surf2);cursor:pointer;user-select:none;transition:background .35s}
@@ -444,6 +453,15 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="cb-section">
       <div class="cb-title">3 · Cümleyi Kur</div>
       <div id="langHint" class="struct-hint" style="margin-bottom:10px">Türkçe sözdizimi: Özne → Nesne → Fiil (SOV)</div>
+
+      <!-- Gramer Hatırlatıcısı -->
+      <div class="gram-hint-box" id="gramHintBox" style="display:none">
+        <div class="gram-hint-hdr" onclick="toggleGramHint()">
+          <span class="gram-hint-hdr-title">📖 Gramer Hatırlatıcısı</span>
+          <span id="gramHintArrow" style="font-size:11px;color:var(--acc-d);transition:transform .3s">▼</span>
+        </div>
+        <div id="gramHintBody" class="gram-hint-body"></div>
+      </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
         <!-- Seçilen kelimeler (serbest sıra) -->
@@ -1194,6 +1212,7 @@ function switchLangTab(lang, el){
   el.classList.add('active');
   const hint=document.getElementById('langHint');
   if(hint) hint.textContent=langHints[lang]||'';
+  updateGramHint(lang);
   renderSlots();renderPool();
   document.getElementById('resultBox').style.display='none';
 }
@@ -1817,6 +1836,94 @@ function filterRef(){
 document.getElementById('refSectionModal').addEventListener('click',function(e){if(e.target===this)closeRefSectionModal();});
 document.getElementById('refRowModal').addEventListener('click',function(e){if(e.target===this)closeRefRowModal();});
 loadRef();renderRef();
+
+/* ── GRAMER HATIRLATICISI ─────────────────── */
+let gramHintOpen=true;
+
+// Rules per language pulled from notes + referans
+const gramRules={
+  tr:{
+    title:'Türkçe Sözdizimi (SOV)',
+    rules:[
+      {title:'Temel Sıra',body:'Özne → Nesne → Fiil',example:'Ben kitap okudum'},
+      {title:'Olumsuzluk',body:'-me/-ma olumsuzluk eki fiile eklenir',example:'Ben kitap okumadım'},
+      {title:'Soru',body:'Soru eki (-mı/-mi/-mu/-mü) fiilin sonuna gelir',example:'Ben kitap okudum mu?'},
+    ]
+  },
+  sy:{
+    title:'Süryanice Sözdizimi (VSO)',
+    rules:[
+      {title:'Temel Sıra',body:'Fiil → Özne → Nesne',example:'ktab gabro ktobo → Yazdı adam kitabı'},
+      {title:'Olumsuzluk',body:"'lo' kelimesi fiilin önüne gelir",example:'lo ktab gabro → Adam yazmadı'},
+      {title:'Soru',body:"Cümle başına 'ara' eklenir veya ses tonu yükseltilir",example:'ara ktab gabro? → Adam yazdı mı?'},
+      {title:'Cinsiyet Uyumu',body:'Fiil öznenin cinsine göre çekilir (e/d)',example:'ktab (e) — ketbat (d)'},
+      {title:'Önekler (BDUL)',body:'b- (içinde) | d- (ilgi) | w- (ve) | l- (yönelme/nesne)',example:'lgabro = adama | bmdito = şehirde'},
+      {title:"'lo' Olumsuzluk",body:"Fiilden önce 'lo' yazılır",example:'lo sleq → tırmanmadı'},
+    ]
+  },
+  en:{
+    title:'İngilizce Sözdizimi (SVO)',
+    rules:[
+      {title:'Temel Sıra',body:'Subject → Verb → Object',example:'I read a book'},
+      {title:'Negation',body:"'not' comes after auxiliary verb",example:"I did not read"},
+      {title:'Question',body:'Auxiliary verb moves before subject',example:'Did I read the book?'},
+    ]
+  }
+};
+
+function updateGramHint(lang){
+  const box=document.getElementById('gramHintBox');
+  const body=document.getElementById('gramHintBody');
+  if(!box||!body) return;
+
+  const rules=gramRules[lang];
+  if(!rules){box.style.display='none';return;}
+
+  // Also pull relevant notes from notlar
+  const relatedNotes=notes.filter(n=>{
+    if(lang==='sy') return n.cat==='Cümle Yapısı'||n.cat==='Fiil Kuralları';
+    if(lang==='tr') return n.cat==='Cümle Yapısı';
+    return false;
+  }).slice(0,3);
+
+  box.style.display='block';
+  body.innerHTML='';
+
+  // Show built-in rules
+  rules.rules.forEach(r=>{
+    const item=document.createElement('div');
+    item.className='gram-hint-item';
+    item.innerHTML='<div class="gram-hint-item-title">'+r.title+'</div>'
+      +'<div class="gram-hint-item-body">'+r.body+'</div>'
+      +(r.example?'<div class="gram-hint-item-example">Örn: '+r.example+'</div>':'');
+    body.appendChild(item);
+  });
+
+  // Show related notes if any
+  if(relatedNotes.length>0){
+    const sep=document.createElement('div');
+    sep.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);opacity:.6;margin-top:4px';
+    sep.textContent='Notlardan';
+    body.appendChild(sep);
+    relatedNotes.forEach(n=>{
+      const item=document.createElement('div');
+      item.className='gram-hint-item';
+      item.style.borderLeftColor='var(--acc)';
+      item.innerHTML='<div class="gram-hint-item-title">'+n.title+'</div>'
+        +'<div class="gram-hint-item-body">'+(n.body||'').slice(0,120)+(n.body&&n.body.length>120?'...':'')+'</div>'
+        +(n.example?'<div class="gram-hint-item-example">'+n.example.slice(0,80)+'</div>':'');
+      body.appendChild(item);
+    });
+  }
+}
+
+function toggleGramHint(){
+  gramHintOpen=!gramHintOpen;
+  const body=document.getElementById('gramHintBody');
+  const arrow=document.getElementById('gramHintArrow');
+  if(body) body.style.display=gramHintOpen?'flex':'none';
+  if(arrow) arrow.style.transform=gramHintOpen?'rotate(0deg)':'rotate(-90deg)';
+}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
