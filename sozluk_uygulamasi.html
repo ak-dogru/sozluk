@@ -61,6 +61,19 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .char-btns{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
 .chbtn{background:var(--surf3);border:1px solid var(--brd);color:var(--acc);font-size:12px;padding:2px 6px;cursor:pointer;border-radius:4px;font-family:var(--fm);transition:background .15s,color .15s;line-height:1.4}
 .chbtn:hover{background:var(--acc);color:var(--bg)}
+/* ── SÜRYANİCE KLAVYE ───────────────────────── */
+.sy-kbd{background:var(--surf2);border:1.5px solid var(--brd);border-radius:10px;padding:12px;margin-top:8px;display:none}
+.sy-kbd.visible{display:block}
+.sy-kbd-rows{display:flex;flex-direction:column;gap:6px}
+.sy-kbd-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.sy-key{min-width:36px;height:36px;background:var(--surf);border:1.5px solid var(--brd);border-radius:6px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--txt);padding:0 6px;font-family:var(--fb)}
+.sy-key:hover{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.sy-key:active{transform:scale(.9)}
+.sy-key.wide{min-width:60px;font-size:0.7rem;font-family:var(--fm);letter-spacing:1px;color:var(--txt-d)}
+.sy-key.wide:hover{color:var(--bg)}
+.sy-kbd-toggle{font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:6px;opacity:.7}
+.sy-kbd-toggle:hover{opacity:1;color:var(--acc)}
+
 /* ── İSTATİSTİK ─────────────────────────────── */
 .istat-card{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;padding:18px;position:relative;overflow:hidden;transition:background .35s}
 .istat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -739,7 +752,11 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
     <div class="igrid" style="margin-bottom:14px">
       <div class="igroup"><label class="ilabel">Türkçe</label><input type="text" class="winput" id="edit_tr" placeholder="Türkçe kelime..."></div>
-      <div class="igroup"><label class="ilabel">Süryanice</label><input type="text" class="winput" id="edit_sy" placeholder="ܣܘܪܝܝܐ ..."></div>
+      <div class="igroup"><label class="ilabel">Süryanice</label>
+        <input type="text" class="winput" id="edit_sy" placeholder="ܣܘܪܝܝܐ ..." onfocus="setSyTarget('edit_sy')">
+        <span class="sy-kbd-toggle" onclick="toggleSyKbd('edit_sy_kbd')">⌨ Süryanice Klavye</span>
+        <div class="sy-kbd" id="edit_sy_kbd"></div>
+      </div>
       <div class="igroup">
         <label class="ilabel">Transliterasyon</label>
         <div style="position:relative">
@@ -2435,6 +2452,96 @@ document.addEventListener('keydown',function(e){
     if(e.key==='ArrowLeft'||e.key==='0') {if(fcFlipped)fcAnswer(false);}
   }
 });
+
+/* ── SÜRYANİCE KLAVYE ───────────────────────── */
+// Syriac alphabet - Serto (Western Syriac) order
+const syAlphabet=[
+  // Row 1 — alaph to dalath
+  ['ܐ','ܒ','ܓ','ܕ','ܗ','ܘ','ܙ','ܚ','ܛ','ܝ'],
+  // Row 2 — kaph to nun
+  ['ܟ','ܠ','ܡ','ܢ','ܣ','ܥ','ܦ','ܨ','ܩ','ܪ'],
+  // Row 3 — shin to taw + special
+  ['ܫ','ܬ','ܰ','ܱ','ܲ','ܳ','ܴ','ܵ','ܶ','ܷ'],
+];
+const sySpecial=[
+  {label:'⌫ Sil',action:'del'},
+  {label:'Boşluk',action:'space'},
+  {label:'← İmleç',action:'left'},
+  {label:'→ İmleç',action:'right'},
+];
+
+let syTarget='inp_sy'; // current target input id
+
+function setSyTarget(id){syTarget=id;}
+
+function toggleSyKbd(kbdId){
+  const kbd=document.getElementById(kbdId);
+  if(!kbd) return;
+  const visible=kbd.classList.toggle('visible');
+  if(visible && !kbd.innerHTML){
+    buildSyKbd(kbd);
+  }
+  // Set target based on kbd id
+  syTarget=kbdId.replace('_kbd','');
+}
+
+function buildSyKbd(kbd){
+  kbd.innerHTML='<div class="sy-kbd-rows"></div>';
+  const rows=kbd.querySelector('.sy-kbd-rows');
+
+  syAlphabet.forEach(row=>{
+    const rowEl=document.createElement('div');
+    rowEl.className='sy-kbd-row';
+    row.forEach(ch=>{
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='sy-key';
+      btn.textContent=ch;
+      btn.onclick=()=>syInsert(ch, kbd.id.replace('_kbd',''));
+      rowEl.appendChild(btn);
+    });
+    rows.appendChild(rowEl);
+  });
+
+  // Special keys row
+  const specRow=document.createElement('div');
+  specRow.className='sy-kbd-row';
+  sySpecial.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='sy-key wide';
+    btn.textContent=s.label;
+    btn.onclick=()=>sySpecialKey(s.action, kbd.id.replace('_kbd',''));
+    specRow.appendChild(btn);
+  });
+  rows.appendChild(specRow);
+}
+
+function syInsert(ch, targetId){
+  const el=document.getElementById(targetId||syTarget);
+  if(!el) return;
+  const s=el.selectionStart, e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+ch+el.value.slice(e);
+  el.selectionStart=el.selectionEnd=s+ch.length;
+  el.focus();
+  el.dispatchEvent(new Event('input'));
+}
+
+function sySpecialKey(action, targetId){
+  const el=document.getElementById(targetId||syTarget);
+  if(!el) return;
+  const s=el.selectionStart;
+  if(action==='del'){
+    if(s>0){el.value=el.value.slice(0,s-1)+el.value.slice(s);el.selectionStart=el.selectionEnd=s-1;}
+  } else if(action==='space'){
+    syInsert(' ', targetId);
+  } else if(action==='left'){
+    el.selectionStart=el.selectionEnd=Math.max(0,s-1);
+  } else if(action==='right'){
+    el.selectionStart=el.selectionEnd=Math.min(el.value.length,s+1);
+  }
+  el.focus();
+}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
