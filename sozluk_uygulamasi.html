@@ -363,9 +363,9 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
       <!-- Tema daireleri -->
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="mini-theme" id="mt-gece" onclick="setTheme('gece',this)" title="Siyah-Beyaz" style="background:linear-gradient(135deg,#0a0a0a 50%,#ffffff 50%)"></div>
-        <div class="mini-theme active" id="mt-krem" onclick="setTheme('krem',this)" title="Beyaz-Siyah" style="background:linear-gradient(135deg,#ffffff 50%,#000000 50%)"></div>
-        <div class="mini-theme" id="mt-bahar" onclick="setTheme('bahar',this)" title="Beyaz-Kahverengi" style="background:linear-gradient(135deg,#fffdf8 50%,#4a3220 50%)"></div>
+        <div class="mini-theme active" id="mt-krem" onclick="setTheme('krem',this)" title="Beyaz Ton" style="background:linear-gradient(135deg,#ffffff 50%,#000000 50%)"></div>
+        <div class="mini-theme" id="mt-bahar" onclick="setTheme('bahar',this)" title="Sıcak Ton" style="background:linear-gradient(135deg,#fffef9 50%,#3a2010 50%)"></div>
+        <div class="mini-theme" id="mt-gece" onclick="setTheme('gece',this)" title="Koyu Ton" style="background:linear-gradient(135deg,#000000 50%,#ffffff 50%)"></div>
       </div>
       <!-- Ayırıcı -->
       <div style="width:1px;height:20px;background:var(--brd)"></div>
@@ -530,7 +530,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- ADIM 1: Dil + Zaman -->
     <div class="cb-section">
-      <div class="cb-title">1 · Dil ve Zaman Seçin</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">1 · Dil ve Zaman Seçin</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
         <!-- Dil -->
         <div style="flex:1;min-width:200px">
@@ -562,9 +562,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- ADIM 2: Kelime Havuzu -->
     <div class="cb-section">
-      <div class="cb-title" onclick="togglePool()" style="cursor:pointer;user-select:none">
-        2 · Kelime Havuzu
-        <span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px;transform:rotate(-90deg)">▼</span>
+      <div class="tbl-hdr" onclick="togglePool()" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0;cursor:pointer"><span class="tbl-ttl">2 · Kelime Havuzu</span><span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px;transform:rotate(-90deg)">▼</span>
       </div>
       <div id="poolBody" style="transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:0;opacity:0">
         <div class="filter-pool">
@@ -584,7 +582,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- ADIM 3: Cümle Alanı -->
     <div class="cb-section">
-      <div class="cb-title">3 · Cümleyi Kur</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">3 · Cümleyi Kur</span></div>
       <div id="langHint" class="struct-hint" style="margin-bottom:10px">Türkçe sözdizimi: Özne → Nesne → Fiil (SOV)</div>
 
       <!-- Gramer Hatırlatıcısı -->
@@ -621,7 +619,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- ADIM 4: Sonuç -->
     <div class="cb-section" id="resultBox" style="display:none">
-      <div class="cb-title">4 · Sonuç</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">4 · Sonuç</span></div>
       <div id="sentResult"></div>
     </div>
 
@@ -647,7 +645,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <!-- Kural Ekle / Düzenle -->
     <div class="ntab-content" id="ntab-edit-panel">
       <div class="cb-section">
-        <div class="cb-title" id="noteFormTitle">Yeni Kural Ekle</div>
+        <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl" id="noteFormTitle">Yeni Kural Ekle</span></div>
         <div style="margin-bottom:14px">
           <div class="igroup" style="margin-bottom:14px">
             <label class="ilabel">Başlık</label>
@@ -712,19 +710,19 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- Türe göre dağılım -->
     <div class="cb-section" style="margin-bottom:16px">
-      <div class="cb-title">Kelime Türlerine Göre Dağılım</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">Kelime Türlerine Göre Dağılım</span></div>
       <div id="istatTypes" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
     </div>
 
     <!-- Zamana göre eklenenler -->
     <div class="cb-section" style="margin-bottom:16px">
-      <div class="cb-title">Zaman İçinde Eklenenler</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">Zaman İçinde Eklenenler</span></div>
       <div id="istatTimeline" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
     </div>
 
     <!-- Son eklenen kelimeler -->
     <div class="cb-section">
-      <div class="cb-title">Son Eklenen 10 Kelime</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">Son Eklenen 10 Kelime</span></div>
       <div id="istatRecent" style="margin-top:4px"></div>
     </div>
 
@@ -735,7 +733,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
     <!-- Ayarlar -->
     <div class="cb-section" style="margin-bottom:16px">
-      <div class="cb-title">Kart Ayarları</div>
+      <div class="tbl-hdr" style="margin:-20px -22px 16px;border-radius:10px 10px 0 0"><span class="tbl-ttl">Kart Ayarları</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;align-items:flex-end">
         <div>
           <div style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">Ön Yüz</div>
@@ -1216,7 +1214,7 @@ const defaults=[
 function load(){try{const r=localStorage.getItem(SKEY);if(r)return JSON.parse(r);}catch(e){}return{words:[...defaults],nextId:159,theme:'krem'};}
 function save(){try{localStorage.setItem(SKEY,JSON.stringify({words,nextId,theme:curTheme}));}catch(e){showToast('⚠ Kaydetme hatası');}}
 let{words,nextId,theme:st}=load();
-let curTheme=st||'gece',q='',filterLang='all',sortKey=null,sortDir=1,acIdx=-1;
+let curTheme=(st||'krem'),q='',filterLang='all',sortKey=null,sortDir=1,acIdx=-1;
 function setTheme(t,el){
   curTheme=t;document.body.dataset.theme=t;
   document.querySelectorAll('.theme-card,.mini-theme').forEach(c=>c.classList.remove('active'));
