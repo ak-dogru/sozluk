@@ -235,6 +235,10 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <span class="lbadge">English</span>
     </div>
     <div class="save-ind"><span class="save-dot"></span>Veriler tarayıcıda kalıcı kaydediliyor</div>
+    <div style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:12px">
+      <span id="userInfo" style="font-family:var(--fm);font-size:9px;color:#3a9a5a;letter-spacing:1px"></span>
+      <button id="authBtn" onclick="showLoginModal()" class="abtn" style="padding:5px 14px;font-size:9px">🔐 Giriş</button>
+    </div>
     <div class="save-ind" style="margin-top:4px"><span id="cloudInd" style="font-family:var(--fm);font-size:9px;letter-spacing:2px">☁ Buluta bağlanıyor...</span></div>
   </header>
 
@@ -277,11 +281,11 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
   </div>
 
   <div class="actions-row">
-    <button class="abtn hl" onclick="toggleAdd()"><span>＋</span>Kelime Ekle</button>
+    <button class="abtn hl edit-only" onclick="toggleAdd()" style="display:none"><span>＋</span>Kelime Ekle</button>
     <button class="abtn" onclick="exportExcel()"><span>⬇</span>Excel İndir</button>
-    <button class="abtn" onclick="document.getElementById('imp').click()"><span>⬆</span>Excel Yükle</button>
+    <button class="abtn edit-only" onclick="document.getElementById('imp').click()" style="display:none"><span>⬆</span>Excel Yükle</button>
     <input type="file" id="imp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
-    <button class="abtn danger" onclick="clearAll()"><span>⊘</span>Tümünü Sil</button>
+    <button class="abtn danger edit-only" onclick="clearAll()" style="display:none"><span>⊘</span>Tümünü Sil</button>
     <button class="abtn" onclick="showApiKeyModal()" style="margin-left:4px" title="Claude API Key"><span>🔑</span>API Key</button>
   </div>
 
@@ -371,10 +375,10 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <span class="tbl-ttl">Kelime Listesi</span>
       <div style="display:flex;align-items:center;gap:12px">
         <span class="res-lbl" id="resLabel"></span>
-        <span id="tblArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block">▼</span>
+        <span id="tblArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;transform:rotate(-90deg)">▼</span>
       </div>
     </div>
-    <div class="tscroll" id="tblScroll">
+    <div class="tscroll collapsed" id="tblScroll">
       <table>
         <thead><tr>
           <th>#</th>
@@ -431,9 +435,9 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="cb-section">
       <div class="cb-title" onclick="togglePool()" style="cursor:pointer;user-select:none">
         2 · Kelime Havuzu
-        <span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px">▼</span>
+        <span id="poolArrow" style="font-size:12px;color:var(--acc-d);transition:transform .3s;display:inline-block;margin-left:8px;transform:rotate(-90deg)">▼</span>
       </div>
-      <div id="poolBody" style="transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:9000px;opacity:1">
+      <div id="poolBody" style="transition:max-height .35s ease,opacity .3s;overflow:hidden;max-height:0;opacity:0">
         <div class="filter-pool">
           <button class="pool-filter on" onclick="setPoolFilter('hepsi',this)">Hepsi</button>
           <button class="pool-filter" onclick="setPoolFilter('zamir',this)">Zamir</button>
@@ -500,7 +504,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <!-- Alt sekmeler -->
     <div class="ntabs">
       <button class="ntab active" id="ntab-list" onclick="switchNTab('list',this)">📋 Kurallar</button>
-      <button class="ntab" id="ntab-edit" onclick="switchNTab('edit',this)">＋ Kural Ekle</button>
+      <button class="ntab edit-only" id="ntab-edit" onclick="switchNTab('edit',this)" style="display:none">＋ Kural Ekle</button>
     </div>
 
     <!-- Kural Listesi -->
@@ -563,7 +567,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
         <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--acc-d);font-size:16px">⌕</span>
         <input type="text" id="refSearch" class="winput" placeholder="Referanslarda ara..." oninput="filterRef()" style="padding-left:42px">
       </div>
-      <button class="abtn hl" onclick="showRefSectionModal()"><span>＋</span>Yeni Bölüm</button>
+      <button class="abtn hl edit-only" onclick="showRefSectionModal()" style="display:none"><span>＋</span>Yeni Bölüm</button>
     </div>
 
     <!-- Sections -->
@@ -667,6 +671,25 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <button class="btn btn-s" onclick="closeApiKeyModal()">İptal</button>
       <a href="https://console.anthropic.com" target="_blank" style="font-family:var(--fm);font-size:9px;color:var(--acc-d);letter-spacing:1px;margin-left:auto">Key al →</a>
     </div>
+  </div>
+</div>
+<!-- Login Modal -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+  <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(400px,90vw)">
+    <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:20px">Düzenleme Girişi</div>
+    <div class="igroup" style="margin-bottom:14px">
+      <label class="ilabel">E-posta</label>
+      <input type="email" class="winput" id="loginEmail" placeholder="ornek@mail.com">
+    </div>
+    <div class="igroup" style="margin-bottom:20px">
+      <label class="ilabel">Şifre</label>
+      <input type="password" class="winput" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
+      <button class="btn btn-s" onclick="closeLoginModal()">İptal</button>
+    </div>
+    <p style="font-family:var(--fm);font-size:9px;color:var(--txt-d);margin-top:14px;opacity:.6">Maksimum 5 yetkili kullanıcı</p>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -973,6 +996,7 @@ function onSearch(v){
 }
 applyFont();
 initCloud();
+restoreSession();
 function buildAc(v){
   const vl=v.toLowerCase(),seen=new Set(),hits=[];
   const ll={tr:'Türkçe',sy:'Süryanice',en:'İngilizce'};
@@ -1041,7 +1065,7 @@ function render(){
     <td class="ten">${hl(w.en,q)||'—'}</td>
     <td>${w.type?`<span class="tpill">${w.type}</span>`:''}</td>
     <td class="tdate">${w.date||''}</td>
-    <td style="white-space:nowrap"><button class="ebtn" onclick="editWord(${w.id})" title="Düzenle">✏️</button><button class="dbtn" onclick="deleteWord(${w.id})" title="Sil">✕</button></td>
+    <td style="white-space:nowrap"><button class="ebtn edit-only" onclick="editWord(${w.id})" title="Düzenle" style="display:none">✏️</button><button class="dbtn edit-only" onclick="deleteWord(${w.id})" title="Sil" style="display:none">✕</button></td>
   </tr>`).join('');
 }
 function exportExcel(){
@@ -1302,7 +1326,7 @@ function clearSentence(){
 }
 
 
-let tableOpen=true;
+let tableOpen=false;
 function toggleTable(){
   tableOpen=!tableOpen;
   const sc=document.getElementById('tblScroll');
@@ -1538,7 +1562,7 @@ function cancelNoteEdit(){
 }
 loadNotes();
 
-let poolOpen=true;
+let poolOpen=false;
 function togglePool(){
   poolOpen=!poolOpen;
   const body=document.getElementById('poolBody');
@@ -1837,6 +1861,7 @@ function filterRef(){
 
 document.getElementById('refSectionModal').addEventListener('click',function(e){if(e.target===this)closeRefSectionModal();});
 document.getElementById('refRowModal').addEventListener('click',function(e){if(e.target===this)closeRefRowModal();});
+document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLoginModal();});
 loadRef();renderRef();
 
 /* ── GRAMER HATIRLATICISI ─────────────────── */
@@ -1925,6 +1950,107 @@ function toggleGramHint(){
   const arrow=document.getElementById('gramHintArrow');
   if(body) body.style.display=gramHintOpen?'flex':'none';
   if(arrow) arrow.style.transform=gramHintOpen?'rotate(0deg)':'rotate(-90deg)';
+}
+
+/* ── AUTH ─────────────────────────────────── */
+let currentUser=null;
+let editMode=false;
+
+async function signIn(email,password){
+  try{
+    const r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password})
+    });
+    const data=await r.json();
+    if(data.error) throw new Error(data.error_description||data.error);
+    currentUser=data.user;
+    localStorage.setItem('sb_access_token',data.access_token);
+    localStorage.setItem('sb_refresh_token',data.refresh_token);
+    return data;
+  }catch(e){throw e;}
+}
+
+async function signOut(){
+  const token=localStorage.getItem('sb_access_token');
+  if(token){
+    await fetch(SB_URL+'/auth/v1/logout',{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token}
+    }).catch(()=>{});
+  }
+  localStorage.removeItem('sb_access_token');
+  localStorage.removeItem('sb_refresh_token');
+  currentUser=null;
+  setEditMode(false);
+  updateAuthUI();
+  showToast('Çıkış yapıldı');
+}
+
+async function restoreSession(){
+  const token=localStorage.getItem('sb_access_token');
+  if(!token) return;
+  try{
+    const r=await fetch(SB_URL+'/auth/v1/user',{
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token}
+    });
+    if(r.ok){
+      currentUser=await r.json();
+      setEditMode(true);
+      updateAuthUI();
+    } else {
+      localStorage.removeItem('sb_access_token');
+    }
+  }catch(e){}
+}
+
+function setEditMode(on){
+  editMode=on;
+  // Show/hide all edit buttons
+  document.querySelectorAll('.edit-only').forEach(el=>{
+    el.style.display=on?'':'none';
+  });
+  updateAuthUI();
+}
+
+function updateAuthUI(){
+  const loginBtn=document.getElementById('authBtn');
+  const userInfo=document.getElementById('userInfo');
+  if(loginBtn){
+    loginBtn.textContent=currentUser?'Çıkış':'🔐 Giriş';
+    loginBtn.onclick=currentUser?signOut:showLoginModal;
+  }
+  if(userInfo) userInfo.textContent=currentUser?('✓ '+currentUser.email):'';
+}
+
+function showLoginModal(){
+  document.getElementById('loginModal').style.display='flex';
+  setTimeout(()=>document.getElementById('loginEmail').focus(),100);
+}
+function closeLoginModal(){
+  document.getElementById('loginModal').style.display='none';
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const btn=document.getElementById('loginBtn');
+  if(!email||!pass){showToast('⚠ E-posta ve şifre girin');return;}
+  btn.textContent='⏳ Giriş yapılıyor...';
+  btn.disabled=true;
+  try{
+    await signIn(email,pass);
+    setEditMode(true);
+    updateAuthUI();
+    closeLoginModal();
+    showToast('✦ Giriş başarılı');
+  }catch(e){
+    showToast('⚠ '+e.message);
+  }finally{
+    btn.textContent='Giriş Yap';
+    btn.disabled=false;
+  }
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
