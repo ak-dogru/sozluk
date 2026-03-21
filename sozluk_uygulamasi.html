@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Sözlük · Türkçe / Süryanice / İngilizce</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13,7 +13,7 @@
 [data-theme="batim"]{--bg:#fff8f0;--surf:#ffffff;--surf2:#fff0e0;--surf3:#ffe4c8;--acc:#c04808;--acc-l:#7a2800;--acc-d:#e07030;--txt:#2a1008;--txt-d:#7a4020;--bad:#1a6a8a;--brd:rgba(192,72,8,.22);--brd-s:rgba(192,72,8,.1);--pb:rgba(192,72,8,.1);--pc:#7a2800;--fh:'Inter',sans-serif;--fb:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--fb);font-size:1rem;line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
-.app{max-width:1100px;margin:0 auto;padding:0 24px 64px}
+.app{max-width:900px;margin:0 auto;padding:0 20px 64px}
 header{text-align:center;padding:48px 0 30px;border-bottom:1px solid var(--brd);margin-bottom:32px}
 .horm{color:var(--acc-d);font-size:10px;letter-spacing:6px;text-transform:uppercase;font-family:var(--fm);margin-bottom:14px;opacity:.8}
 h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:var(--acc);letter-spacing:2px;margin-bottom:8px}
@@ -138,6 +138,9 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .fsbtn{background:var(--surf2);border:1.5px solid var(--brd);color:var(--acc);font-family:var(--fh);font-size:11px;padding:6px 14px;cursor:pointer;border-radius:6px;transition:all .2s;letter-spacing:1px}
 .fsbtn:hover{border-color:var(--acc);background:var(--pb)}
 .fslbl{font-family:var(--fm);font-size:10px;color:var(--txt-d);min-width:36px;text-align:center}
+.mini-theme{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s;flex-shrink:0}
+.mini-theme:hover{transform:scale(1.15)}
+.mini-theme.active{border-color:var(--acc);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
 .brow{display:flex;gap:8px;margin-top:14px}
 .btn{padding:10px 24px;border:none;cursor:pointer;font-family:var(--fh);font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;border-radius:6px}
 .btn-p{background:var(--acc);color:var(--bg);font-weight:600}
@@ -247,6 +250,28 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
 .cb-actions{display:flex;gap:8px;margin-top:14px}
 
+
+@media(max-width:600px){
+  .app{padding:0 12px 48px}
+  .stats-row{gap:8px}
+  .stat-card{min-width:80px;padding:12px}
+  .stat-num{font-size:1.6rem}
+  .actions-row{gap:6px}
+  .abtn{padding:7px 12px;font-size:8px}
+  .igrid{grid-template-columns:1fr}
+  table{font-size:0.85rem}
+  td,th{padding:7px 8px}
+  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .tab{padding:8px 14px;font-size:8px;letter-spacing:1px;white-space:nowrap}
+  #fcCard{padding:20px;min-height:180px}
+  #fcFrontText{font-size:1.4rem}
+  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
+  .word-pool{gap:6px}
+  .pool-word{padding:5px 10px;font-size:0.85rem}
+  .lang-tabs{flex-direction:row;flex-wrap:wrap}
+  .lang-tab{font-size:8px;padding:5px 10px}
+  h1{font-size:1.4rem}
+}
 </style>
 </head>
 <body data-theme="gece">
@@ -269,6 +294,25 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </div>
       <button id="authBtn" onclick="showLoginModal()" class="abtn" style="padding:5px 14px;font-size:9px">🔐 Giriş</button>
     </div>
+
+    <!-- Kompakt Ayar Çubuğu -->
+    <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+      <!-- Tema daireleri -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="mini-theme active" id="mt-gece" onclick="setTheme('gece',this)" title="Beyaz" style="background:linear-gradient(135deg,#f8f8f8 50%,#2c2c2c 50%)"></div>
+        <div class="mini-theme" id="mt-krem" onclick="setTheme('krem',this)" title="Krem" style="background:linear-gradient(135deg,#faf6ee 50%,#8b5e2a 50%)"></div>
+        <div class="mini-theme" id="mt-bahar" onclick="setTheme('bahar',this)" title="Bahar" style="background:linear-gradient(135deg,#f0faf2 50%,#1a7a3a 50%)"></div>
+        <div class="mini-theme" id="mt-batim" onclick="setTheme('batim',this)" title="Gün Batımı" style="background:linear-gradient(135deg,#fff8f0 50%,#c04808 50%)"></div>
+      </div>
+      <!-- Ayırıcı -->
+      <div style="width:1px;height:20px;background:var(--brd)"></div>
+      <!-- Font boyutu -->
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="fsbtn" onclick="changeFont(-1)" title="Küçült">A−</button>
+        <span class="fslbl" id="fsLabel">100%</span>
+        <button class="fsbtn" onclick="changeFont(1)" title="Büyüt">A+</button>
+      </div>
+    </div>
     <div class="save-ind" style="margin-top:4px"><span id="cloudInd" style="font-family:var(--fm);font-size:9px;letter-spacing:2px">☁ Buluta bağlanıyor...</span></div>
   </header>
 
@@ -284,27 +328,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
   <!-- SÖZLÜK PANELİ -->
   <div class="tab-content active" id="tab-sozluk">
-  <div class="theme-section">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
-      <div>
-        <div class="theme-label">Tema Seçin</div>
-        <div class="theme-grid">
-          <div class="theme-card tc-gece"    onclick="setTheme('gece',this)"    title="Beyaz"><div class="tc-name">Beyaz</div></div>
-          <div class="theme-card tc-krem"    onclick="setTheme('krem',this)"    title="Krem"><div class="tc-name">Krem</div></div>
-          <div class="theme-card tc-bahar"   onclick="setTheme('bahar',this)"   title="Bahar"><div class="tc-name">Bahar</div></div>
-          <div class="theme-card tc-batim"   onclick="setTheme('batim',this)"   title="Gün Batımı"><div class="tc-name">Batım</div></div>
-        </div>
-      </div>
-      <div>
-        <div class="theme-label">Yazı Boyutu</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <button class="fsbtn" onclick="changeFont(-1)" title="Küçült">A−</button>
-          <span class="fslbl" id="fsLabel">100%</span>
-          <button class="fsbtn" onclick="changeFont(1)" title="Büyüt">A+</button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <div class="stats-row">
     <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-lbl">Toplam Kelime</div></div>
@@ -315,7 +339,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
   <div class="actions-row">
     <button class="abtn hl edit-only" onclick="toggleAdd()" style="display:none"><span>＋</span>Kelime Ekle</button>
     <button class="abtn" onclick="exportExcel()"><span>⬇</span>Excel İndir</button>
-    <button class="abtn" onclick="showPdfModal()"><span>📄</span>PDF İndir</button>
     <button class="abtn" onclick="showPdfModal()"><span>📄</span>PDF İndir</button>
     <button class="abtn edit-only" onclick="document.getElementById('imp').click()" style="display:none"><span>⬆</span>Excel Yükle</button>
     <input type="file" id="imp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
@@ -680,7 +703,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </div>
 
       <!-- Kart -->
-      <div id="fcCard" onclick="flipCard()" style="cursor:pointer;min-height:220px;background:var(--surf);border:2px solid var(--brd);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;transition:all .3s;user-select:none;margin-bottom:16px">
+      <div id="fcCard" onclick="flipCard()" style="cursor:pointer;min-height:240px;max-width:520px;margin:0 auto 16px;background:var(--surf);border:2px solid var(--brd);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;transition:all .3s;user-select:none">
         <div id="fcFrontLabel" style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:16px"></div>
         <div id="fcFrontText" style="font-size:1.8rem;font-weight:600;color:var(--txt);margin-bottom:8px"></div>
         <div id="fcHint" style="font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);opacity:.5;margin-top:12px">👆 Cevabı görmek için tıkla</div>
@@ -695,7 +718,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </div>
 
       <!-- Butonlar -->
-      <div id="fcBtns" style="display:none;justify-content:center;gap:16px">
+      <div id="fcBtns" style="display:none;justify-content:center;gap:16px;max-width:520px;margin:0 auto">
         <button class="btn" onclick="fcAnswer(false)" style="background:rgba(204,51,51,.1);color:var(--bad);border:2px solid var(--bad);padding:12px 32px;font-size:1rem">✗ Bilmedim</button>
         <button class="btn" onclick="fcAnswer(true)" style="background:rgba(58,154,90,.1);color:#3a9a5a;border:2px solid #3a9a5a;padding:12px 32px;font-size:1rem">✓ Bildim</button>
       </div>
@@ -834,33 +857,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
   </div>
 </div>
 <!-- PDF Modal -->
-<div id="pdfModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:center;justify-content:center">
-  <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(420px,90vw)">
-    <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:20px">PDF Dışa Aktar</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem">
-        <input type="checkbox" id="pdf-sozluk" checked style="width:16px;height:16px;accent-color:var(--acc)">
-        <span>📖 Sözlük — tüm kelimeler tablo halinde</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem">
-        <input type="checkbox" id="pdf-notlar" checked style="width:16px;height:16px;accent-color:var(--acc)">
-        <span>📝 Notlar — gramer kuralları</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem">
-        <input type="checkbox" id="pdf-referans" checked style="width:16px;height:16px;accent-color:var(--acc)">
-        <span>📚 Referans — zamirler, sayılar, günler...</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem">
-        <input type="checkbox" id="pdf-istatistik" style="width:16px;height:16px;accent-color:var(--acc)">
-        <span>📊 İstatistik — kelime dağılımı özeti</span>
-      </label>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-p" onclick="exportPDF()">PDF Oluştur</button>
-      <button class="btn btn-s" onclick="closePdfModal()">İptal</button>
-    </div>
-  </div>
-</div>
+
 <!-- PDF Modal -->
 <div id="pdfModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
   <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(400px,92vw)">
@@ -1145,14 +1142,17 @@ let{words,nextId,theme:st}=load();
 let curTheme=st||'gece',q='',filterLang='all',sortKey=null,sortDir=1,acIdx=-1;
 function setTheme(t,el){
   curTheme=t;document.body.dataset.theme=t;
-  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.theme-card,.mini-theme').forEach(c=>c.classList.remove('active'));
   if(el)el.classList.add('active');
+  // Also sync mini theme
+  const mini=document.getElementById('mt-'+t);
+  if(mini) mini.classList.add('active');
   save();
 }
 (function(){
   document.body.dataset.theme=curTheme;
-  const m={gece:'Beyaz',krem:'Krem',okyanus:'Okyanus',bahar:'Bahar',batim:'Gün Batımı',mor:'Mor Gece'};
-  document.querySelectorAll('.theme-card').forEach(c=>{if(c.getAttribute('title')===m[curTheme])c.classList.add('active');});
+  const mini=document.getElementById('mt-'+curTheme);
+  if(mini) mini.classList.add('active');
 })();
 function toggleAdd(){const w=document.getElementById('addWrap');w.classList.toggle('open');if(w.classList.contains('open'))document.getElementById('inp_tr').focus();}
 function insChar(ch){
@@ -2612,122 +2612,6 @@ function showPdfModal(){document.getElementById('pdfModal').style.display='flex'
 function closePdfModal(){document.getElementById('pdfModal').style.display='none';}
 document.getElementById('pdfModal').addEventListener('click',function(e){if(e.target===this)closePdfModal();});
 
-function exportPDF(){
-  const incSozluk=document.getElementById('pdf-sozluk').checked;
-  const incNotlar=document.getElementById('pdf-notlar').checked;
-  const incReferans=document.getElementById('pdf-referans').checked;
-  const incIstat=document.getElementById('pdf-istatistik').checked;
-
-  if(!incSozluk&&!incNotlar&&!incReferans&&!incIstat){showToast('⚠ En az bir seçenek seçin');return;}
-
-  const d=new Date();
-  const dateStr=d.toLocaleDateString('tr-TR');
-
-  let html=`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Süryanice Sözlük</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#1a1a1a;padding:24px;max-width:900px;margin:0 auto}
-    h1{font-size:22px;text-align:center;margin-bottom:4px}
-    .subtitle{text-align:center;color:#666;font-size:11px;margin-bottom:24px}
-    h2{font-size:15px;margin:24px 0 10px;padding:7px 12px;background:#f0f0f0;border-left:4px solid #333}
-    h3{font-size:12px;margin:12px 0 6px;color:#555;border-bottom:1px solid #ddd;padding-bottom:3px}
-    table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:11px}
-    th{background:#333;color:#fff;padding:6px 10px;text-align:left;font-size:10px;letter-spacing:1px}
-    td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:middle}
-    tr:nth-child(even) td{background:#fafafa}
-    .sy{font-size:14px}
-    .pill{display:inline-block;padding:1px 7px;border-radius:10px;background:#e8e8e8;font-size:9px;letter-spacing:1px}
-    .note-card{margin-bottom:10px;padding:10px 12px;border-left:3px solid #555;background:#fafafa;border-radius:0 6px 6px 0}
-    .note-title{font-weight:700;margin-bottom:4px;font-size:12px}
-    .note-body{color:#444;line-height:1.6;white-space:pre-wrap;font-size:11px}
-    .note-example{margin-top:6px;font-style:italic;color:#666;font-size:10px;padding:4px 8px;background:#fff;border-radius:4px}
-    .cat-header{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#999;margin:16px 0 8px;font-weight:600}
-    .stat-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
-    .stat-bar-track{flex:1;height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden}
-    .stat-bar-fill{height:100%;background:#333;border-radius:4px}
-    .stat-count{font-size:11px;color:#666;min-width:30px;text-align:right}
-    @media print{body{padding:12px} h2{page-break-before:auto}}
-  </style></head><body>`;
-
-  html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1>
-  <div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
-
-  // SÖZLÜK
-  if(incSozluk){
-    html+=`<h2>📖 Sözlük <span style="font-weight:normal;font-size:12px">(${words.length} kelime)</span></h2>`;
-    html+=`<table><thead><tr><th>#</th><th>Türkçe</th><th>Süryanice</th><th>İngilizce</th><th>Tür</th></tr></thead><tbody>`;
-    words.forEach((w,i)=>{
-      html+=`<tr><td>${i+1}</td><td>${w.tr||'—'}</td><td class="sy">${w.sy||'—'}</td><td>${w.en||'—'}</td><td>${w.type?'<span class="pill">'+w.type+'</span>':''}</td></tr>`;
-    });
-    html+=`</tbody></table>`;
-  }
-
-  // NOTLAR
-  if(incNotlar&&notes&&notes.length){
-    html+=`<h2>📝 Notlar <span style="font-weight:normal;font-size:12px">(${notes.length} kural)</span></h2>`;
-    const cats={};
-    notes.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
-    Object.entries(cats).forEach(([cat,items])=>{
-      html+=`<div class="cat-header">${cat}</div>`;
-      items.forEach(n=>{
-        html+=`<div class="note-card">`;
-        html+=`<div class="note-title">${n.title}</div>`;
-        if(n.body) html+=`<div class="note-body">${n.body}</div>`;
-        if(n.example) html+=`<div class="note-example">Örnek: ${n.example}</div>`;
-        html+=`</div>`;
-      });
-    });
-  }
-
-  // REFERANS
-  if(incReferans&&refData&&refData.length){
-    html+=`<h2>📚 Referans</h2>`;
-    refData.forEach(sec=>{
-      if(!sec.rows||!sec.rows.length) return;
-      html+=`<h3>${sec.title}</h3>`;
-      html+=`<table><thead><tr><th>Türkçe</th><th>Süryanice</th><th>Transliterasyon</th></tr></thead><tbody>`;
-      sec.rows.forEach(r=>{
-        html+=`<tr><td>${r.tr||''}</td><td class="sy">${r.sy||''}</td><td>${r.translit||''}</td></tr>`;
-      });
-      html+=`</tbody></table>`;
-    });
-  }
-
-  // İSTATİSTİK
-  if(incIstat){
-    html+=`<h2>📊 İstatistik</h2>`;
-    const typeCounts={};
-    words.forEach(w=>{const t=w.type||'diğer';typeCounts[t]=(typeCounts[t]||0)+1;});
-    const sorted=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
-    const maxC=sorted[0]?sorted[0][1]:1;
-    html+=`<p style="margin-bottom:12px;font-size:11px;color:#666">Toplam ${words.length} kelime · ${notes?notes.length:0} gramer kuralı</p>`;
-    sorted.forEach(([type,count])=>{
-      const pct=Math.round(count/maxC*100);
-      html+=`<div class="stat-row">
-        <span style="min-width:100px;font-size:11px">${type}</span>
-        <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
-        <span class="stat-count">${count}</span>
-      </div>`;
-    });
-  }
-
-  html+=`</body></html>`;
-
-  // Open in new window for print/save as PDF
-  const win=window.open('','_blank');
-  win.document.write(html);
-  win.document.close();
-  win.onload=function(){
-    setTimeout(()=>{win.print();},300);
-  };
-  closePdfModal();
-  showToast('✦ PDF hazırlanıyor...');
-}
-
-/* ── PDF ÇIKTISI ─────────────────────────────── */
-function showPdfModal(){
-  document.getElementById('pdfModal').style.display='flex';
-}
 function closePdfModal(){
   document.getElementById('pdfModal').style.display='none';
 }
@@ -2763,7 +2647,29 @@ function exportPDF(){
     .cat-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#888;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
     .cat-title::after{content:'';flex:1;height:1px;background:#ddd}
     @media print{@page{margin:15mm} h2{page-break-before:auto}}
-  </style></head><body>`;
+  
+@media(max-width:600px){
+  .app{padding:0 12px 48px}
+  .stats-row{gap:8px}
+  .stat-card{min-width:80px;padding:12px}
+  .stat-num{font-size:1.6rem}
+  .actions-row{gap:6px}
+  .abtn{padding:7px 12px;font-size:8px}
+  .igrid{grid-template-columns:1fr}
+  table{font-size:0.85rem}
+  td,th{padding:7px 8px}
+  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .tab{padding:8px 14px;font-size:8px;letter-spacing:1px;white-space:nowrap}
+  #fcCard{padding:20px;min-height:180px}
+  #fcFrontText{font-size:1.4rem}
+  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
+  .word-pool{gap:6px}
+  .pool-word{padding:5px 10px;font-size:0.85rem}
+  .lang-tabs{flex-direction:row;flex-wrap:wrap}
+  .lang-tab{font-size:8px;padding:5px 10px}
+  h1{font-size:1.4rem}
+}
+</style></head><body>`;
 
   html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1><div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
 
