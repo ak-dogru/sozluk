@@ -2870,288 +2870,66 @@ function closePdfModal(){document.getElementById('pdfModal').style.display='none
 document.getElementById('pdfModal').addEventListener('click',function(e){if(e.target===this)closePdfModal();});
 
 function exportPDF(){
-  const incSozluk=document.getElementById('pdf-sozluk').checked;
-  const incNotlar=document.getElementById('pdf-notlar').checked;
-  const incReferans=document.getElementById('pdf-referans').checked;
-  const typeFilter=document.getElementById('pdf-type-filter').value;
-
-  if(!incSozluk&&!incNotlar&&!incReferans){showToast('⚠ En az bir bölüm seçin');return;}
-
-  const d=new Date();
-  const dateStr=d.toLocaleDateString('tr-TR');
-  let html=`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Süryanice Sözlük</title><style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;color:#1a1a1a;padding:24px;max-width:900px;margin:0 auto}
-    h1{font-size:22px;text-align:center;margin-bottom:4px}
-    .subtitle{text-align:center;color:#666;font-size:11px;margin-bottom:24px}
-    h2{font-size:15px;margin:24px 0 12px;padding:6px 12px;background:#f0f0f0;border-left:4px solid #333}
-    h3{font-size:11px;margin:12px 0 6px;color:#555;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #ddd;padding-bottom:4px}
-    table{width:100%;border-collapse:collapse;margin-bottom:16px}
-    th{background:#333;color:#fff;padding:7px 10px;text-align:left;font-size:10px;letter-spacing:1px}
-    td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:middle}
-    tr:nth-child(even) td{background:#fafafa}
-    .sy{font-size:14px}
-    .pill{display:inline-block;padding:1px 7px;border-radius:10px;background:#e8e8e8;font-size:9px}
-    .note-card{margin-bottom:10px;padding:8px 12px;border-left:3px solid #666;background:#fafafa;border-radius:0 4px 4px 0}
-    .note-title{font-weight:700;font-size:12px;margin-bottom:4px}
-    .note-body{color:#444;line-height:1.6;white-space:pre-wrap;font-size:11px}
-    .note-example{margin-top:5px;font-style:italic;color:#777;font-size:10px;padding:4px 8px;background:#f0f0f0;border-radius:3px}
-    .cat-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#888;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
-    .cat-title::after{content:'';flex:1;height:1px;background:#ddd}
-    @media print{@page{margin:15mm} h2{page-break-before:auto}}
-  
-@media(max-width:640px){
-  /* Genel */
-  .app{padding:0 10px 48px}
-  h1{font-size:1.3rem}
-  .sub{font-size:0.85rem}
-  .lang-row{gap:4px}
-  .lbadge{font-size:7px;padding:2px 8px}
-
-  /* Ayar çubuğu */
-  .mini-theme{width:22px;height:22px}
-  .icon-nav-btn{width:30px;height:30px}
-  .fsbtn{padding:5px 10px;font-size:10px}
-
-  /* Sekmeler */
-  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-  .tab{padding:8px 12px;font-size:8px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
-
-  /* İstatistik kartları */
-  .stats-row{gap:8px}
-  .stat-card{min-width:70px;padding:10px 12px}
-  .stat-num{font-size:1.4rem}
-  .stat-lbl{font-size:8px}
-
-  /* Butonlar */
-  .actions-row{gap:6px}
-  .abtn{padding:7px 10px;font-size:8px;gap:4px}
-  .abtn span{font-size:12px}
-  .btn{padding:8px 16px;font-size:9px}
-
-  /* Form */
-  .igrid{grid-template-columns:1fr}
-  .add-inner{padding:14px}
-  .char-btns{gap:2px}
-  .chbtn{padding:2px 4px;font-size:10px}
-
-  /* Tablo */
-  table{font-size:0.8rem}
-  td,th{padding:6px 8px}
-  td:first-child{width:28px}
-
-  /* Sözlük */
-  .tbl-hdr{padding:10px 14px}
-  .search-sec{margin-bottom:16px}
-  #searchInput{font-size:0.95rem}
-
-  /* Cümle kur */
-  .lang-tabs{gap:4px}
-  .lang-tab{font-size:8px;padding:5px 8px}
-  .lang-tag{display:none}
-  .tense-btn{padding:5px 10px;font-size:8px}
-  .slot-row{min-height:40px;padding:8px}
-  .slot-word{padding:5px 10px;font-size:0.85rem}
-  .word-pool{gap:5px}
-  .pool-word{padding:5px 10px;font-size:0.85rem}
-  #livePreview{font-size:0.9rem;padding:8px}
-
-  /* Flashcard */
-  #fcCard{padding:20px 16px;min-height:190px;max-width:100%}
-  #fcFrontText{font-size:1.3rem}
-  #fcBtns{gap:10px;max-width:100%}
-  #fcBtns .btn{padding:10px 20px;font-size:0.9rem}
-
-  /* Notlar */
-  .ntabs{gap:4px}
-  .ntab{padding:5px 12px;font-size:8px}
-  .note-card-body{font-size:0.85rem}
-  .note-card-hdr{padding:10px 12px}
-  .note-card-title{font-size:0.9rem}
-
-  /* Referans */
-  .ref-hdr{padding:10px 14px}
-  .ref-title{font-size:0.85rem}
-  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
-  .ref-table td.sy{font-size:0.95rem}
-
-  /* İstatistik */
-  #istatCards{grid-template-columns:1fr 1fr}
-  .istat-bar-label{min-width:80px;font-size:0.8rem}
-  .istat-recent-row{flex-wrap:wrap;gap:4px}
-
-  /* Gramer kutusu */
-  .gram-hint-item-body{font-size:0.8rem}
-}
-
-.cb-section > *:not(.cb-title):not(.tbl-hdr){padding-left:20px;padding-right:20px}
-.cb-section > *:last-child{padding-bottom:20px}
-.cb-section > .cb-actions{padding:16px 20px 20px}
-.cb-section > .slot-row{margin-left:20px;margin-right:20px}
-.cb-section > #langHint{padding-top:14px}
-.cb-section > .gram-hint-box{margin-left:20px;margin-right:20px}
-
-/* ── ANA SAYFA ──────────────────────────────── */
-.home-card{padding:18px 20px;cursor:pointer;border-right:1px solid var(--brd-s);border-bottom:1px solid var(--brd-s);transition:background .2s}
-.home-card:hover{background:var(--surf2)}
-.home-card:nth-child(even){border-right:none}
-@media(min-width:640px){.home-card:nth-child(3n){border-right:none}}
-.home-card-icon{font-size:1.4rem;margin-bottom:8px}
-.home-card-title{font-family:var(--fm);font-size:0.85rem;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:0.5px}
-.home-card-desc{font-size:0.8rem;color:var(--txt-d);line-height:1.6}
-.home-info-item{padding:10px 14px;background:var(--surf2);border-radius:8px}
-.home-info-label{font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:4px}
-.home-info-val{font-size:0.88rem;color:var(--txt);font-weight:500}
-.home-stat{text-align:center;padding:14px 10px;background:var(--surf2);border-radius:8px}
-.home-stat-num{font-size:1.8rem;font-weight:800;color:var(--acc);line-height:1;margin-bottom:4px}
-.home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
-
-/* ── GÜNÜN KELİMESİ ─────────────────────────── */
-
-
-
-.wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
-.wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
-
-
-/* ── FAVORİLER ──────────────────────────────── */
-.fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
-.fav-btn:hover{opacity:.8;transform:scale(1.2)}
-.fav-btn.on{opacity:1;color:#f5a623}
-.fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
-.fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
-
-
-
-@media(max-width:800px){}
-@media(max-width:480px){}
-
-
-
-
-
-
-
-
-
-
-
-/* ── BUGÜN KARTI ─────────────────────────────── */
-
-
-  html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1><div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
-
-  // SÖZLÜK
+  var incSozluk=document.getElementById('pdf-sozluk').checked;
+  var incNotlar=document.getElementById('pdf-notlar').checked;
+  var incReferans=document.getElementById('pdf-referans').checked;
+  var typeFilter=document.getElementById('pdf-type-filter').value;
+  if(!incSozluk&&!incNotlar&&!incReferans){showToast('En az bir bolum secin');return;}
+  var d=new Date();
+  var dateStr=d.toLocaleDateString('tr-TR');
+  var html='<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Suryanice Sozluk</title>';
+  html+='<style>body{font-family:Arial,sans-serif;font-size:12px;color:#1a1a1a;padding:24px;max-width:900px;margin:0 auto}';
+  html+='h1{font-size:22px;text-align:center;margin-bottom:4px}.subtitle{text-align:center;color:#666;font-size:11px;margin-bottom:24px}';
+  html+='h2{font-size:15px;margin:24px 0 12px;padding:6px 12px;background:#f0f0f0;border-left:4px solid #333}';
+  html+='table{width:100%;border-collapse:collapse;margin-bottom:16px}';
+  html+='th{background:#333;color:#fff;padding:7px 10px;text-align:left;font-size:10px}';
+  html+='td{padding:6px 10px;border-bottom:1px solid #eee}.sy{font-size:14px}';
+  html+='tr:nth-child(even) td{background:#fafafa}.pill{display:inline-block;padding:1px 7px;border-radius:10px;background:#e8e8e8;font-size:9px}';
+  html+='</style></head><body>';
+  html+='<h1>Suryanice Sozluk</h1><div class="subtitle">Turkce - Suryanice - Ingilizce &nbsp; '+dateStr+'</div>';
   if(incSozluk){
-    let filtered=typeFilter==='hepsi'?words:words.filter(w=>w.type===typeFilter);
-    html+=`<h2>📖 Sözlük <span style="font-weight:normal;font-size:12px">(${filtered.length} kelime${typeFilter!=='hepsi'?' · '+typeFilter:''})</span></h2>`;
-    html+=`<table><thead><tr><th>#</th><th>Türkçe</th><th>Süryanice</th><th>İngilizce</th><th>Tür</th></tr></thead><tbody>`;
-    filtered.forEach((w,i)=>{
-      html+=`<tr><td>${i+1}</td><td><b>${w.tr||'—'}</b></td><td class="sy">${w.sy||'—'}</td><td>${w.en||'—'}</td><td><span class="pill">${w.type||'—'}</span></td></tr>`;
+    var filtered=typeFilter==='hepsi'?words:words.filter(function(w){return w.type===typeFilter;});
+    html+='<h2>Sozluk ('+filtered.length+' kelime)</h2>';
+    html+='<table><thead><tr><th>#</th><th>Turkce</th><th>Suryanice</th><th>Ingilizce</th><th>Tur</th></tr></thead><tbody>';
+    filtered.forEach(function(w,i){
+      html+='<tr><td>'+(i+1)+'</td><td><b>'+(w.tr||'-')+'</b></td><td class="sy">'+(w.sy||'-')+'</td><td>'+(w.en||'-')+'</td><td><span class="pill">'+(w.type||'-')+'</span></td></tr>';
     });
-    html+=`</tbody></table>`;
+    html+='</tbody></table>';
   }
-
-  // NOTLAR
   if(incNotlar&&notes&&notes.length){
-    html+=`<h2>📝 Notlar — Gramer Kuralları <span style="font-weight:normal;font-size:12px">(${notes.length} kural)</span></h2>`;
-    const cats={};
-    notes.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
-    Object.entries(cats).forEach(([cat,items])=>{
-      html+=`<div class="cat-title">${cat}</div>`;
-      items.forEach(n=>{
-        html+=`<div class="note-card"><div class="note-title">${n.title}</div>`;
-        if(n.body) html+=`<div class="note-body">${n.body}</div>`;
-        if(n.example) html+=`<div class="note-example">Örnek: ${n.example}</div>`;
-        html+=`</div>`;
+    html+='<h2>Notlar ('+notes.length+' kural)</h2>';
+    var cats={};
+    notes.forEach(function(n){var c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
+    Object.keys(cats).forEach(function(cat){
+      html+='<h3>'+cat+'</h3>';
+      cats[cat].forEach(function(n){
+        html+='<div style="margin-bottom:10px;padding:8px 12px;border-left:3px solid #666;background:#fafafa">';
+        html+='<div style="font-weight:700;margin-bottom:4px">'+(n.title||'')+'</div>';
+        if(n.body) html+='<div style="color:#444;white-space:pre-wrap;font-size:11px">'+(n.body)+'</div>';
+        if(n.example) html+='<div style="margin-top:5px;font-style:italic;color:#777;font-size:10px">'+(n.example)+'</div>';
+        html+='</div>';
       });
     });
   }
-
-  // REFERANS
   if(incReferans&&refData&&refData.length){
-    html+=`<h2>📚 Referans</h2>`;
-    refData.forEach(sec=>{
+    html+='<h2>Referans</h2>';
+    refData.forEach(function(sec){
       if(!sec.rows||!sec.rows.length) return;
-      html+=`<h3>${sec.title}</h3>`;
-      html+=`<table><thead><tr><th>Türkçe</th><th>Süryanice</th><th>Transliterasyon</th></tr></thead><tbody>`;
-      sec.rows.forEach(r=>{
-        html+=`<tr><td>${r.tr||'—'}</td><td class="sy">${r.sy||'—'}</td><td>${r.translit||'—'}</td></tr>`;
+      html+='<h3>'+sec.title+'</h3>';
+      html+='<table><thead><tr><th>Turkce</th><th>Suryanice</th><th>Transliterasyon</th><th>Ingilizce</th></tr></thead><tbody>';
+      sec.rows.forEach(function(r){
+        html+='<tr><td>'+(r.tr||'-')+'</td><td class="sy">'+(r.sy||'-')+'</td><td>'+(r.translit||'-')+'</td><td>'+(r.en||'-')+'</td></tr>';
       });
-      html+=`</tbody></table>`;
+      html+='</tbody></table>';
     });
   }
-
-  html+=`</body></html>`;
-
-  // Open in new window and print
-  const win=window.open('','_blank');
-  win.document.write(html);
-  win.document.close();
-  win.onload=function(){
-    win.print();
-  };
+  html+='</body></html>';
+  var win=window.open('','_blank');
+  if(win){win.document.write(html);win.document.close();win.onload=function(){win.print();};}
   closePdfModal();
-  showToast('✦ PDF hazırlanıyor...');
+  showToast('PDF hazirlaniyor...');
 }
 
-/* ── ANA SAYFA ──────────────────────────────── */
-/* -- BUGUN ve BILIYOR MUSUN -- */
-function renderBugun(){
-  var grid=document.getElementById('bugun-grid');
-  var biliyorEl=document.getElementById('biliyor-musun');
-  var tarihEl=document.getElementById('bugun-tarih');
-  var bugun=new Date();
-  var aylar=['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
-  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
-  if(tarihEl) tarihEl.textContent=bugun.getDate()+' '+aylar[bugun.getMonth()]+' '+bugun.getFullYear();
-  if(grid){
-    function kart(w,lbl){
-      if(!w) return '<div class="bugun-kart"><div class="bugun-kart-baslik">'+lbl+'</div><div class="bugun-kart-en" style="opacity:.4">---</div></div>';
-      var sy=w.sy||''; var p=sy.indexOf('(');
-      var sc=p>-1?sy.substring(0,p).trim():sy.trim();
-      var tr=p>-1?sy.substring(p+1).replace(')','').trim():'';
-      var c=(typeof typeColors!='undefined'&&typeColors[w.type])?typeColors[w.type]:'#888';
-      return '<div class="bugun-kart">'
-        +'<div class="bugun-kart-baslik">'+lbl+'</div>'
-        +(sc?'<div class="bugun-kart-sy">'+sc+'</div>':'')
-        +(tr?'<div class="bugun-kart-translit">'+tr+'</div>':'')
-        +'<div class="bugun-kart-tr">'+(w.tr||'---')+'</div>'
-        +(w.en?'<div class="bugun-kart-en">'+w.en+'</div>':'')
-        +(w.type?'<div class="bugun-kart-tur" style="background:'+c+'18;color:'+c+';border-color:'+c+'33">'+w.type+'</div>':'')
-        +'</div>';
-    }
-    if(!words||!words.length){
-      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--txt-d);opacity:.5">Yukleniyor...</div>';
-    } else {
-      var turler=[
-        ['isim','Gunun Ismi'],['fiil','Gunun Fiili'],
-        ['sifat','Gunun Sifati'],['baglac','Gunun Baglaci'],['edat','Gunun Edati']
-      ];
-      var html='';
-      turler.forEach(function(t){
-        var pool=words.filter(function(w){return w.type===t[0]||w.type===(t[0]==='sifat'?'sifat':t[0]==='baglac'?'baglac':t[0]);});
-        html+=kart(pool.length?pool[seed%pool.length]:null,t[1]);
-      });
-      html+=kart(words[Math.floor(Math.random()*words.length)],'Bu Ziyarette');
-      html+='<div class="bugun-kart" style="grid-column:1/-1;background:transparent;border:1.5px dashed var(--brd);display:flex;align-items:center;justify-content:center;padding:14px;gap:8px"><span>Bu kelimelerden kac farkli cumle kurabilirsin?</span></div>';
-      grid.innerHTML=html;
-    }
-  }
-  if(biliyorEl){
-    if(!notes||!notes.length){
-      biliyorEl.innerHTML='<div style="opacity:.5">Kural yok.</div>';
-    } else {
-      var k=notes[seed%notes.length];
-      var rc=(typeof catColors!='undefined'&&catColors[k.cat])?catColors[k.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
-      biliyorEl.innerHTML='<div style="margin-bottom:8px"><span style="padding:2px 10px;border-radius:20px;font-size:0.7rem;background:'+rc.bg+';color:'+rc.text+';border:1px solid '+rc.border+'">'+(k.cat||'Genel')+'</span></div>'
-        +'<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+(k.title||'')+'</div>'
-        +(k.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75;white-space:pre-wrap">'+k.body+'</div>':'')
-        +(k.example?'<div style="margin-top:8px;font-size:0.82rem;font-style:italic;border-left:3px solid var(--brd);padding-left:10px">'+k.example+'</div>':'');
-    }
-  }
-}
 
 function renderHomeStats(){
   const today2=new Date().toISOString().split('T')[0];
@@ -3178,5 +2956,72 @@ function renderHomeStats(){
   }
 }
 
-/* ── GÜNÜN KELİMESİ ─────────────────────────── */
->
+/* -- BUGUN ve BILIYOR MUSUN -- */
+function renderBugun(){
+  var grid=document.getElementById('bugun-grid');
+  var biliyorEl=document.getElementById('biliyor-musun');
+  var tarihEl=document.getElementById('bugun-tarih');
+  var bugun=new Date();
+  var aylar=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
+  if(tarihEl) tarihEl.textContent=bugun.getDate()+' '+aylar[bugun.getMonth()]+' '+bugun.getFullYear();
+  if(grid){
+    function kart(w,lbl){
+      if(!w) return '<div class="bugun-kart"><div class="bugun-kart-baslik">'+lbl+'</div><div class="bugun-kart-en" style="opacity:.4">---</div></div>';
+      var sy=w.sy||''; var p=sy.indexOf('(');
+      var sc=p>-1?sy.substring(0,p).trim():sy.trim();
+      var tr=p>-1?sy.substring(p+1).replace(')','').trim():'';
+      var c=(typeof typeColors!='undefined'&&typeColors[w.type])?typeColors[w.type]:'#888';
+      return '<div class="bugun-kart">'
+        +'<div class="bugun-kart-baslik">'+lbl+'</div>'
+        +(sc?'<div class="bugun-kart-sy">'+sc+'</div>':'')
+        +(tr?'<div class="bugun-kart-translit">'+tr+'</div>':'')
+        +'<div class="bugun-kart-tr">'+(w.tr||'---')+'</div>'
+        +(w.en?'<div class="bugun-kart-en">'+w.en+'</div>':'')
+        +(w.type?'<div class="bugun-kart-tur" style="background:'+c+'18;color:'+c+';border-color:'+c+'33">'+w.type+'</div>':'')
+        +'</div>';
+    }
+    if(!words||!words.length){
+      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--txt-d);opacity:.5">Yükleniyor...</div>';
+    } else {
+      var turler=[
+        ['isim','Günün İsmi'],['fiil','Günün Fiili'],
+        ['sıfat','Günün Sıfatı'],['bağlaç','Günün Bağlacı'],['edat','Günün Edatı']
+      ];
+      var html='';
+      turler.forEach(function(t){
+        var pool=words.filter(function(w){return w.type===t[0]||w.type===(t[0]==='sıfat'?'sıfat':t[0]==='bağlaç'?'bağlaç':t[0]);});
+        html+=kart(pool.length?pool[seed%pool.length]:null,t[1]);
+      });
+      html+=kart(words[Math.floor(Math.random()*words.length)],'Bu Ziyarette');
+      html+='<div class="bugun-kart" style="grid-column:1/-1;background:transparent;border:1.5px dashed var(--brd);display:flex;align-items:center;justify-content:center;padding:14px;gap:8px"><span>Bu kelimelerden kac farkli cumle kurabilirsin?</span></div>';
+      grid.innerHTML=html;
+    }
+  }
+  if(biliyorEl){
+    if(!notes||!notes.length){
+      biliyorEl.innerHTML='<div style="opacity:.5">Kural yok.</div>';
+    } else {
+      var k=notes[seed%notes.length];
+      var rc=(typeof catColors!='undefined'&&catColors[k.cat])?catColors[k.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
+      biliyorEl.innerHTML='<div style="margin-bottom:8px"><span style="padding:2px 10px;border-radius:20px;font-size:0.7rem;background:'+rc.bg+';color:'+rc.text+';border:1px solid '+rc.border+'">'+(k.cat||'Genel')+'</span></div>'
+        +'<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+(k.title||'')+'</div>'
+        +(k.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75;white-space:pre-wrap">'+k.body+'</div>':'')
+        +(k.example?'<div style="margin-top:8px;font-size:0.82rem;font-style:italic;border-left:3px solid var(--brd);padding-left:10px">'+k.example+'</div>':'');
+    }
+  }
+}
+
+
+/* ── BAŞLANGIÇ ──────────────────────────────── */
+applyFont();
+loadNotes();
+loadRef();
+render();
+renderHomeStats();
+renderBugun();
+initCloud();
+restoreSession();
+</script>
+</body>
+</html>
