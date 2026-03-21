@@ -427,7 +427,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <!-- Günün Kelimesi ve Cümlesi -->
     <div class="tbl-wrap" style="margin-bottom:16px">
       <div class="tbl-hdr">
-        <span class="tbl-ttl">📖 Günün Kelimeleri</span>
+        <span class="tbl-ttl">🕐 Saatlik Kelimeler</span>
         <span id="gun-tarih" style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)"></span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0" id="gun-grid">
@@ -522,7 +522,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
   <!-- SÖZLÜK PANELİ -->
   <div class="tab-content" id="tab-sozluk">
-
 
   <div class="stats-row">
     <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-lbl">Toplam Kelime</div></div>
@@ -622,7 +621,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
   </div>
 
-  <div class="tbl-wrap">
+    <div class="tbl-wrap">
     <div class="tbl-hdr" onclick="toggleTable()">
       <span class="tbl-ttl">Kelime Listesi</span>
       <div style="display:flex;align-items:center;gap:12px">
@@ -633,7 +632,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="tscroll collapsed" id="tblScroll">
       <table>
         <thead><tr>
-          <th>#</th>
+          <th style="width:32px">#</th>
           <th onclick="sortT('tr')">Türkçe</th>
           <th onclick="sortT('sy')">Süryanice</th>
           <th onclick="sortT('en')">İngilizce</th>
@@ -645,7 +644,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </table>
     </div>
   </div>
-</div>
+
   </div><!-- /tab-sozluk -->
 
   <!-- CÜMLE KUR PANELİ -->
@@ -1435,9 +1434,7 @@ function clearSearch(){document.getElementById('searchInput').value='';document.
 function setFilter(lang,el){filterLang=lang;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');render();}
 function sortT(key){
   if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}
-  document.querySelectorAll('th').forEach(t=>t.classList.remove('sa','sd'));
-  const m={tr:1,sy:2,en:3,type:4,date:5};const ths=document.querySelectorAll('th');
-  if(m[key]!==undefined)ths[m[key]].classList.add(sortDir===1?'sa':'sd');render();
+  render();
 }
 function getFiltered(){
   let list=[...words];
@@ -1474,118 +1471,49 @@ function toggleFavFilter(){
   render();
 }
 
-/* Sözlük bölüm durumları */
-const sectionOpen={};
 
-function toggleWordSection(type){
-  sectionOpen[type]=!sectionOpen[type];
-  const body=document.getElementById('ws-body-'+type);
-  const arrow=document.getElementById('ws-arrow-'+type);
-  if(body){body.classList.toggle('closed',!sectionOpen[type]);}
-  if(arrow){arrow.style.transform=sectionOpen[type]?'rotate(0deg)':'rotate(-90deg)';}
+let tableOpen=false;
+function toggleTable(){
+  tableOpen=!tableOpen;
+  const sc=document.getElementById('tblScroll');
+  const arrow=document.getElementById('tblArrow');
+  if(sc) sc.classList.toggle('collapsed',!tableOpen);
+  if(arrow) arrow.style.transform=tableOpen?'rotate(0deg)':'rotate(-90deg)';
 }
 
 function render(){
   const f=getFiltered();
   document.getElementById('totalCount').textContent=words.length;
   document.getElementById('filteredCount').textContent=f.length;
+  const resLbl=document.getElementById('resLabel');if(resLbl)resLbl.textContent=f.length+' kelime';
   document.getElementById('todayCount').textContent=words.filter(w=>w.date===today).length;
-
-  const container=document.getElementById('wordSections');
-  if(!container) return;
-
+  const tbody=document.getElementById('tbody');
   if(!f.length){
-    container.innerHTML='<div class="empty"><div class="big">◌</div>'+(q?'Aramanızla eşleşen kelime bulunamadı.':'Henüz kelime eklenmemiş.')+'</div>';
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="big">◌</div>'+(q?'Aramanızla eşleşen kelime bulunamadı.':'Henüz kelime eklenmemiş.')+'</div></td></tr>';
     if(q) document.getElementById('aiSearchBtn').style.display='inline-flex';
     return;
   }
   document.getElementById('aiSearchBtn').style.display='none';
-
-  // Group by type
-  const typeOrder=['isim','fiil','sıfat','zamir','zarf','edat','bağlaç','ünlem','deyim','birleşik','soru','diğer',''];
-  const groups={};
-  f.forEach(w=>{
-    const t=w.type||'diğer';
-    if(!groups[t]) groups[t]=[];
-    groups[t].push(w);
-  });
-
-  const typeIcons={isim:'📦',fiil:'⚡',sıfat:'🎨',zamir:'👤',zarf:'🔄',edat:'📍',bağlaç:'🔗',ünlem:'❗',deyim:'💬',birleşik:'🔀',soru:'❓',diğer:'◌'};
-  const typeColors2={
-    isim:'#4a9eff',fiil:'#ff7043',sıfat:'#ab47bc',zamir:'#26a69a',
-    zarf:'#ffa726',edat:'#78909c',bağlaç:'#ec407a',diğer:'#bdbdbd'
-  };
-
-  container.innerHTML='';
-  const sorted=typeOrder.filter(t=>groups[t]).concat(Object.keys(groups).filter(t=>!typeOrder.includes(t)));
-
-  sorted.forEach(type=>{
-    const items=groups[type];
-    if(!items||!items.length) return;
-    const color=typeColors2[type]||'#bdbdbd';
-    const icon=typeIcons[type]||'◌';
-    if(sectionOpen[type]===undefined) sectionOpen[type]=false; // kapalı başla
-
-    const sec=document.createElement('div');
-    sec.className='tbl-wrap';
-    sec.style.marginBottom='10px';
-
-    // Header
-    const hdr=document.createElement('div');
-    hdr.className='tbl-hdr';
-    hdr.style.cursor='pointer';
-    hdr.onclick=function(){toggleWordSection(type);};
-    hdr.innerHTML='<div style="display:flex;align-items:center;gap:10px">'
-      +'<span style="width:10px;height:10px;border-radius:50%;background:'+color+';display:inline-block;flex-shrink:0"></span>'
-      +'<span class="tbl-ttl">'+icon+' '+(type||'diğer').charAt(0).toUpperCase()+(type||'diğer').slice(1)+'</span>'
-      +'<span style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)">'+items.length+'</span>'
-      +'</div>'
-      +'<span id="ws-arrow-'+type+'" style="font-size:11px;color:var(--acc-d);transition:transform .3s;transform:rotate(-90deg)">▼</span>';
-    sec.appendChild(hdr);
-
-    // Body
-    const body=document.createElement('div');
-    body.id='ws-body-'+type;
-    body.className='tscroll'+(sectionOpen[type]?'':' collapsed');
-
-    const table=document.createElement('table');
-    table.innerHTML='<thead><tr>'
-      +'<th style="width:32px">#</th>'
-      +'<th>Türkçe</th>'
-      +'<th>Süryanice</th>'
-      +'<th>Transliterasyon</th>'
-      +'<th>İngilizce</th>'
-      +'<th style="width:70px"></th>'
-      +'</tr></thead>';
-    const tbody=document.createElement('tbody');
-
-    items.forEach((w,i)=>{
-      const sy=w.sy||'';
-      const paren=sy.indexOf('(');
-      const syScript=paren>-1?sy.substring(0,paren).trim():sy.trim();
-      const syTranslit=paren>-1?sy.substring(paren+1).replace(')','').trim():'';
-      const isFav=favWords.has(w.id);
-
-      const tr=document.createElement('tr');
-      tr.innerHTML='<td style="color:var(--txt-d);font-family:var(--fm);font-size:0.75rem">'+(i+1)+'</td>'
-        +'<td><strong>'+(hl(w.tr,q)||'—')+'</strong></td>'
-        +'<td style="font-size:1rem;direction:rtl">'+(syScript||'—')+'</td>'
-        +'<td style="font-family:var(--fm);font-size:0.78rem;color:var(--acc-d)">'+(hl(syTranslit,q)||'—')+'</td>'
-        +'<td style="color:var(--txt-d)">'+(hl(w.en,q)||'—')+'</td>'
-        +'<td style="white-space:nowrap">'
-        +'<button class="fav-btn'+(isFav?' on':'')+'" onclick="toggleFav('+w.id+')" title="Favori">'+(isFav?'⭐':'☆')+'</button>'
-        +'<button class="ebtn edit-only" onclick="editWord('+w.id+')" title="Düzenle" style="display:none">✏️</button>'
-        +'<button class="dbtn edit-only" onclick="deleteWord('+w.id+')" title="Sil" style="display:none">✕</button>'
-        +'</td>';
-      tbody.appendChild(tr);
-    });
-
-    table.appendChild(tbody);
-    body.appendChild(table);
-    sec.appendChild(body);
-    container.appendChild(sec);
-  });
+  tbody.innerHTML=f.map(function(w,i){
+    const sy=w.sy||'';
+    const isFav=favWords.has(w.id);
+    return '<tr>'
+      +'<td style="width:32px;color:var(--txt-d);font-family:var(--fm);font-size:11px">'+(i+1)+'</td>'
+      +'<td><strong>'+(hl(w.tr,q)||'—')+'</strong></td>'
+      +'<td class="tsy">'+(hl(w.sy,q)||'—')+'</td>'
+      +'<td class="ten">'+(hl(w.en,q)||'—')+'</td>'
+      +'<td>'+(w.type?'<span class="tpill">'+w.type+'</span>':'')+'</td>'
+      +'<td class="tdate">'+(w.date||'')+'</td>'
+      +'<td style="white-space:nowrap">'
+      +'<button class="fav-btn'+(isFav?' on':'')+'" onclick="toggleFav('+w.id+')" title="Favori">'+(isFav?'⭐':'☆')+'</button>'
+      +'<button class="ebtn edit-only" onclick="editWord('+w.id+')" title="Düzenle" style="display:none">✏️</button>'
+      +'<button class="dbtn edit-only" onclick="deleteWord('+w.id+')" title="Sil" style="display:none">✕</button>'
+      +'</td>'
+      +'</tr>';
+  }).join('');
 }
+
+
 function exportExcel(){
   const data=[['#','Türkçe','Süryanice','İngilizce','Kelime Türü','Tarih']];
   words.forEach((w,i)=>data.push([i+1,w.tr,w.sy,w.en,w.type||'',w.date]));
@@ -1624,7 +1552,7 @@ function switchTab(id, el){
   document.querySelectorAll('.icon-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   if(el) el.classList.add('active');
-  if(id==='cumle') renderPool();
+  if(id==='sozluk')   if(id==='cumle') renderPool();
   if(id==='notlar') renderNotes();
   if(id==='referans'){renderRef();}
   if(id==='istatistik') renderIstatistik();
@@ -3000,36 +2928,60 @@ function renderGunKelimeCumle(){
 
   var bugun=new Date();
   var aylar=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
+  var seed=bugun.getFullYear()*1000000+(bugun.getMonth()+1)*10000+bugun.getDate()*100+bugun.getHours();
   tarihEl.textContent=bugun.getDate()+' '+aylar[bugun.getMonth()]+' '+bugun.getFullYear();
 
+  // Sözlük kelimesi kartı (fiil ve isim)
   function kelimeKart(elId, tip, etiket){
     var el=document.getElementById(elId);
     if(!el) return;
-    var etiketHtml='<div style="font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px">'+etiket+'</div>';
-    if(!words||!words.length){el.innerHTML=etiketHtml+'<div style="opacity:.4">—</div>';return;}
+    var baslik='<div style="font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px">'+etiket+'</div>';
+    if(!words||!words.length){el.innerHTML=baslik+'<div style="opacity:.4">—</div>';return;}
     var pool=words.filter(function(w){return w.type===tip;});
-    if(!pool.length){el.innerHTML=etiketHtml+'<div style="opacity:.4">—</div>';return;}
+    if(!pool.length){el.innerHTML=baslik+'<div style="opacity:.4">—</div>';return;}
     var w=pool[seed%pool.length];
     var sy=w.sy||'';
     var p=sy.indexOf('(');
     var syScript=p>-1?sy.substring(0,p).trim():sy.trim();
     var syTranslit=p>-1?sy.substring(p+1).replace(')','').trim():'';
     var renk=(typeof typeColors!='undefined'&&typeColors[w.type])?typeColors[w.type]:'#888';
-    el.innerHTML=etiketHtml
+    el.innerHTML=baslik
       +(syScript?'<div style="font-size:1.4rem;font-weight:700;color:var(--acc);margin-bottom:4px">'+syScript+'</div>':'')
       +(syTranslit?'<div style="font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);margin-bottom:6px">'+syTranslit+'</div>':'')
-      +'<div style="font-size:0.9rem;font-weight:700;color:var(--txt)">'+( w.tr||'—')+'</div>'
+      +'<div style="font-size:0.9rem;font-weight:700;color:var(--txt)">'+(w.tr||'—')+'</div>'
       +(w.en?'<div style="font-size:0.78rem;color:var(--txt-d)">'+w.en+'</div>':'');
   }
 
-  kelimeKart('gun-fiil',  'fiil',  '⚡ Fiil');
-  kelimeKart('gun-isim',  'isim',  '📦 İsim');
-  kelimeKart('gun-edat',  'edat',  '📍 Edat');
-  kelimeKart('gun-sayi',  'sayı',  '🔢 Sayı');
+  // Referans kartı (edat ve sayı)
+  function refKart(elId, secId, etiket){
+    var el=document.getElementById(elId);
+    if(!el) return;
+    var baslik='<div style="font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px">'+etiket+'</div>';
+    if(!refData||!refData.length){el.innerHTML=baslik+'<div style="opacity:.4">—</div>';return;}
+    var sec=refData.find(function(s){return s.id===secId;});
+    if(!sec||!sec.rows||!sec.rows.length){el.innerHTML=baslik+'<div style="opacity:.4">—</div>';return;}
+    var row=sec.rows[seed%sec.rows.length];
+    var sy=row.sy||'';
+    var p=sy.indexOf('(');
+    var syScript=p>-1?sy.substring(0,p).trim():sy.trim();
+    var syTranslit=row.translit||'';
+    el.innerHTML=baslik
+      +(syScript?'<div style="font-size:1.4rem;font-weight:700;color:var(--acc);margin-bottom:4px">'+syScript+'</div>':'')
+      +(syTranslit?'<div style="font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);margin-bottom:6px">'+syTranslit+'</div>':'')
+      +'<div style="font-size:0.9rem;font-weight:700;color:var(--txt)">'+(row.tr||'—')+'</div>'
+      +(row.en?'<div style="font-size:0.78rem;color:var(--txt-d)">'+row.en+'</div>':'');
+  }
+
+  kelimeKart('gun-fiil', 'fiil', '⚡ Fiil');
+  kelimeKart('gun-isim', 'isim', '📦 İsim');
+  refKart('gun-edat', 3, '🔗 Bağlaç');
+  refKart('gun-sayi', 4, '🔢 Sayı');
 }
 
+
 /* -- BUNU BILIYOR MUSUN -- */
+
+
 function renderBiliyorMusun(){
   var el=document.getElementById('biliyormusun-icerik');
   var catEl=document.getElementById('biliyormusun-cat');
@@ -3039,7 +2991,7 @@ function renderBiliyorMusun(){
     return;
   }
   var bugun=new Date();
-  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
+  var seed=bugun.getFullYear()*1000000+(bugun.getMonth()+1)*10000+bugun.getDate()*100+bugun.getHours();
   var kural=notes[seed%notes.length];
   var renk=(typeof catColors!='undefined'&&catColors[kural.cat])?catColors[kural.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
   if(catEl) catEl.textContent=kural.cat||'Genel';
