@@ -1680,7 +1680,56 @@ document.getElementById('editModal').addEventListener('click',function(e){if(e.t
 /* ── NOTLAR ─────────────────────────────────── */
 let notes=[], editingNoteId=null;
 const NKEY='sozluk_notes_v1';
-function loadNotes(){try{const r=localStorage.getItem(NKEY);if(r)notes=JSON.parse(r);}catch(e){notes=[];}renderNotes();}
+const GRAMMAR_NOTES_DATA=[
+  {title:'Alfabe ve Yazı Yönü',cat:'Yazı Sistemi',body:'Süryanice alfabesinde 22 harf vardır. Yazı sağdan sola yazılır.',example:'Harf sayısı: 22 | Yön: Sağdan sola'},
+  {title:'Bağlanmayan 8 Harf',cat:'Yazı Sistemi',body:'22 harfin sekizi kendisinden sonra gelen harfe bağlanmaz: Ālap, Dālat, He, Waw, Zayn, ʿAyn, Reš ve Taw.',example:'Bağlanmayanlar: ʾ d h w z ʿ r t'},
+  {title:'BeGaDKePaT — Sert ve Yumuşak Telaffuz',cat:'Yazı Sistemi',body:"Bet (b), Gomal (g), Dolat (d), Kap (k), Pe (p) ve Taw (t) harfleri 'sert' veya 'yumuşak' okunur.\n• Quššoyo (sağ üst nokta) = sert\n• Rukoko (sağ alt nokta) = yumuşak",example:'Sert: b, g, d, k, p, t | Yumuşak: v, ğ, ð, x, f, θ'},
+  {title:'Susturan Çizgi (mbaṭlono)',cat:'Yazı Sistemi',body:'Harfin altında ince bir çizgi, o harfin telaffuz edilmediğini gösterir.',example:"mdito 'şehir': Nun altı çizgili → okunmaz"},
+  {title:'Syome — Çoğul Dişil İşareti',cat:'Yazı Sistemi',body:"Kelimenin üzerinde yatay iki nokta (Syome) çoğul dişil üçüncü şahıs anlamı taşır.",example:'İki nokta üstte → çoğul dişil 3. şahıs'},
+  {title:'Pʿal Noktası',cat:'Yazı Sistemi',body:'Pʿal kalıbındaki fiiller bazı durumlarda fazladan bir noktayla gösterilir.',example:'Nokta altta → Pʿal kalıbı | Nokta üstte → 1. tekil şahıs'},
+  {title:'Harekeleme Sistemi',cat:'Sesler ve Hareke',body:'Süryanice normalde harekesiz yazılır. İki tür harekeleme: (1) nokta sistemi (2) Yunan harflerinden türetilmiş semboller.',example:''},
+  {title:'Beş Temel Ünlü',cat:'Sesler ve Hareke',body:"Klasik Süryanicede beş temel ünlü: a, e, i, o, u\n• zqopo (ā) → Batı Süryanicesinde 'o' okunur",example:'zqopo (ā→o) | ptoḥo (a) | rboṣo (e) | ḥboṣo (i) | ʿṣoṣo (u)'},
+  {title:'Hareke Tabanı — Waw ve Yud',cat:'Sesler ve Hareke',body:"Waw ve Yud harfleri 'hareke tabanı' işlevi görür.\n• u/o harekesi → Waw tabanı\n• i/e harekesi → Yud tabanı",example:"Pawlos: Waw hareke tabanı, 'w' okunmaz"},
+  {title:'Yazılıp Okunmayan Harfler',cat:'Sesler ve Hareke',body:'Harekenin etkili olduğu yere kadar telaffuz edilebilir; devamında harf olsa da hareke yoksa okunmaz.',example:"ktobaw: 'a' harekesi Waw ile o heceyi bitirir → sonraki harfler okunmaz"},
+  {title:'Šwa — Yardımcı Ses',cat:'Sesler ve Hareke',body:"Üç ünsüz art arda geldiğinde ikinci ve üçüncü harf arasında zayıf bir ses (šwa) varsayılır.",example:"t'ren — t ve r arasındaki zayıf ses"},
+  {title:'Altı Temel Fiil Kalıbı',cat:'Fiil Kuralları',body:'1. Pʿal — temel\n2. Paʿel — nesne alan\n3. Apʿel — ettirgen\n4. Etpʿel — edilgen\n5. Etpaʿal — edilgen\n6. Ettapʿal — edilgen',example:'ktab (yazmak) → Pʿal kalıbı'},
+  {title:'Fiil Grupları — Sağlam ve Zayıf',cat:'Fiil Kuralları',body:"Kök-ünsüzlerden biri 'zayıf' (Ālap, Waw, Yud) ise çekimde farklılıklar olur. 9 fiil grubu vardır.",example:'2-Waw: ʿraq | 1-Ālap: emar | Sağlam: ktab'},
+  {title:'Geçmiş Zaman — 3. Tekil Eril',cat:'Fiil Kuralları',body:'Sözlüklerde fiiller bu çekimiyle verilir. Ek yoktur.',example:'ktab (yazdı) | šmaʿ (duydu) | nṣar (korudu)'},
+  {title:'Geçmiş Zaman — 3. Tekil Dişil',cat:'Fiil Kuralları',body:"İki heceli çekim. Sona -at (Rukoko'lu Taw ile) eklenir.",example:'ketbat (yazdı d) | šelʿat (gönderdi d)'},
+  {title:'Geçmiş Zaman — 3. Çoğul',cat:'Fiil Kuralları',body:'• 3. çoğul eril: Temel Pʿal gövdesi + -un\n• 3. çoğul dişil: Temel Pʿal gövdesi + -ī̱n',example:'ktabun (yazdılar e) | ktabī̱n (yazdılar d)'},
+  {title:'1-Ālap Fiilleri',cat:'Fiil Kuralları',body:'Birinci kök-ünsüzü Ālap olan fiillerde Ālap daima e harekesi alır.',example:'emar (söyledi e) | emrat (söyledi d) | ezal (gitti e)'},
+  {title:'2. Şahıs Çekimleri',cat:'Fiil Kuralları',body:'• 2. tekil eril: TPG + -t\n• 2. tekil dişil: TPG + -t + sessiz Yud\n• 2. çoğul eril: TPG + -tun\n• 2. çoğul dişil: TPG + -tī̱n',example:'ktabt (yazdın e) | ktabtun (yazdınız e)'},
+  {title:'1. Şahıs Çekimleri',cat:'Fiil Kuralları',body:'• 1. tekil: e-kök-e-kök-et şablonu\n• 1. çoğul: TPG + -n veya -nan\n• Ortak cins (eril ve dişil için aynı)',example:'ketbet (yazdım) | ktabn / ktabnan (yazdık)'},
+  {title:'Şahıs Tespiti — Hızlı Tanıma',cat:'Fiil Kuralları',body:"• Pʿal noktası üstteyse → 'ben'\n• -n/-nan → 'biz'\n• -t=sen e | -tun=siz e | -tī̱n=siz d\n• -un=onlar e | -ī̱n=onlar d",example:'ktabt=yazdın | ktabnan=yazdık | ktabun=yazdılar'},
+  {title:'İsim Halleri — Üç Hal',cat:'İsim Kuralları',body:'1. Belirli hal (status determinatus)\n2. Yalın hal\n3. Terkibe giren hal (status constructus)',example:''},
+  {title:'İsim Cinsiyeti',cat:'İsim Kuralları',body:'• -o ile bitenler → genellikle eril\n• -to ile bitenler → genellikle dişil\nSözlüklerde e ve d kısaltmalarıyla belirtilir.',example:'gabro (e)=adam | atto (d)=kadın | ktobo (e)=kitap'},
+  {title:'BDUL Harfleri — Önekler',cat:'İsim Kuralları',body:'B, D, W, L harfleri kelimelerin başına önek olarak eklenir.',example:'b-(içinde) | d-(ilgi) | w-(ve) | l-(yönelme)'},
+  {title:'Lamad (l-) Öneki',cat:'İsim Kuralları',body:'a) Yönelme hali (-e/-a)\nb) Belirtili nesne (-ı/-i)\nc) Lehine, adına',example:'lgabro=adama | lktobo=kitabı'},
+  {title:'Men İlgeci — Uzaklaşma',cat:'İsim Kuralları',body:'Türkçedeki -den/-dan uzaklaşma halinin işlevini görür.',example:'men mdito=şehirden | men ṣuro=dağdan'},
+  {title:'Bet (b-) Öneki',cat:'İsim Kuralları',body:'a) İçinde (-de/-da)\nb) İçine (-e/-a)\nc) Zaman bildiren kelimelerle\nd) Araç veya karşılık olarak',example:'bmdito=şehirde | bṣapro=sabahleyin'},
+  {title:'Waw (w-) Bağlacı',cat:'İsim Kuralları',body:"Waw harfi 've' bağlacı olarak iki öğeyi birbirine bağlar.",example:'arʿo wnomuso=ülke ve yasa'},
+  {title:'Temel Söz Dizimi — VSO',cat:'Cümle Yapısı',body:'Süryanice cümlelerde söz dizimi çoğunlukla Yüklem–Özne–Diğer öğeler (VSO) şeklindedir.',example:'ktab gabro ktobo → Adam kitap yazdı.'},
+  {title:'Olumsuzluk — lo',cat:'Cümle Yapısı',body:"'lo' kelimesi fiilin olumsuzluğunu belirtir.",example:'lo sleq gabro → Adam tırmanmadı.'},
+  {title:'Soru Cümleleri',cat:'Cümle Yapısı',body:"Evet/Hayır soruları tonlamayla belirtilir. 'ara' ile güçlendirilebilir.",example:'ayko=nerede? | mono=ne? | man=kim?'},
+  {title:'Dolat — Bağlaç ve İlgi Zamiri',cat:'Cümle Yapısı',body:"1. Yan cümle kurma\n2. İlgi zamiri ('-ki', 'olan')",example:'ktobo daktab nbiyo → peygamberin yazdığı kitap'},
+  {title:'Bağımsız Şahıs Zamirleri',cat:'Zamir Kuralları',body:'Yalnızca özne işlevindedir. 3. şahıslarda genellikle kullanılmaz.',example:'eno(ben) | hu(o e) | hi(o d) | ḥnan(biz)'},
+  {title:'Kısa Ekfiiller (Kopula)',cat:'Zamir Kuralları',body:'Bağımsız zamirlerin kısaltılmış şekilleri her şeyi yüklem yapar.',example:'-no(ben) | -u/-w(o e) | -i/-y(o d) | -nan(biz)'},
+  {title:'Transliterasyon Özel Harfleri',cat:'Transliterasyon',body:'ṭ=Ṭet | ṣ=Ṣade | ḥ=Ḥet | š=Šin | ʿ=Ayin | ʾ=Ālap',example:'š=ş | ḥ=h(gırtlak) | ṭ=t(vurgulu) | ʿ=ayin'},
+];
+const GRAMMAR_NOTES_KEY='sozluk_grammar_loaded_v1';
+function loadNotes(){
+  try{const r=localStorage.getItem(NKEY);if(r)notes=JSON.parse(r);}catch(e){notes=[];}
+  // Inject grammar notes once
+  if(!localStorage.getItem(GRAMMAR_NOTES_KEY)){
+    const maxId=notes.reduce((m,n)=>Math.max(m,n.id||0),0);
+    GRAMMAR_NOTES_DATA.forEach((n,i)=>{
+      notes.push({id:maxId+i+1,title:n.title,body:n.body,cat:n.cat,example:n.example||''});
+    });
+    try{localStorage.setItem(NKEY,JSON.stringify(notes));localStorage.setItem(GRAMMAR_NOTES_KEY,'1');}catch(e){}
+  }
+  noteNextId=notes.reduce((m,n)=>Math.max(m,n.id||0),0)+1;
+  renderNotes();
+}
 function saveNotes(){try{localStorage.setItem(NKEY,JSON.stringify(notes));}catch(e){}}
 
 function switchNTab(id,el){
@@ -2046,20 +2095,22 @@ function renderRef(){
 
     const table=document.createElement('table');
     table.className='ref-table';
-    table.innerHTML='<thead><tr><th>Türkçe</th><th>Süryanice</th><th>Transliterasyon</th><th style="width:60px"></th></tr></thead>';
+    table.innerHTML='<thead><tr><th>Türkçe</th><th>Süryanice</th><th>Transliterasyon</th>'+(editMode?'<th style="width:60px"></th>':'')+'</tr></thead>';
     const tbody=document.createElement('tbody');
 
     sec.rows.forEach((row,idx)=>{
       const tr=document.createElement('tr');
       tr.innerHTML='<td>'+row.tr+'</td><td class="sy">'+row.sy+'</td><td class="tr2">'+row.translit+'</td>'
-        +'<td style="white-space:nowrap">'
-        +'<button class="ebtn" onclick="editRefRow('+sec.id+','+idx+')" title="Düzenle" style="opacity:.5">✏️</button>'
-        +'<button class="dbtn" onclick="deleteRefRow('+sec.id+','+idx+')" title="Sil" style="opacity:.5">✕</button>'
-        +'</td>';
-      tr.querySelector('.ebtn').onmouseenter=function(){this.style.opacity='1';};
-      tr.querySelector('.ebtn').onmouseleave=function(){this.style.opacity='.5';};
-      tr.querySelector('.dbtn').onmouseenter=function(){this.style.opacity='1';};
-      tr.querySelector('.dbtn').onmouseleave=function(){this.style.opacity='.5';};
+        +(editMode?'<td style="white-space:nowrap"><button class="ebtn" style="opacity:.5">✏️</button><button class="dbtn" style="opacity:.5">✕</button></td>':'<td></td>');
+      if(editMode){
+        const btns=tr.querySelectorAll('.ebtn,.dbtn');
+        btns[0].onclick=function(){editRefRow(sec.id,idx);};
+        btns[0].onmouseenter=function(){this.style.opacity='1';};
+        btns[0].onmouseleave=function(){this.style.opacity='.5';};
+        btns[1].onclick=function(){deleteRefRow(sec.id,idx);};
+        btns[1].onmouseenter=function(){this.style.opacity='1';};
+        btns[1].onmouseleave=function(){this.style.opacity='.5';};
+      }
       tbody.appendChild(tr);
     });
 
@@ -2333,12 +2384,13 @@ function setEditMode(on){
   document.querySelectorAll('.edit-only').forEach(el=>{
     el.style.display=on?(el.dataset.flex?'flex':''):'none';
   });
-  // Notes edit tab
   const ntabEdit=document.getElementById('ntab-edit');
   if(ntabEdit) ntabEdit.style.display=on?'':'none';
-  // Ref section/row add buttons — hide dynamically in renderRef
-  renderRef();
-  renderNotes();
+  // Re-render sections that are currently visible to update edit buttons
+  const noteList=document.getElementById('noteList');
+  if(noteList&&noteList.innerHTML) renderNotes();
+  const refSec=document.getElementById('refSections');
+  if(refSec&&refSec.innerHTML) renderRef();
   updateAuthUI();
 }
 
@@ -2895,18 +2947,6 @@ document.addEventListener('keydown',e=>{
 });
 render();
 
-// Inject grammar notes from Suryanice_Dilbilgisi_Kurallari.docx
-(function(){
-  const NKEY_LOCAL='sozluk_notes_v1';
-  let existing=[];
-  try{const r=localStorage.getItem(NKEY_LOCAL);if(r)existing=JSON.parse(r);}catch(e){}
-  const grammarNotes=[{'title': 'Alfabe ve Yazı Yönü', 'cat': 'Yazı Sistemi', 'body': 'Süryanice alfabesinde 22 harf vardır. Yazı sağdan sola yazılır. Bu kitapta Sertô (Batı Süryani) yazısı esas alınmıştır.', 'example': 'Harf sayısı: 22 | Yön: Sağdan sola'}, {'title': 'Bağlanmayan 8 Harf', 'cat': 'Yazı Sistemi', 'body': '22 harfin sekizi kendisinden sonra gelen harfe bağlanmaz: Ālap, Dālat, He, Waw, Zayn, ʿAyn, Reš ve Taw.\nBağlantı çizgisi satır üzerindedir.', 'example': 'Bağlanmayanlar: ʾ d h w z ʿ r t'}, {'title': 'BeGaDKePaT — Sert ve Yumuşak Telaffuz', 'cat': 'Yazı Sistemi', 'body': "Bet (b), Gomal (g), Dolat (d), Kap (k), Pe (p) ve Taw (t) harfleri oluşan duruma göre 'sert' (nefefsiz) veya 'yumuşak' (nefesli) olmak üzere iki şekilde telaffuz edilir.\n• Quššoyo (sağ üst nokta) = sert okuma\n• Rukoko (sağ alt nokta) = yumuşak okuma\n• Cümle başındaki BeGaDKePaT harfleri Quššoyo almasa da sert okunur.", 'example': 'Sert: b, g, d, k, p, t | Yumuşak: v, ğ, ð, x, f, θ'}, {'title': 'Susturan Çizgi (mbaṭlono)', 'cat': 'Yazı Sistemi', 'body': 'Harfin altında ince bir çizgi, o harfin telaffuz edilmediğini gösterir. Harf ya tamamen sessizdir ya da sonraki harfe benzeşmiştir (asimilasyon).\nWaw ve Yud sessiz olduklarında altları çizilmez.', 'example': "mdito 'şehir': Nun altı çizgili → okunmaz"}, {'title': 'Syome — Çoğul Dişil İşareti', 'cat': 'Yazı Sistemi', 'body': "Kelimenin üzerinde yatay iki nokta (Syome) çoğul dişil üçüncü şahıs anlamı taşır. 'Siz d' çekiminde Syome kullanılmaz.", 'example': 'İki nokta üstte → çoğul dişil 3. şahıs'}, {'title': 'Pʿal Noktası', 'cat': 'Yazı Sistemi', 'body': 'Pʿal kalıbındaki fiiller bazı durumlarda altlarında (veya üstlerinde) fazladan bir noktayla gösterilir. Harekesiz yazıda da Pʿal noktası her zaman kullanılır.', 'example': 'Nokta alttta → Pʿal kalıbı | Nokta üstte → 1. tekil şahıs'}, {'title': 'Harekeleme Sistemi', 'cat': 'Sesler ve Hareke', 'body': 'Süryanice normalde harekesiz yazılır. İki tür harekeleme vardır:\n1. Nokta sistemi\n2. Yunan harflerinden türetilmiş özel semboller\nHarekeler ait oldukları harfin tam altına veya üstüne yazılır.', 'example': ''}, {'title': 'Beş Temel Ünlü', 'cat': 'Sesler ve Hareke', 'body': "Klasik Süryanicede beş temel ünlü ses: a, e, i, o, u\n• zqopo (ā) → Batı Süryanicesinde 'o' okunur\n• Üzeri çizgili ünlüler uzun sayılır", 'example': 'zqopo (ā→o) | ptoḥo (a) | rboṣo (e) | ḥboṣo (i) | ʿṣoṣo (u)'}, {'title': 'Hareke Tabanı — Waw ve Yud', 'cat': 'Sesler ve Hareke', 'body': "Waw ve Yud harfleri 'hareke tabanı' işlevi görür — kendi başlarına seslendirilmez, yalnızca ünlüyü taşırlar.\n• u/o harekesi → Waw tabanı\n• i/e harekesi → Yud tabanı\nKelime başındaki ve sonundaki Ālap da hareke tabanı olabilir.", 'example': "Pawlos: Waw hareke tabanı, 'w' okunmaz"}, {'title': 'Yazılıp Okunmayan Harfler', 'cat': 'Sesler ve Hareke', 'body': 'Temel prensip: Harekenin etkili olduğu yere kadar telaffuz edilebilir; devamında harf olmasına rağmen hareke görülmüyorsa o kısım okunmaz.', 'example': "ktobaw: 'a' harekesi Waw ile o heceyi bitirir → sonraki harfler okunmaz"}, {'title': 'Šwa — Yardımcı Ses', 'cat': 'Sesler ve Hareke', 'body': "Üç ünsüz art arda geldiğinde, özellikle ikinci ve üçüncü harf arasında Türkçedeki 'ı'dan biraz daha zayıf bir ses (šwa) varsayılır. Transliterasyonda zorunlu değildir.", 'example': "t'ren — t ve r arasındaki zayıf ses"}, {'title': 'Altı Temel Fiil Kalıbı', 'cat': 'Fiil Kuralları', 'body': 'Süryanicede altı temel fiil kalıbı (binyan):\n1. Pʿal — temel kalıp\n2. Paʿel — nesne alan kalıp\n3. Apʿel — ettirgen\n4. Etpʿel — edilgen\n5. Etpaʿal — edilgen\n6. Ettapʿal — edilgen\nBu ciltte yalnızca Pʿal öğretilmektedir.', 'example': 'ktab (yazmak) → Pʿal kalıbı'}, {'title': 'Fiil Grupları — Sağlam ve Zayıf Kökler', 'cat': 'Fiil Kuralları', 'body': "Kök-ünsüzlerden biri 'zayıf' (Ālap, Waw, Yud) ise çekimde önemli farklılıklar olur.\n9 fiil grubu:\n• Sağlam | 1-Ālap | 3-Zayıf | 3-Gırtlak/Reš | 2-Yud | 2-Waw | 2-Ālap | 2-Nun | Ālap (1-Ālap grubu)", 'example': '2-Waw: ʿraq (kaçmak) | 1-Ālap: emar (söylemek) | Sağlam: ktab (yazmak)'}, {'title': 'Geçmiş Zaman — 3. Tekil Eril', 'cat': 'Fiil Kuralları', 'body': 'Sözlüklerde fiiller bu çekimiyle verilir. Ek yoktur. Kök sesli a veya e olarak değişir.', 'example': 'ktab (yazdı) | šmaʿ (duydu) | nṣar (korudu) | ʿbar (geçti)'}, {'title': 'Geçmiş Zaman — 3. Tekil Dişil', 'cat': 'Fiil Kuralları', 'body': "İki heceli çekim. Birinci ve üçüncü kök-ünsüz üzerine e ve a harekesi gelir; sona -at (Rukoko'lu Taw ile) eklenir.", 'example': 'ketbat (yazdı d) | šelʿat (gönderdi d) | neṣrat (korudu d)'}, {'title': 'Geçmiş Zaman — 3. Çoğul', 'cat': 'Fiil Kuralları', 'body': '• 3. çoğul eril: Temel Pʿal gövdesi + -un\n• 3. çoğul dişil: Temel Pʿal gövdesi + -ī̱n', 'example': 'ktabun (yazdılar e) | ktabī̱n (yazdılar d)'}, {'title': '1-Ālap Fiilleri', 'cat': 'Fiil Kuralları', 'body': 'Birinci kök-ünsüzü Ālap olan fiillerde Ālap daima e harekesi alır. Şahıs belirtici sonekler sağlam fiillerle aynıdır.', 'example': 'emar (söyledi e) | emrat (söyledi d) | ezal (gitti e)'}, {'title': '2. Şahıs Çekimleri', 'cat': 'Fiil Kuralları', 'body': 'Temel Pʿal gövdesi (TPG) -t ile biter.\n• 2. tekil eril: TPG + -t\n• 2. tekil dişil: TPG + -t + sessiz Yud\n• 2. çoğul eril: TPG + -tun\n• 2. çoğul dişil: TPG + -tī̱n', 'example': 'ktabt (yazdın e) | ktabtun (yazdınız e) | ktabtī̱n (yazdınız d)'}, {'title': '1. Şahıs Çekimleri', 'cat': 'Fiil Kuralları', 'body': '• 1. tekil: e-kök-e-kök-et şablonu. Pʿal noktası üsttedir.\n• 1. çoğul: TPG + -n veya -nan\n• 1. şahıs çekimleri hem eril hem dişil için aynıdır (ortak cins).', 'example': 'ketbet (yazdım) | ktabn / ktabnan (yazdık) | rʿemet (sevdim)'}, {'title': 'Şahıs Tespiti — Hızlı Tanıma', 'cat': 'Fiil Kuralları', 'body': "• Pʿal noktası üstteyse → 'ben'\n• -n veya -nan → 'biz'\n• -t = sen e | -t + sessiz Yud = sen d | -tun = siz e | -tī̱n = siz d\n• Taw yoksa: -un = onlar e | -ī̱n veya Syome = onlar d", 'example': 'ktabt = yazdın (e) | ktabnan = yazdık | ktabun = yazdılar (e)'}, {'title': 'İsim Halleri — Üç Hal', 'cat': 'İsim Kuralları', 'body': 'Klasik Süryanicede isimler üç halde çekilir:\n1. Belirli hal (status determinatus)\n2. Yalın hal\n3. Terkibe giren hal (status constructus)', 'example': ''}, {'title': 'İsim Cinsiyeti', 'cat': 'İsim Kuralları', 'body': 'İsimler eril ve dişil olmak üzere iki cinse ayrılır.\n• Belirli halde -o ile bitenler → genellikle eril\n• -to ile bitenler → genellikle dişil\nİstisna: arʿo (ülke) -o ile bitmesine rağmen dişildir.\nSözlüklerde e ve d kısaltmalarıyla belirtilir.', 'example': 'gabro (e) = adam | atto (d) = kadın | ktobo (e) = kitap | mdito (d) = şehir'}, {'title': 'BDUL Harfleri — Önekler', 'cat': 'İsim Kuralları', 'body': "B, D, W, L harfleri çeşitli kelimelerin başına önek olarak eklenir. Harekeli Ālap'tan önce geldiklerinde o harekeyi üstlerine alırlar.", 'example': 'b- (içinde) | d- (ilgi zamiri) | w- (ve) | l- (yönelme/nesne)'}, {'title': 'Lamad (l-) Öneki', 'cat': 'İsim Kuralları', 'body': 'Üç işlevi vardır:\na) Yönelme hali: birine/bir şeye doğru (-e/-a)\nb) Belirtili nesne: eylemden etkilenen belirli kişi/şey (-ı/-i)\nc) Lehine, adına anlamında', 'example': 'lgabro = adama | lktobo = kitabı (belirtili nesne)'}, {'title': 'Men İlgeci — Uzaklaşma', 'cat': 'İsim Kuralları', 'body': 'Men, Türkçedeki -den/-dan uzaklaşma/ayrılma hali ekinin işlevini görür. İlgili ismin önünde yazılır.', 'example': 'men mdito = şehirden | men ṣuro = dağdan | men qrito = köyden'}, {'title': 'lwot İlgeci — Yakınlık', 'cat': 'İsim Kuralları', 'body': "lwot birden fazla anlam taşır:\n• Hareket + fiil: yanına, tarafına\n• Sabit konum: yanında, huzurunda\n• Mektuplarda: hitaben\nmen lwot = 'yanından, huzurundan'", 'example': 'šlaʿun lwot ʿabdo = köleye gönderdiler'}, {'title': 'Bet (b-) Öneki', 'cat': 'İsim Kuralları', 'body': 'Altı işlevi:\na) İçinde, üstünde (-de/-da)\nb) İçine, üzerine (-e/-a)\nc) Birinin arasında\nd) Zaman bildiren kelimelerle\ne) Araç veya karşılık olarak\nf) Bazı fiillerde Lamad yerine nesne belirtir', 'example': 'bmdito = şehirde | bṣapro = sabahleyin | bdahbo = altın karşılığında'}, {'title': 'ʿad İlgeci — Sınır', 'cat': 'İsim Kuralları', 'body': "'Bir şeye dek, bir şeye/vakte ulaşıncaya kadar' anlamı taşır.", 'example': 'ʿad bayto = eve kadar | ʿad ramšo = akşama kadar'}, {'title': 'Waw (w-) Bağlacı', 'cat': 'İsim Kuralları', 'body': "Waw harfi 've' bağlacı olarak iki eşdeğer öğeyi veya iki cümleyi birbirine bağlar. Harekesiz ünsüzle başlayan kelimeye eklendiğinde a harekesi alır.", 'example': 'arʿo wnomuso = ülke ve yasa | gabro watto = adam ve kadın'}, {'title': 'Temel Söz Dizimi — VSO', 'cat': 'Cümle Yapısı', 'body': 'Süryanice cümlelerde söz dizimi çoğunlukla Yüklem–Özne–Diğer öğeler (VSO) şeklindedir. Ancak devrik cümle de görülebilir. Her cümle en az bir yüklem içerir.', 'example': 'ktab gabro ktobo → Yazdı adam kitabı. (= Adam kitap yazdı.)'}, {'title': 'Özne–Yüklem Uyumu', 'cat': 'Cümle Yapısı', 'body': 'Yüklem öznesine göre eril veya dişil ve tekil veya çoğul olarak çekilir. Özne açık değilse çeviride yüklemin ardından parantez içinde cinsi (e veya d) belirtilir.', 'example': 'ketbat atto ktobo → Yazdı kadın kitabı.'}, {'title': 'Olumsuzluk — lo', 'cat': 'Cümle Yapısı', 'body': "'lo' kelimesi önüne geldiği fiilin olumsuzluğunu belirtir. Türkçede -me/-ma olumsuzluk ekiyle karşılanır. Ekfiil alan her cümlede de 'lo' ile olumsuz yapılır.", 'example': 'lo sleq gabro lṣuro → Adam dağa tırmanmadı.\nlo ʿerqat atto → Kadın kaçmadı.'}, {'title': 'Soru Cümleleri', 'cat': 'Cümle Yapısı', 'body': "Evet/Hayır soruları ses tonlamasıyla belirtilir. Cümle başına 'ara' kelimesi getirilerek soru anlamı güçlendirilebilir.\nSoru kelimeleri cümle başına gelir.", 'example': 'ayko = nerede? | mono = ne? | man = kim? | lmono = neden?\nayko ktab laktobo? → Kitabı nerede yazdı?'}, {'title': 'Dolat — Bağlaç ve İlgi Zamiri', 'cat': 'Cümle Yapısı', 'body': "İki temel işlev:\n1. Yan cümle kurma: Dolat'tan sonra çekimli fiil gelirse ana–yan cümle ilişkisi kurulur.\n2. İlgi zamiri ('-ki', 'olan'): Dolat'tan sonra isim/ilgeç gelirse '-ki' ile çevrilir.", 'example': 'ktobo daktab nbiyo → peygamberin yazdığı kitap\nhayklo dbamdito → şehirdeki tapınak'}, {'title': 'Bağımsız Şahıs Zamirleri', 'cat': 'Zamir Kuralları', 'body': 'Bağımsız zamirler yalnızca özne işlevindedir. 3. şahıslarda genellikle kullanılmaz; yalnızca vurgu amacıyla eklenir.', 'example': 'eno (ben) | at (sen e) | at (sen d) | hu (o e) | hi (o d)\nєnan (biz) | atun (siz e) | atī̱n (siz d) | henun (onlar e) | henī̱n (onlar d)'}, {'title': 'Kısa Ekfiiller (Kopula)', 'cat': 'Zamir Kuralları', 'body': 'Bağımsız zamirlerin kısaltılmış şekilleri, fiil olmayan her şeyi yüklem yapar. Türkçedeki -(y)ım/-(y)sın/-(y)dır ekleriyle karşılanır.', 'example': '-no/-eno (ben) | -ṯat/-t (sen) | -u/-w (o e) | -i/-y (o d)\n-nan (biz) | -tun (siz e) | -tī̱n (siz d)'}, {'title': 'Ekfiil — 3. Tekil Harekeleme', 'cat': 'Zamir Kuralları', 'body': "• 3. tekil eril (-u/-w): ünsüzden sonra -u, ünlüden sonra -w\n• 3. tekil dişil (-i/-y): ünsüzden sonra -i, ünlüden sonra -y\nYaygın birleşimler: honaw (hu+-w) = 'budur e' | hodoy (hi+-y) = 'budur d'", 'example': 'tamonu malko → kral oradadır (e)\ntamoni malkto → kraliçe oradadır (d)'}, {'title': 'Cins ve Şahıs Tespiti', 'cat': 'Zamir Kuralları', 'body': "• 3. şahıslarda He harfi (ܗ) bulunur\n• Çoğul dişiller: -ī̱n veya Syome\n• Çoğul eriller: -un\n• 2. şahıslarda Taw ve Taw'a benzeşmiş sessiz Nun görülür\n• Harekesiz yazıda 3. tekil dişil ve eril karışabilir; fark bağlamdan çıkarılır", 'example': ''}, {'title': 'Transliterasyon Nedir?', 'cat': 'Transliterasyon', 'body': 'Latin dışı harfler kullanan dillerin uluslararası literatürde Latin harfleriyle gösterilmesi işlemi.\nDikkat edilecekler:\n1. Transliterasyonlar eğik yazıyla gösterilir\n2. Noktalı harfler transliterasyonda da noktalı olmalıdır\n3. Fonetik alfabe ve yazımla karıştırılmamalıdır', 'example': ''}, {'title': 'Özel Transliterasyon Harfleri', 'cat': 'Transliterasyon', 'body': "ṭ — altında noktalı t (Ṭet; Türkçe t'den farklı)\nṣ — altında noktalı s (Ṣade; vurgulu s)\nḥ — altında noktalı h (Ḥet; gırtlaktan vurgulu h)\nš — üstünde kanca olan s (Šin; Türkçe ş sesi)\nʿ — ayin işareti (gırtlaktan çıkan ünsüz; Türkçede yok)\nʾ — Ālap işareti (sessiz; hareke tabanı işlevi)\nğ — yumuşak Gomal (Arapça ğayn gibi)", 'example': 'š = ş | ḥ = h (gırtlak) | ṭ = t (vurgulu) | ʿ = ayin'}];
-  const maxId=existing.reduce((m,n)=>Math.max(m,n.id||0),0);
-  grammarNotes.forEach((n,i)=>{
-    existing.push({id:maxId+i+1,title:n.title,body:n.body,cat:n.cat,example:n.example||''});
-  });
-  try{localStorage.setItem(NKEY_LOCAL,JSON.stringify(existing));}catch(e){}
-})();
 </script>
 </body>
 </html>
