@@ -1710,10 +1710,12 @@ function renderRef(){
       +'<span class="ref-arrow">▼</span></div>';
     hdr.querySelector('.ref-arrow').onclick=function(){toggleRefSec(sec.id);};
     hdr.querySelector('.ref-title').onclick=function(){toggleRefSec(sec.id);};
+    // Set arrow to closed position initially
+    hdr.querySelector('.ref-arrow').style.transform='rotate(-90deg)';
     div.appendChild(hdr);
 
     const body=document.createElement('div');
-    body.className='ref-body';
+    body.className='ref-body closed';
     body.id='refbody-'+sec.id;
 
     const table=document.createElement('table');
