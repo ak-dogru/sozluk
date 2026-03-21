@@ -14,25 +14,11 @@
 body{background:var(--bg);color:var(--txt);font-family:var(--fb);font-size:1rem;font-weight:500;line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
 .app{max-width:900px;margin:0 auto;padding:0 20px 64px}
 header{text-align:center;padding:48px 0 30px;border-bottom:1px solid var(--brd);margin-bottom:32px}
-.horm{color:var(--acc-d);font-size:10px;letter-spacing:6px;text-transform:uppercase;font-family:var(--fm);margin-bottom:14px;opacity:.8}
-h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:800;color:var(--acc);letter-spacing:2px;margin-bottom:8px}
-.sub{font-size:15px;color:var(--txt-d);font-style:italic;font-weight:300;letter-spacing:1px}
-.lang-row{display:flex;justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap}
-.lbadge{padding:3px 12px;border:1px solid var(--brd);font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d)}
+
 .save-ind{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--txt-d);opacity:.6;text-transform:uppercase}
 .save-dot{width:6px;height:6px;border-radius:50%;background:#3a9a5a;animation:pulse 2.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.theme-section{margin-bottom:28px}
-.theme-label{font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--txt-d);margin-bottom:10px;opacity:.7}
-.theme-grid{display:flex;gap:10px;flex-wrap:wrap}
-.theme-card{position:relative;cursor:pointer;border:2.5px solid transparent;border-radius:10px;overflow:hidden;width:84px;height:60px;transition:transform .2s,border-color .2s;flex-shrink:0}
-.theme-card:hover{transform:translateY(-3px)}
-.theme-card.active{border-color:var(--acc)!important}
-.theme-card.active::after{content:'✓';position:absolute;bottom:4px;right:7px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
-.tc-gece{background:linear-gradient(135deg,#0a0a0a 50%,#ffffff 50%);border-color:#333}
-.tc-krem{background:linear-gradient(135deg,#ffffff 50%,#000000 50%);border-color:#ccc}
-.tc-bahar{background:linear-gradient(135deg,#fffdf8 50%,#4a3220 50%);border-color:#c8b0a0}
-.tc-name{position:absolute;bottom:0;left:0;right:0;font-family:var(--fm);font-size:8px;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:3px 2px;background:rgba(0,0,0,.55);color:#fff}
+
 .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
 .stat-card{flex:1;min-width:120px;background:var(--surf);border:1px solid var(--brd-s);padding:16px 18px;position:relative;overflow:hidden;border-radius:8px;transition:background .35s}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);opacity:.7}
@@ -250,17 +236,15 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .tense-btn:hover{border-color:var(--acc);color:var(--acc)}
 .tense-btn.active{border-color:var(--acc);color:var(--acc);background:var(--pb);font-weight:600}
 
-
 .cb-actions{display:flex;gap:8px;margin-top:14px}
-
 
 @media(max-width:640px){
   /* Genel */
-  .app{padding:0 10px 48px}
-  h1{font-size:1.3rem}
-  .sub{font-size:0.85rem}
-  .lang-row{gap:4px}
-  .lbadge{font-size:7px;padding:2px 8px}
+  
+  
+  
+  
+  
 
   /* Ayar çubuğu */
   .mini-theme{width:22px;height:22px}
@@ -353,21 +337,10 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .home-card-icon{font-size:1.4rem;margin-bottom:8px}
 .home-card-title{font-family:var(--fm);font-size:0.85rem;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:0.5px}
 .home-card-desc{font-size:0.8rem;color:var(--txt-d);line-height:1.6}
-.home-info-item{padding:10px 14px;background:var(--surf2);border-radius:8px}
-.home-info-label{font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:4px}
-.home-info-val{font-size:0.88rem;color:var(--txt);font-weight:500}
+
 .home-stat{text-align:center;padding:14px 10px;background:var(--surf2);border-radius:8px}
 .home-stat-num{font-size:1.8rem;font-weight:800;color:var(--acc);line-height:1;margin-bottom:4px}
 .home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
-
-/* ── GÜNÜN KELİMESİ ─────────────────────────── */
-
-
-
-
-
-
-
 
 /* ── FAVORİLER ──────────────────────────────── */
 .fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
@@ -376,35 +349,21 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
 .fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
 
-
-
 @media(max-width:800px){}
 @media(max-width:480px){}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </style>
 </head>
 <body data-theme="krem">
 <div class="app">
   <header>
+    <!-- Başlık -->
+    <div style="text-align:center;padding:24px 0 16px">
+      <div style="font-family:var(--fm);font-size:0.65rem;letter-spacing:6px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px;opacity:.7">✦ Lexicon ✦</div>
+      <div style="font-size:1.8rem;font-weight:800;color:var(--acc);letter-spacing:1px;margin-bottom:4px">ܡܠܬܐ · Sözcük · Word</div>
+      <div style="font-family:var(--fm);font-size:0.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);opacity:.6">Türkçe — Süryanice — İngilizce</div>
+      <div style="width:40px;height:1.5px;background:var(--acc);opacity:.3;margin:14px auto 0"></div>
+    </div>
     <div class="save-ind"><span class="save-dot"></span>Veriler tarayıcıda kalıcı kaydediliyor</div>
     <div style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
       <div id="userPanel" style="display:none;align-items:center;gap:8px;background:var(--surf2);border:1px solid var(--brd);border-radius:20px;padding:4px 12px 4px 8px">
@@ -1351,10 +1310,10 @@ function save(){try{localStorage.setItem(SKEY,JSON.stringify({words,nextId,theme
 let{words,nextId,theme:st}=load();
 let curTheme=(st||'krem'),q='',filterLang='all',sortKey=null,sortDir=1,acIdx=-1;
 function setTheme(t,el){
-  curTheme=t;document.body.dataset.theme=t;
-  document.querySelectorAll('.theme-card,.mini-theme').forEach(c=>c.classList.remove('active'));
-  if(el)el.classList.add('active');
-  // Also sync mini theme
+  curTheme=t;
+  document.body.dataset.theme=t;
+  document.querySelectorAll('.mini-theme').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
   const mini=document.getElementById('mt-'+t);
   if(mini) mini.classList.add('active');
   save();
@@ -1464,6 +1423,28 @@ function getFiltered(){
   return list;
 }
 function hl(t,q){if(!q||!t)return t||'';const esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return String(t).replace(new RegExp(esc,'gi'),m=>`<mark>${m}</mark>`);}
+
+/* ── FAVORİLER ──────────────────────────────── */
+const FAV_KEY='sozluk_favs_v1';
+let favWords=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]'));
+let showOnlyFavs=false;
+
+function saveFavs(){
+  localStorage.setItem(FAV_KEY,JSON.stringify([...favWords]));
+}
+function toggleFav(id){
+  if(favWords.has(id)) favWords.delete(id);
+  else favWords.add(id);
+  saveFavs();
+  render();
+}
+function toggleFavFilter(){
+  showOnlyFavs=!showOnlyFavs;
+  const btn=document.getElementById('favFilterBtn');
+  if(btn){btn.classList.toggle('on',showOnlyFavs);btn.textContent=showOnlyFavs?'⭐ Favoriler ✕':'⭐ Favoriler';}
+  render();
+}
+
 function render(){
   const f=getFiltered();
   document.getElementById('totalCount').textContent=words.length;
@@ -2912,18 +2893,8 @@ function renderHomeStats(){
   set('hs-week', words.filter(w=>w.date>=thisWeek).length);
   set('hs-types', types);
   set('hs-favs', favWords.size);
-  // Son güncelleme
-  const lastDate=words.reduce((max,w)=>w.date&&w.date>max?w.date:max,'');
-  if(lastDate){
-    const d=new Date(lastDate);
-    const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-    const diff=Math.floor((Date.now()-d.getTime())/(1000*60*60*24));
-    const diffStr=diff===0?'Bugün':diff===1?'Dün':diff+' gün önce';
-    set('hs-lastupdate', d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+' · '+diffStr);
-  }
+
 }
-
-
 
 /* ── BAŞLANGIÇ ──────────────────────────────── */
 applyFont();
