@@ -61,6 +61,19 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .char-btns{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
 .chbtn{background:var(--surf3);border:1px solid var(--brd);color:var(--acc);font-size:12px;padding:2px 6px;cursor:pointer;border-radius:4px;font-family:var(--fm);transition:background .15s,color .15s;line-height:1.4}
 .chbtn:hover{background:var(--acc);color:var(--bg)}
+/* ── İSTATİSTİK ─────────────────────────────── */
+.istat-card{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;padding:18px;position:relative;overflow:hidden;transition:background .35s}
+.istat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.istat-num{font-size:2rem;font-weight:700;color:var(--acc);line-height:1;margin-bottom:4px}
+.istat-lbl{font-size:0.75rem;color:var(--txt-d);letter-spacing:1px;text-transform:uppercase}
+.istat-bar-wrap{display:flex;align-items:center;gap:10px}
+.istat-bar-label{font-size:0.85rem;color:var(--txt);min-width:100px}
+.istat-bar-track{flex:1;height:8px;background:var(--surf2);border-radius:4px;overflow:hidden}
+.istat-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.istat-bar-count{font-size:0.8rem;color:var(--txt-d);min-width:30px;text-align:right}
+.istat-recent-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd-s)}
+.istat-recent-row:last-child{border-bottom:none}
+
 .gram-hint-box{margin-top:14px;border:1.5px solid var(--brd);border-radius:8px;overflow:hidden;transition:all .3s}
 .gram-hint-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surf2);cursor:pointer;user-select:none}
 .gram-hint-hdr-title{font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
@@ -252,6 +265,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <button class="tab" onclick="switchTab('cumle',this)">✏️ Cümle Kur</button>
     <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
     <button class="tab" onclick="switchTab('referans',this)">📚 Referans</button>
+    <button class="tab" onclick="switchTab('istatistik',this)">📊 İstatistik</button>
   </div>
 
   <!-- SÖZLÜK PANELİ -->
@@ -578,6 +592,32 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div id="refSections"></div>
 
   </div><!-- /tab-referans -->
+
+  <!-- İSTATİSTİK PANELİ -->
+  <div class="tab-content" id="tab-istatistik">
+
+    <!-- Genel Özet -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px" id="istatCards"></div>
+
+    <!-- Türe göre dağılım -->
+    <div class="cb-section" style="margin-bottom:16px">
+      <div class="cb-title">Kelime Türlerine Göre Dağılım</div>
+      <div id="istatTypes" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+    </div>
+
+    <!-- Zamana göre eklenenler -->
+    <div class="cb-section" style="margin-bottom:16px">
+      <div class="cb-title">Zaman İçinde Eklenenler</div>
+      <div id="istatTimeline" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
+    </div>
+
+    <!-- Son eklenen kelimeler -->
+    <div class="cb-section">
+      <div class="cb-title">Son Eklenen 10 Kelime</div>
+      <div id="istatRecent" style="margin-top:4px"></div>
+    </div>
+
+  </div><!-- /tab-istatistik -->
 
   <!-- Ref Section Modal -->
   <div id="refSectionModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
@@ -1119,6 +1159,7 @@ function switchTab(id, el){
   el.classList.add('active');
   if(id==='cumle') renderPool();
   if(id==='referans') renderRef();
+  if(id==='istatistik') renderIstatistik();
 }
 
 /* ── CÜMLE KUR ────────────────────────────── */
@@ -2086,6 +2127,109 @@ async function doLogin(){
   }finally{
     btn.textContent='Giriş Yap';
     btn.disabled=false;
+  }
+}
+
+/* ── İSTATİSTİK ─────────────────────────────── */
+const typeColors={
+  'isim':'#4a9eff','fiil':'#ff7043','sıfat':'#ab47bc',
+  'zamir':'#26a69a','zarf':'#ffa726','bağlaç':'#ec407a',
+  'edat':'#78909c','ünlem':'#ef5350','deyim':'#8d6e63',
+  'birleşik':'#66bb6a','soru':'#29b6f6','diğer':'#bdbdbd'
+};
+
+function renderIstatistik(){
+  if(!words) return;
+  const total=words.length;
+  const today2=new Date().toISOString().split('T')[0];
+  const thisWeek=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
+  const thisMonth=new Date().toISOString().slice(0,7);
+
+  const todayCount=words.filter(w=>w.date===today2).length;
+  const weekCount=words.filter(w=>w.date>=thisWeek).length;
+  const monthCount=words.filter(w=>w.date&&w.date.startsWith(thisMonth)).length;
+  const noteCount=notes?notes.length:0;
+
+  // Cards
+  const cards=[
+    {num:total,lbl:'Toplam Kelime',color:'#4a9eff'},
+    {num:todayCount,lbl:'Bugün Eklendi',color:'#26a69a'},
+    {num:weekCount,lbl:'Bu Hafta',color:'#ffa726'},
+    {num:noteCount,lbl:'Gramer Kuralı',color:'#ab47bc'},
+  ];
+  const cardsEl=document.getElementById('istatCards');
+  if(cardsEl){
+    cardsEl.innerHTML='';
+    cards.forEach(c=>{
+      const d=document.createElement('div');
+      d.className='istat-card';
+      d.innerHTML='<div class="istat-num">'+c.num+'</div><div class="istat-lbl">'+c.lbl+'</div>';
+      d.querySelector('.istat-num').style.color=c.color;
+      d.style.borderTopColor=c.color;
+      d.style.borderTop='3px solid '+c.color;
+      cardsEl.appendChild(d);
+    });
+  }
+
+  // Type distribution
+  const typeCounts={};
+  words.forEach(w=>{const t=w.type||'diğer';typeCounts[t]=(typeCounts[t]||0)+1;});
+  const sorted=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
+  const maxCount=sorted[0]?sorted[0][1]:1;
+  const typesEl=document.getElementById('istatTypes');
+  if(typesEl){
+    typesEl.innerHTML='';
+    sorted.forEach(([type,count])=>{
+      const pct=Math.round(count/total*100);
+      const color=typeColors[type]||'#bdbdbd';
+      const row=document.createElement('div');
+      row.className='istat-bar-wrap';
+      row.innerHTML='<span class="istat-bar-label">'+type+' <span style="font-size:0.75rem;color:var(--txt-d)">('+pct+'%)</span></span>'
+        +'<div class="istat-bar-track"><div class="istat-bar-fill" style="width:'+Math.round(count/maxCount*100)+'%;background:'+color+'"></div></div>'
+        +'<span class="istat-bar-count">'+count+'</span>';
+      typesEl.appendChild(row);
+    });
+  }
+
+  // Timeline — group by month
+  const monthCounts={};
+  words.forEach(w=>{
+    if(w.date){const m=w.date.slice(0,7);monthCounts[m]=(monthCounts[m]||0)+1;}
+  });
+  const months=Object.entries(monthCounts).sort((a,b)=>a[0].localeCompare(b[0]));
+  const maxM=months[0]?Math.max(...months.map(m=>m[1])):1;
+  const timeEl=document.getElementById('istatTimeline');
+  if(timeEl){
+    timeEl.innerHTML='';
+    if(!months.length){timeEl.innerHTML='<span style="color:var(--txt-d);font-size:0.9rem">Henüz tarih verisi yok</span>';return;}
+    months.forEach(([month,count])=>{
+      const row=document.createElement('div');
+      row.className='istat-bar-wrap';
+      const [y,m]=month.split('-');
+      const monthNames=['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+      const label=monthNames[parseInt(m)]+' '+y;
+      row.innerHTML='<span class="istat-bar-label">'+label+'</span>'
+        +'<div class="istat-bar-track"><div class="istat-bar-fill" style="width:'+Math.round(count/maxM*100)+'%;background:var(--acc)"></div></div>'
+        +'<span class="istat-bar-count">'+count+'</span>';
+      timeEl.appendChild(row);
+    });
+  }
+
+  // Recent words
+  const recentEl=document.getElementById('istatRecent');
+  if(recentEl){
+    const recent=[...words].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,10);
+    recentEl.innerHTML='';
+    recent.forEach(w=>{
+      const row=document.createElement('div');
+      row.className='istat-recent-row';
+      const color=typeColors[w.type]||'#bdbdbd';
+      row.innerHTML='<span style="font-size:0.9rem;font-weight:600;flex:1">'+w.tr+'</span>'
+        +'<span style="font-size:0.85rem;color:var(--txt-d);flex:1">'+w.en+'</span>'
+        +'<span style="font-family:var(--fm);font-size:0.7rem;padding:2px 8px;border-radius:20px;background:'+color+'22;color:'+color+'">'+( w.type||'—')+'</span>'
+        +'<span style="font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);margin-left:8px">'+( w.date||'')+'</span>';
+      recentEl.appendChild(row);
+    });
   }
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
