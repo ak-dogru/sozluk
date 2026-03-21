@@ -344,6 +344,30 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .cb-section > .slot-row{margin-left:20px;margin-right:20px}
 .cb-section > #langHint{padding-top:14px}
 .cb-section > .gram-hint-box{margin-left:20px;margin-right:20px}
+
+/* ── ANA SAYFA ──────────────────────────────── */
+.home-card{padding:18px 20px;cursor:pointer;border-right:1px solid var(--brd-s);border-bottom:1px solid var(--brd-s);transition:background .2s}
+.home-card:hover{background:var(--surf2)}
+.home-card:nth-child(even){border-right:none}
+@media(min-width:640px){.home-card:nth-child(3n){border-right:none}}
+.home-card-icon{font-size:1.4rem;margin-bottom:8px}
+.home-card-title{font-family:var(--fm);font-size:0.85rem;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:0.5px}
+.home-card-desc{font-size:0.8rem;color:var(--txt-d);line-height:1.6}
+.home-info-item{padding:10px 14px;background:var(--surf2);border-radius:8px}
+.home-info-label{font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:4px}
+.home-info-val{font-size:0.88rem;color:var(--txt);font-weight:500}
+.home-stat{text-align:center;padding:14px 10px;background:var(--surf2);border-radius:8px}
+.home-stat-num{font-size:1.8rem;font-weight:800;color:var(--acc);line-height:1;margin-bottom:4px}
+.home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
+
+/* ── GÜNÜN KELİMESİ ─────────────────────────── */
+.wotd-sy{font-size:2rem;color:var(--acc);font-weight:700;margin-bottom:6px;direction:rtl}
+.wotd-translit{font-family:var(--fm);font-size:0.8rem;color:var(--acc-d);letter-spacing:2px;margin-bottom:16px}
+.wotd-langs{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:12px}
+.wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
+.wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
+.wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
 </style>
 </head>
 <body data-theme="krem">
@@ -400,14 +424,107 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('sozluk',this)">📖 Sözlük</button>
+    <button class="tab active" onclick="switchTab('anasayfa',this)">🏠 Ana Sayfa</button>
+    <button class="tab" onclick="switchTab('sozluk',this)">📖 Sözlük</button>
     <button class="tab" onclick="switchTab('cumle',this)">✏️ Cümle Kur</button>
     <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
     <button class="tab" onclick="switchTab('referans',this)">📚 Referans</button>
   </div>
 
+  <!-- ANA SAYFA PANELİ -->
+  <div class="tab-content active" id="tab-anasayfa">
+
+    <!-- Karşılama -->
+    <div style="text-align:center;padding:28px 20px 20px">
+      <div style="font-size:2.2rem;margin-bottom:10px">ܡܠܬܐ</div>
+      <div style="font-family:var(--fm);font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px">Sözcük · Word</div>
+      <p style="font-size:0.95rem;color:var(--txt-d);max-width:480px;margin:0 auto;line-height:1.7">
+        Türkçe, Süryanice ve İngilizce üç dilli dijital sözlük. Klasik Süryanice öğrenmek, kelime çalışmak ve dilbilgisi kurallarını keşfetmek için.
+      </p>
+    </div>
+
+    <!-- Kelime Günü -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr">
+        <span class="tbl-ttl">Günün Kelimesi</span>
+        <span style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)" id="wotd-date"></span>
+      </div>
+      <div id="wotd-card" style="padding:24px 20px;text-align:center">
+        <div style="color:var(--txt-d);font-size:0.85rem">Yükleniyor...</div>
+      </div>
+    </div>
+
+    <!-- Bölümler -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr"><span class="tbl-ttl">Bölümler</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border-top:none">
+
+        <div class="home-card" onclick="switchTab('sozluk',document.querySelector('.tab:nth-child(2)'))">
+          <div class="home-card-icon">📖</div>
+          <div class="home-card-title">Sözlük</div>
+          <div class="home-card-desc">Türkçe, Süryanice ve İngilizce kelimeler. Arama, filtreleme, bulut senkronizasyonu.</div>
+        </div>
+
+        <div class="home-card" onclick="switchTab('cumle',document.querySelector('.tab:nth-child(3)'))">
+          <div class="home-card-icon">✏️</div>
+          <div class="home-card-title">Cümle Kur</div>
+          <div class="home-card-desc">Kelimelerden cümle oluştur. SOV, VSO, SVO sözdizimi ile otomatik sıralama.</div>
+        </div>
+
+        <div class="home-card" onclick="switchTab('notlar',document.querySelector('.tab:nth-child(4)'))">
+          <div class="home-card-icon">📝</div>
+          <div class="home-card-title">Notlar</div>
+          <div class="home-card-desc">40+ dilbilgisi kuralı. Fiil çekimleri, isim halleri, zamir kuralları ve daha fazlası.</div>
+        </div>
+
+        <div class="home-card" onclick="switchTab('referans',document.querySelector('.tab:nth-child(5)'))">
+          <div class="home-card-icon">📚</div>
+          <div class="home-card-title">Referans</div>
+          <div class="home-card-desc">Zamirler, sayılar, günler, aylar, bağlaçlar. Üç dilli hızlı başvuru tabloları.</div>
+        </div>
+
+        <div class="home-card" onclick="switchToPage('flashcard',document.getElementById('inb-flashcard'))">
+          <div class="home-card-icon">🃏</div>
+          <div class="home-card-title">Flashcard</div>
+          <div class="home-card-desc">Kelime kartlarıyla test yap. Dil ve tür seçerek çalış, başarı oranını gör.</div>
+        </div>
+
+        <div class="home-card" onclick="switchToPage('istatistik',document.getElementById('inb-istatistik'))">
+          <div class="home-card-icon">📊</div>
+          <div class="home-card-title">İstatistik</div>
+          <div class="home-card-desc">Kelime dağılımı, aylara göre eklenenler ve son eklenen kelimeler.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Hızlı İstatistik -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr"><span class="tbl-ttl">Özet</span></div>
+      <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px" id="homeStats">
+        <div class="home-stat"><div class="home-stat-num" id="hs-words">—</div><div class="home-stat-lbl">Kelime</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-today">—</div><div class="home-stat-lbl">Bugün Eklendi</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-notes">—</div><div class="home-stat-lbl">Gramer Kuralı</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-ref">—</div><div class="home-stat-lbl">Referans Girişi</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-week">—</div><div class="home-stat-lbl">Bu Hafta</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-types">—</div><div class="home-stat-lbl">Kelime Türü</div></div>
+      </div>
+    </div>
+
+    <!-- Sözlük Hakkında -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr"><span class="tbl-ttl">Sözlük Hakkında</span></div>
+      <div style="padding:20px">
+        <p style="font-size:0.95rem;color:var(--txt-d);line-height:1.8;margin:0">
+          Bu sözlük tamamen amatörce hazırlanmış olup, temel düzeyde öğrencilerin çalışmalarına destek vermeyi hedeflemiştir. Hazırlayan kişilerin hedeflerine ulaşmasından sonra yayından kaldırılacaktır.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /tab-anasayfa -->
+
   <!-- SÖZLÜK PANELİ -->
-  <div class="tab-content active" id="tab-sozluk">
+  <div class="tab-content" id="tab-sozluk">
 
 
   <div class="stats-row">
@@ -1056,7 +1173,7 @@ async function initCloud(){
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
       document.getElementById('cloudInd').style.color='#3a9a5a';
-      render();renderNotes();
+      render();renderNotes();renderHomeStats();renderWordOfTheDay();
     }
   } catch(e){
     console.error('Cloud init error:',e);
@@ -2891,6 +3008,30 @@ function exportPDF(){
 .cb-section > .slot-row{margin-left:20px;margin-right:20px}
 .cb-section > #langHint{padding-top:14px}
 .cb-section > .gram-hint-box{margin-left:20px;margin-right:20px}
+
+/* ── ANA SAYFA ──────────────────────────────── */
+.home-card{padding:18px 20px;cursor:pointer;border-right:1px solid var(--brd-s);border-bottom:1px solid var(--brd-s);transition:background .2s}
+.home-card:hover{background:var(--surf2)}
+.home-card:nth-child(even){border-right:none}
+@media(min-width:640px){.home-card:nth-child(3n){border-right:none}}
+.home-card-icon{font-size:1.4rem;margin-bottom:8px}
+.home-card-title{font-family:var(--fm);font-size:0.85rem;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:0.5px}
+.home-card-desc{font-size:0.8rem;color:var(--txt-d);line-height:1.6}
+.home-info-item{padding:10px 14px;background:var(--surf2);border-radius:8px}
+.home-info-label{font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:4px}
+.home-info-val{font-size:0.88rem;color:var(--txt);font-weight:500}
+.home-stat{text-align:center;padding:14px 10px;background:var(--surf2);border-radius:8px}
+.home-stat-num{font-size:1.8rem;font-weight:800;color:var(--acc);line-height:1;margin-bottom:4px}
+.home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
+
+/* ── GÜNÜN KELİMESİ ─────────────────────────── */
+.wotd-sy{font-size:2rem;color:var(--acc);font-weight:700;margin-bottom:6px;direction:rtl}
+.wotd-translit{font-family:var(--fm);font-size:0.8rem;color:var(--acc-d);letter-spacing:2px;margin-bottom:16px}
+.wotd-langs{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:12px}
+.wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
+.wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
+.wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
 </style></head><body>`;
 
   html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1><div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
@@ -2947,6 +3088,54 @@ function exportPDF(){
   };
   closePdfModal();
   showToast('✦ PDF hazırlanıyor...');
+}
+
+/* ── ANA SAYFA ──────────────────────────────── */
+function renderHomeStats(){
+  const today2=new Date().toISOString().split('T')[0];
+  const thisWeek=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
+  const totalRef=refData.reduce((s,sec)=>s+sec.rows.length,0);
+  const types=new Set(words.map(w=>w.type).filter(Boolean)).size;
+
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set('hs-words', words.length);
+  set('hs-today', words.filter(w=>w.date===today2).length);
+  set('hs-notes', notes.length);
+  set('hs-ref', totalRef);
+  set('hs-week', words.filter(w=>w.date>=thisWeek).length);
+  set('hs-types', types);
+}
+
+/* ── GÜNÜN KELİMESİ ─────────────────────────── */
+function renderWordOfTheDay(){
+  const card=document.getElementById('wotd-card');
+  const dateEl=document.getElementById('wotd-date');
+  if(!card||!words||!words.length) return;
+
+  // Use date as seed so same word shows all day
+  const today2=new Date();
+  const seed=today2.getFullYear()*10000+(today2.getMonth()+1)*100+today2.getDate();
+  const idx=seed % words.length;
+  const w=words[idx];
+
+  // Date label
+  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  if(dateEl) dateEl.textContent=today2.getDate()+' '+months[today2.getMonth()]+' '+today2.getFullYear();
+
+  // Syriac script only (without transliteration)
+  const syScript=(w.sy||'').split('(')[0].trim();
+  const syTranslit=(w.sy||'').match(/\(([^)]+)\)/)?.[1]||'';
+  const color=typeColors&&typeColors[w.type]?typeColors[w.type]:'#888';
+
+  card.innerHTML=
+    '<div class="wotd-sy">'+(syScript||'—')+'</div>'
+    +(syTranslit?'<div class="wotd-translit">'+syTranslit+'</div>':'')
+    +(w.type?'<div class="wotd-type" style="background:'+color+'18;color:'+color+';border-color:'+color+'33">'+w.type+'</div>':'')
+    +'<div class="wotd-langs">'
+    +'<div class="wotd-lang-item"><div class="wotd-lang-label">Türkçe</div><div class="wotd-lang-val">'+(w.tr||'—')+'</div></div>'
+    +'<div style="width:1px;background:var(--brd-s);align-self:stretch"></div>'
+    +'<div class="wotd-lang-item"><div class="wotd-lang-label">İngilizce</div><div class="wotd-lang-val">'+(w.en||'—')+'</div></div>'
+    +'</div>';
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
