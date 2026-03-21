@@ -361,13 +361,13 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
 
 /* ── GÜNÜN KELİMESİ ─────────────────────────── */
-.wotd-sy{font-size:2rem;color:var(--acc);font-weight:700;margin-bottom:6px;direction:rtl}
-.wotd-translit{font-family:var(--fm);font-size:0.8rem;color:var(--acc-d);letter-spacing:2px;margin-bottom:16px}
-.wotd-langs{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:12px}
+
+
+
 .wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
 .wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
 .wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
-.wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
+
 
 /* ── FAVORİLER ──────────────────────────────── */
 .fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
@@ -376,20 +376,30 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
 .fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
 
-/* ── GÜNLÜK KARTLAR ─────────────────────────── */
-.daily-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 20px}
-@media(max-width:800px){.daily-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.daily-grid{grid-template-columns:1fr 1fr;gap:8px;padding:12px}}
-.daily-card{background:var(--surf2);border-radius:8px;padding:16px 14px;text-align:center;border:1px solid var(--brd-s);transition:background .2s}
-.daily-card-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px}
-.daily-card-sy{font-size:1.6rem;color:var(--acc);font-weight:700;margin-bottom:4px;direction:rtl;line-height:1.3}
-.daily-card-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);letter-spacing:1px;margin-bottom:8px}
-.daily-card-tr{font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:2px}
-.daily-card-en{font-size:0.8rem;color:var(--txt-d)}
-.daily-card-type{display:inline-block;padding:2px 10px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;margin-top:6px;border:1px solid transparent}
-.daily-card-rule{font-size:0.82rem;color:var(--txt-d);line-height:1.6;text-align:left;margin-top:4px}
-.daily-card-rule-title{font-size:0.88rem;font-weight:700;color:var(--txt);margin-bottom:6px;text-align:left}
-.daily-card-example{font-size:0.75rem;color:var(--acc-d);font-style:italic;margin-top:6px;text-align:left;border-left:2px solid var(--brd);padding-left:8px}
+
+
+@media(max-width:800px){}
+@media(max-width:480px){}
+
+
+
+
+
+
+
+
+
+
+
+/* ── BUGÜN KARTI ─────────────────────────────── */
+.bugun-kart{background:var(--surf2);border:1px solid var(--brd-s);border-radius:8px;padding:14px 12px;text-align:center}
+.bugun-kart-baslik{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:8px}
+.bugun-kart-sy{font-size:1.5rem;font-weight:700;color:var(--acc);margin-bottom:4px}
+.bugun-kart-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);margin-bottom:6px}
+.bugun-kart-tr{font-size:0.9rem;font-weight:700;color:var(--txt);margin-bottom:2px}
+.bugun-kart-en{font-size:0.78rem;color:var(--txt-d)}
+.bugun-kart-tur{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;border:1px solid transparent}
+@media(max-width:640px){#bugun-grid{grid-template-columns:repeat(2,1fr)!important;padding:12px!important}}
 </style>
 </head>
 <body data-theme="krem">
@@ -469,10 +479,18 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <div class="tbl-wrap" style="margin-bottom:16px">
       <div class="tbl-hdr">
         <span class="tbl-ttl">Bugün</span>
-        <span style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)" id="wotd-date"></span>
+        <span id="bugun-tarih" style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)"></span>
       </div>
-      <div class="daily-grid" id="daily-grid">
-        <div class="daily-card"><div class="daily-card-label" style="opacity:.5">Yükleniyor...</div></div>
+      <div id="bugun-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 20px">
+        <div style="color:var(--txt-d);font-size:0.85rem;opacity:.5;grid-column:1/-1;text-align:center;padding:12px">Yükleniyor...</div>
+      </div>
+    </div>
+
+    <!-- Biliyor musun? -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr"><span class="tbl-ttl">💡 Biliyor musun?</span></div>
+      <div id="biliyor-musun" style="padding:16px 20px">
+        <div style="color:var(--txt-d);font-size:0.85rem;opacity:.5">Yükleniyor...</div>
       </div>
     </div>
 
@@ -517,14 +535,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
           <div class="home-card-desc">Kelime dağılımı, aylara göre eklenenler ve son eklenen kelimeler.</div>
         </div>
 
-      </div>
-    </div>
-
-    <!-- Biliyor musun? -->
-    <div class="tbl-wrap" style="margin-bottom:16px">
-      <div class="tbl-hdr"><span class="tbl-ttl">💡 Biliyor musun?</span></div>
-      <div id="daily-rule" style="padding:16px 20px">
-        <div style="color:var(--txt-d);font-size:0.85rem;opacity:.5">Yükleniyor...</div>
       </div>
     </div>
 
@@ -1206,8 +1216,7 @@ async function initCloud(){
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
       document.getElementById('cloudInd').style.color='#3a9a5a';
-      render();renderNotes();renderHomeStats();renderDailyCards();
-    }
+      render();renderNotes();renderHomeStats();renderBugun();renderBugun();    }
   } catch(e){
     console.error('Cloud init error:',e);
     document.getElementById('cloudInd').textContent='⚠ Çevrimdışı';
@@ -1553,6 +1562,7 @@ function switchTab(id, el){
   if(id==='referans'){renderRef();}
   if(id==='istatistik') renderIstatistik();
   if(id==='flashcard'){document.getElementById('fcArea').style.display='none';document.getElementById('fcResult').style.display='none';}
+  if(id==='anasayfa'){renderHomeStats();renderBugun();}
   const iconBtn=document.getElementById('inb-'+id);
   if(iconBtn) iconBtn.classList.add('active');
 }
@@ -2997,13 +3007,13 @@ function exportPDF(){
 .home-stat-lbl{font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--txt-d)}
 
 /* ── GÜNÜN KELİMESİ ─────────────────────────── */
-.wotd-sy{font-size:2rem;color:var(--acc);font-weight:700;margin-bottom:6px;direction:rtl}
-.wotd-translit{font-family:var(--fm);font-size:0.8rem;color:var(--acc-d);letter-spacing:2px;margin-bottom:16px}
-.wotd-langs{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:12px}
+
+
+
 .wotd-lang-item{display:flex;flex-direction:column;align-items:center;gap:4px}
 .wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
 .wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
-.wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
+
 
 /* ── FAVORİLER ──────────────────────────────── */
 .fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
@@ -3012,21 +3022,23 @@ function exportPDF(){
 .fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
 .fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
 
-/* ── GÜNLÜK KARTLAR ─────────────────────────── */
-.daily-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 20px}
-@media(max-width:800px){.daily-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.daily-grid{grid-template-columns:1fr 1fr;gap:8px;padding:12px}}
-.daily-card{background:var(--surf2);border-radius:8px;padding:16px 14px;text-align:center;border:1px solid var(--brd-s);transition:background .2s}
-.daily-card-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px}
-.daily-card-sy{font-size:1.6rem;color:var(--acc);font-weight:700;margin-bottom:4px;direction:rtl;line-height:1.3}
-.daily-card-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);letter-spacing:1px;margin-bottom:8px}
-.daily-card-tr{font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:2px}
-.daily-card-en{font-size:0.8rem;color:var(--txt-d)}
-.daily-card-type{display:inline-block;padding:2px 10px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;margin-top:6px;border:1px solid transparent}
-.daily-card-rule{font-size:0.82rem;color:var(--txt-d);line-height:1.6;text-align:left;margin-top:4px}
-.daily-card-rule-title{font-size:0.88rem;font-weight:700;color:var(--txt);margin-bottom:6px;text-align:left}
-.daily-card-example{font-size:0.75rem;color:var(--acc-d);font-style:italic;margin-top:6px;text-align:left;border-left:2px solid var(--brd);padding-left:8px}
-</style></head><body>`;
+
+
+@media(max-width:800px){}
+@media(max-width:480px){}
+
+
+
+
+
+
+
+
+
+
+
+/* ── BUGÜN KARTI ─────────────────────────────── */
+
 
   html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1><div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
 
@@ -3085,6 +3097,62 @@ function exportPDF(){
 }
 
 /* ── ANA SAYFA ──────────────────────────────── */
+/* -- BUGUN ve BILIYOR MUSUN -- */
+function renderBugun(){
+  var grid=document.getElementById('bugun-grid');
+  var biliyorEl=document.getElementById('biliyor-musun');
+  var tarihEl=document.getElementById('bugun-tarih');
+  var bugun=new Date();
+  var aylar=['Ocak','Subat','Mart','Nisan','Mayis','Haziran','Temmuz','Agustos','Eylul','Ekim','Kasim','Aralik'];
+  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
+  if(tarihEl) tarihEl.textContent=bugun.getDate()+' '+aylar[bugun.getMonth()]+' '+bugun.getFullYear();
+  if(grid){
+    function kart(w,lbl){
+      if(!w) return '<div class="bugun-kart"><div class="bugun-kart-baslik">'+lbl+'</div><div class="bugun-kart-en" style="opacity:.4">---</div></div>';
+      var sy=w.sy||''; var p=sy.indexOf('(');
+      var sc=p>-1?sy.substring(0,p).trim():sy.trim();
+      var tr=p>-1?sy.substring(p+1).replace(')','').trim():'';
+      var c=(typeof typeColors!='undefined'&&typeColors[w.type])?typeColors[w.type]:'#888';
+      return '<div class="bugun-kart">'
+        +'<div class="bugun-kart-baslik">'+lbl+'</div>'
+        +(sc?'<div class="bugun-kart-sy">'+sc+'</div>':'')
+        +(tr?'<div class="bugun-kart-translit">'+tr+'</div>':'')
+        +'<div class="bugun-kart-tr">'+(w.tr||'---')+'</div>'
+        +(w.en?'<div class="bugun-kart-en">'+w.en+'</div>':'')
+        +(w.type?'<div class="bugun-kart-tur" style="background:'+c+'18;color:'+c+';border-color:'+c+'33">'+w.type+'</div>':'')
+        +'</div>';
+    }
+    if(!words||!words.length){
+      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--txt-d);opacity:.5">Yukleniyor...</div>';
+    } else {
+      var turler=[
+        ['isim','Gunun Ismi'],['fiil','Gunun Fiili'],
+        ['sifat','Gunun Sifati'],['baglac','Gunun Baglaci'],['edat','Gunun Edati']
+      ];
+      var html='';
+      turler.forEach(function(t){
+        var pool=words.filter(function(w){return w.type===t[0]||w.type===(t[0]==='sifat'?'sifat':t[0]==='baglac'?'baglac':t[0]);});
+        html+=kart(pool.length?pool[seed%pool.length]:null,t[1]);
+      });
+      html+=kart(words[Math.floor(Math.random()*words.length)],'Bu Ziyarette');
+      html+='<div class="bugun-kart" style="grid-column:1/-1;background:transparent;border:1.5px dashed var(--brd);display:flex;align-items:center;justify-content:center;padding:14px;gap:8px"><span>Bu kelimelerden kac farkli cumle kurabilirsin?</span></div>';
+      grid.innerHTML=html;
+    }
+  }
+  if(biliyorEl){
+    if(!notes||!notes.length){
+      biliyorEl.innerHTML='<div style="opacity:.5">Kural yok.</div>';
+    } else {
+      var k=notes[seed%notes.length];
+      var rc=(typeof catColors!='undefined'&&catColors[k.cat])?catColors[k.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
+      biliyorEl.innerHTML='<div style="margin-bottom:8px"><span style="padding:2px 10px;border-radius:20px;font-size:0.7rem;background:'+rc.bg+';color:'+rc.text+';border:1px solid '+rc.border+'">'+(k.cat||'Genel')+'</span></div>'
+        +'<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+(k.title||'')+'</div>'
+        +(k.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75;white-space:pre-wrap">'+k.body+'</div>':'')
+        +(k.example?'<div style="margin-top:8px;font-size:0.82rem;font-style:italic;border-left:3px solid var(--brd);padding-left:10px">'+k.example+'</div>':'');
+    }
+  }
+}
+
 function renderHomeStats(){
   const today2=new Date().toISOString().split('T')[0];
   const thisWeek=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
@@ -3111,104 +3179,4 @@ function renderHomeStats(){
 }
 
 /* ── GÜNÜN KELİMESİ ─────────────────────────── */
-function renderDailyCards(){
-  const grid=document.getElementById('daily-grid');
-  const ruleEl=document.getElementById('daily-rule');
-  const dateEl=document.getElementById('wotd-date');
-  if(!grid){console.log('daily-grid not found');return;}
-
-  const today2=new Date();
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  const seed=today2.getFullYear()*10000+(today2.getMonth()+1)*100+today2.getDate();
-
-  if(dateEl) dateEl.textContent=today2.getDate()+' '+months[today2.getMonth()]+' '+today2.getFullYear();
-
-  function wordCard(w, label){
-    if(!w) return '<div class="daily-card"><div class="daily-card-label">'+label+'</div><div class="daily-card-en" style="opacity:.4">—</div></div>';
-    const syScript=(w.sy||'').split('(')[0].trim();
-    const syTranslit=(w.sy||'').replace(/^[^(]*/,'').replace(/[()]/g,'').trim();
-    const color=(typeColors&&typeColors[w.type])||'#888';
-    return '<div class="daily-card">'
-      +'<div class="daily-card-label">'+label+'</div>'
-      +(syScript?'<div class="daily-card-sy">'+syScript+'</div>':'')
-      +(syTranslit?'<div class="daily-card-translit">'+syTranslit+'</div>':'')
-      +'<div class="daily-card-tr">'+(w.tr||'—')+'</div>'
-      +(w.en?'<div class="daily-card-en">'+w.en+'</div>':'')
-      +(w.type?'<div class="daily-card-type" style="background:'+color+'18;color:'+color+';border-color:'+color+'33">'+w.type+'</div>':'')
-      +'</div>';
-  }
-
-  if(!words||!words.length){
-    grid.innerHTML='<div class="daily-card" style="grid-column:1/-1;text-align:center"><div class="daily-card-label" style="opacity:.5">Kelimeler yükleniyor...</div></div>';
-    // Still render rule even without words
-    if(ruleEl&&notes&&notes.length){
-      const seed2=new Date().getFullYear()*10000+(new Date().getMonth()+1)*100+new Date().getDate();
-      const rule=notes[seed2%notes.length];
-      const color2=(typeof catColors!=='undefined'&&catColors[rule.cat])||{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
-      ruleEl.innerHTML='<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+rule.title+'</div>'+(rule.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75">'+rule.body+'</div>':'');
-    }
-    return;
-  }
-
-  // 5 sabit tür
-  const fixedTypes=[
-    {type:'isim',  label:'📦 Günün İsmi'},
-    {type:'fiil',  label:'⚡ Günün Fiili'},
-    {type:'sıfat', label:'🎨 Günün Sıfatı'},
-    {type:'bağlaç',label:'🔗 Günün Bağlacı'},
-    {type:'edat',  label:'📍 Günün Edatı'},
-  ];
-
-  function pickWord(type){
-    const pool=words.filter(w=>w.type===type);
-    return pool.length?pool[seed%pool.length]:null;
-  }
-
-  // Bu Ziyarette — rastgele
-  let visitIdx=Math.floor(Math.random()*words.length);
-  const visitWord=words[visitIdx];
-
-  let cardsHtml=fixedTypes.map(t=>wordCard(pickWord(t.type),t.label)).join('');
-  cardsHtml+=wordCard(visitWord,'🔀 Bu Ziyarette');
-
-  // Meydan okuma
-  cardsHtml+='<div class="daily-card" style="grid-column:1/-1;background:var(--pb);border:1.5px dashed var(--brd);display:flex;align-items:center;justify-content:center;padding:16px;gap:10px">'
-    +'<span style="font-size:1.2rem">✏️</span>'
-    +'<span style="font-size:0.9rem;color:var(--txt-d);font-style:italic">Bu kelimelerden kaç farklı cümle kurabilirsin?</span>'
-    +'</div>';
-
-  grid.innerHTML=cardsHtml;
-
-  // Günün Kuralı / Biliyor musun?
-  if(ruleEl){
-    if(!notes||!notes.length){
-      ruleEl.innerHTML='<div style="color:var(--txt-d);font-size:0.85rem;opacity:.5">Henüz kural eklenmemiş.</div>';
-    } else {
-      const rule=notes[seed%notes.length];
-      const color2=(catColors&&catColors[rule.cat])||{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
-      ruleEl.innerHTML=
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-        +'<span style="padding:2px 10px;border-radius:20px;font-family:var(--fm);font-size:0.7rem;background:'+color2.bg+';color:'+color2.text+';border:1px solid '+color2.border+'22">'+(rule.cat||'Genel')+'</span>'
-        +'</div>'
-        +'<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+rule.title+'</div>'
-        +(rule.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75;white-space:pre-wrap">'+rule.body+'</div>':'')
-        +(rule.example?'<div style="margin-top:10px;font-size:0.82rem;color:var(--acc-d);font-style:italic;border-left:3px solid var(--brd);padding-left:10px">'+rule.example+'</div>':'');
-    }
-  }
-}
-
-/* ── BAŞLANGIÇ ──────────────────────────────── */
-applyFont();
-loadNotes();
-loadRef();
-render();
-renderHomeStats();
-renderDailyCards();  // runs with localStorage words first
-initCloud().then(()=>{
-  renderHomeStats();
-  renderDailyCards(); // re-runs after cloud words loaded
-});
-restoreSession();
-</script>
-</body>
-</html>
+>
