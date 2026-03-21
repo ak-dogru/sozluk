@@ -2355,62 +2355,6 @@ function deleteRefRow(sid,idx){if(!requireAuth())return;
   saveRef();renderRef();showToast('Satır silindi');
 }
 
-function filterRef(){
-  const q=(document.getElementById('refSearch').value||'').toLowerCase().trim();
-  document.querySelectorAll('.ref-table tbody tr').forEach(row=>{
-    if(row.querySelector('.abtn')) return; // skip add row button
-    const text=row.textContent.toLowerCase();
-    row.style.display=!q||text.includes(q)?'':'none';
-  });
-  if(q){
-    document.querySelectorAll('.ref-section').forEach(sec=>{
-      const hasVisible=[...sec.querySelectorAll('tbody tr')].some(r=>!r.querySelector('.abtn')&&r.style.display!=='none');
-      const body=sec.querySelector('.ref-body');
-      const arrow=sec.querySelector('.ref-arrow');
-      if(hasVisible){body.classList.remove('closed');if(arrow)arrow.style.transform='rotate(0deg)';}
-    });
-  }
-}
-
-document.getElementById('refSectionModal').addEventListener('click',function(e){if(e.target===this)closeRefSectionModal();});
-document.getElementById('refRowModal').addEventListener('click',function(e){if(e.target===this)closeRefRowModal();});
-document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLoginModal();});
-loadRef();
-
-/* ── GRAMER HATIRLATICISI ─────────────────── */
-let gramHintOpen=true;
-
-// Rules per language pulled from notes + referans
-const gramRules={
-  tr:{
-    title:'Türkçe Sözdizimi (SOV)',
-    rules:[
-      {title:'Temel Sıra',body:'Özne → Nesne → Fiil',example:'Ben kitap okudum'},
-      {title:'Olumsuzluk',body:'-me/-ma olumsuzluk eki fiile eklenir',example:'Ben kitap okumadım'},
-      {title:'Soru',body:'Soru eki (-mı/-mi/-mu/-mü) fiilin sonuna gelir',example:'Ben kitap okudum mu?'},
-    ]
-  },
-  sy:{
-    title:'Süryanice Sözdizimi (VSO)',
-    rules:[
-      {title:'Temel Sıra',body:'Fiil → Özne → Nesne',example:'ktab gabro ktobo → Yazdı adam kitabı'},
-      {title:'Olumsuzluk',body:"'lo' kelimesi fiilin önüne gelir",example:'lo ktab gabro → Adam yazmadı'},
-      {title:'Soru',body:"Cümle başına 'ara' eklenir veya ses tonu yükseltilir",example:'ara ktab gabro? → Adam yazdı mı?'},
-      {title:'Cinsiyet Uyumu',body:'Fiil öznenin cinsine göre çekilir (e/d)',example:'ktab (e) — ketbat (d)'},
-      {title:'Önekler (BDUL)',body:'b- (içinde) | d- (ilgi) | w- (ve) | l- (yönelme/nesne)',example:'lgabro = adama | bmdito = şehirde'},
-      {title:"'lo' Olumsuzluk",body:"Fiilden önce 'lo' yazılır",example:'lo sleq → tırmanmadı'},
-    ]
-  },
-  en:{
-    title:'İngilizce Sözdizimi (SVO)',
-    rules:[
-      {title:'Temel Sıra',body:'Subject → Verb → Object',example:'I read a book'},
-      {title:'Negation',body:"'not' comes after auxiliary verb",example:"I did not read"},
-      {title:'Question',body:'Auxiliary verb moves before subject',example:'Did I read the book?'},
-    ]
-  }
-};
-
 function updateGramHint(lang){
   const box=document.getElementById('gramHintBox');
   const body=document.getElementById('gramHintBody');
@@ -2915,11 +2859,6 @@ function showPdfModal(){document.getElementById('pdfModal').style.display='flex'
 function closePdfModal(){document.getElementById('pdfModal').style.display='none';}
 document.getElementById('pdfModal').addEventListener('click',function(e){if(e.target===this)closePdfModal();});
 
-function closePdfModal(){
-  document.getElementById('pdfModal').style.display='none';
-}
-document.getElementById('pdfModal').addEventListener('click',function(e){if(e.target===this)closePdfModal();});
-
 function exportPDF(){
   const incSozluk=document.getElementById('pdf-sozluk').checked;
   const incNotlar=document.getElementById('pdf-notlar').checked;
@@ -3250,3 +3189,16 @@ function renderDailyCards(){
     }
   }
 }
+
+/* ── BAŞLANGIÇ ──────────────────────────────── */
+applyFont();
+loadNotes();
+loadRef();
+render();
+renderHomeStats();
+renderDailyCards();
+initCloud();
+restoreSession();
+</script>
+</body>
+</html>
