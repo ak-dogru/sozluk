@@ -464,6 +464,17 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </div>
     </div>
 
+    <!-- Bunu Biliyor Musun? -->
+    <div class="tbl-wrap" style="margin-bottom:16px" id="biliyormusun-wrap">
+      <div class="tbl-hdr">
+        <span class="tbl-ttl">💡 Bunu Biliyor musun?</span>
+        <span id="biliyormusun-cat" style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)"></span>
+      </div>
+      <div id="biliyormusun-icerik" style="padding:16px 20px">
+        <div style="color:var(--txt-d);opacity:.5;font-size:0.85rem">Yükleniyor...</div>
+      </div>
+    </div>
+
     <!-- Özet -->
     <div class="tbl-wrap" style="margin-bottom:16px">
       <div class="tbl-hdr"><span class="tbl-ttl">Özet</span></div>
@@ -1142,7 +1153,7 @@ async function initCloud(){
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
       document.getElementById('cloudInd').style.color='#3a9a5a';
-      render();renderNotes();renderHomeStats();    }
+      render();renderNotes();renderHomeStats();renderBiliyorMusun();    }
   } catch(e){
     console.error('Cloud init error:',e);
     document.getElementById('cloudInd').textContent='⚠ Çevrimdışı';
@@ -2879,6 +2890,27 @@ function exportPDF(){
 }
 
 
+
+/* -- BUNU BILIYOR MUSUN -- */
+function renderBiliyorMusun(){
+  var el=document.getElementById('biliyormusun-icerik');
+  var catEl=document.getElementById('biliyormusun-cat');
+  if(!el) return;
+  if(!notes||!notes.length){
+    el.innerHTML='<div style="color:var(--txt-d);opacity:.5">Henuz kural eklenmemis.</div>';
+    return;
+  }
+  var bugun=new Date();
+  var seed=bugun.getFullYear()*10000+(bugun.getMonth()+1)*100+bugun.getDate();
+  var kural=notes[seed%notes.length];
+  var renk=(typeof catColors!='undefined'&&catColors[kural.cat])?catColors[kural.cat]:{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
+  if(catEl) catEl.textContent=kural.cat||'Genel';
+  el.innerHTML=
+    '<div style="font-size:1rem;font-weight:700;color:var(--txt);margin-bottom:10px">'+(kural.title||'')+'</div>'
+    +(kural.body?'<div style="font-size:0.9rem;color:var(--txt-d);line-height:1.8;white-space:pre-wrap">'+kural.body+'</div>':'')
+    +(kural.example?'<div style="margin-top:12px;padding:10px 14px;background:var(--surf2);border-radius:6px;border-left:3px solid '+renk.border+';font-size:0.85rem;color:var(--acc-d);font-style:italic">'+kural.example+'</div>':'');
+}
+
 function renderHomeStats(){
   const today2=new Date().toISOString().split('T')[0];
   const thisWeek=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
@@ -2902,6 +2934,7 @@ loadNotes();
 loadRef();
 render();
 renderHomeStats();
+renderBiliyorMusun();
 initCloud();
 restoreSession();
 </script>
