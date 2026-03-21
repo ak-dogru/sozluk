@@ -3115,7 +3115,7 @@ function renderDailyCards(){
   const grid=document.getElementById('daily-grid');
   const ruleEl=document.getElementById('daily-rule');
   const dateEl=document.getElementById('wotd-date');
-  if(!grid) return;
+  if(!grid){console.log('daily-grid not found');return;}
 
   const today2=new Date();
   const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -3140,6 +3140,13 @@ function renderDailyCards(){
 
   if(!words||!words.length){
     grid.innerHTML='<div class="daily-card" style="grid-column:1/-1;text-align:center"><div class="daily-card-label" style="opacity:.5">Kelimeler yükleniyor...</div></div>';
+    // Still render rule even without words
+    if(ruleEl&&notes&&notes.length){
+      const seed2=new Date().getFullYear()*10000+(new Date().getMonth()+1)*100+new Date().getDate();
+      const rule=notes[seed2%notes.length];
+      const color2=(typeof catColors!=='undefined'&&catColors[rule.cat])||{border:'#888',bg:'rgba(128,128,128,.1)',text:'#888'};
+      ruleEl.innerHTML='<div style="font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:8px">'+rule.title+'</div>'+(rule.body?'<div style="font-size:0.87rem;color:var(--txt-d);line-height:1.75">'+rule.body+'</div>':'');
+    }
     return;
   }
 
@@ -3196,8 +3203,11 @@ loadNotes();
 loadRef();
 render();
 renderHomeStats();
-renderDailyCards();
-initCloud();
+renderDailyCards();  // runs with localStorage words first
+initCloud().then(()=>{
+  renderHomeStats();
+  renderDailyCards(); // re-runs after cloud words loaded
+});
 restoreSession();
 </script>
 </body>
