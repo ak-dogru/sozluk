@@ -797,6 +797,10 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
             <label class="ilabel">Örnek Kelime / Cümle</label>
             <textarea class="winput" id="note_example" rows="3" style="resize:vertical;line-height:1.6" placeholder="ܐܒܐ (Aba) — Baba / Father&#10;ܐܡܐ (Ema) — Anne / Mother"></textarea>
           </div>
+          <div class="igroup" style="margin-top:14px">
+            <label class="ilabel">Görsel URL (isteğe bağlı)</label>
+            <input type="text" class="winput" id="note_img_url" placeholder="https://... görsel linki yapıştırın">
+          </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-p" onclick="saveNote()">Kaydet</button>
@@ -2028,6 +2032,18 @@ function renderNotes(){
         ex.appendChild(document.createTextNode(n.example));
         card.appendChild(ex);
       }
+      if(n.img){
+        const im=document.createElement('img');
+        im.src=n.img;
+        im.alt='Görsel';
+        im.style.cssText='width:100%;max-height:240px;object-fit:contain;border-radius:6px;display:block;margin:10px 0;cursor:pointer;background:var(--surf2)';
+        im.onclick=function(){window.open(n.img,'_blank');};
+        im.onerror=function(){this.style.display='none';};
+        const iw=document.createElement('div');
+        iw.style.cssText='padding:0 16px 12px';
+        iw.appendChild(im);
+        card.appendChild(iw);
+      }
       body.appendChild(card);
     });
 
@@ -2042,14 +2058,15 @@ function saveNote(){if(!requireAuth())return;
   const body=document.getElementById('note_body').value.trim();
   const cat=document.getElementById('note_cat').value||'Genel';
   const example=document.getElementById('note_example').value.trim();
+  const img=document.getElementById('note_img_url').value.trim();
   if(!title&&!body){showToast('⚠ Başlık veya açıklama girin');return;}
   if(editingNoteId){
     const n=notes.find(x=>x.id===editingNoteId);
-    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;}
+    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;n.img=img||'';}
     editingNoteId=null;
     document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   } else {
-    notes.push({id:noteNextId++,title,body,cat,example});
+    notes.push({id:noteNextId++,title,body,cat,example,img:img||''});
   }
   if(useCloud){
     if(editingNoteId){const n=notes.find(x=>x.id===editingNoteId);if(n&&n.sbId)sbUpdateNote(n.sbId,n).catch(e=>console.error(e));}
@@ -2071,6 +2088,7 @@ function editNote(id){
   document.getElementById('note_body').value=n.body;
   document.getElementById('note_cat').value=n.cat||'Genel';
   document.getElementById('note_example').value=n.example||'';
+  document.getElementById('note_img_url').value=n.img||'';
   document.getElementById('noteFormTitle').textContent='Kural Düzenle';
   switchNTab('edit',document.getElementById('ntab-edit'));
 }
@@ -2089,6 +2107,7 @@ function cancelNoteEdit(){
   document.getElementById('note_body').value='';
   document.getElementById('note_cat').value='';
   document.getElementById('note_example').value='';
+  document.getElementById('note_img_url').value='';
   document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   switchNTab('list',document.getElementById('ntab-list'));
 }
