@@ -61,6 +61,23 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .char-btns{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:3px}
 .chbtn{background:var(--surf3);border:1px solid var(--brd);color:var(--acc);font-size:12px;padding:2px 6px;cursor:pointer;border-radius:4px;font-family:var(--fm);transition:background .15s,color .15s;line-height:1.4}
 .chbtn:hover{background:var(--acc);color:var(--bg)}
+/* ── REFERANS ───────────────────────────────── */
+.ref-section{background:var(--surf);border:1px solid var(--brd-s);border-radius:10px;margin-bottom:12px;overflow:hidden;transition:background .35s}
+.ref-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--surf2);cursor:pointer;user-select:none;transition:background .35s}
+.ref-hdr:hover .ref-title{color:var(--acc)}
+.ref-title{font-family:var(--fh);font-size:12px;letter-spacing:2px;color:var(--txt);font-weight:600}
+.ref-arrow{font-size:11px;color:var(--acc-d);transition:transform .3s;display:inline-block}
+.ref-body{overflow:hidden;transition:max-height .35s ease,opacity .3s;max-height:9000px;opacity:1}
+.ref-body.closed{max-height:0;opacity:0}
+.ref-table{width:100%;border-collapse:collapse;font-size:14px}
+.ref-table th{padding:9px 16px;text-align:left;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);border-bottom:1px solid var(--brd);background:var(--surf2)}
+.ref-table td{padding:9px 16px;border-bottom:1px solid var(--brd-s);color:var(--txt);vertical-align:middle}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:var(--pb)}
+.ref-table td.sy{font-size:16px;color:var(--txt-d)}
+.ref-table td.tr2{font-family:var(--fm);font-size:12px;color:var(--acc-d)}
+.ref-highlight{background:var(--pb)!important}
+
 /* ── NOTLAR ─────────────────────────────────── */
 .ntabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
 .ntab{padding:7px 18px;font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;transition:all .2s}
@@ -217,6 +234,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <button class="tab active" onclick="switchTab('sozluk',this)">📖 Sözlük</button>
     <button class="tab" onclick="switchTab('cumle',this)">✏️ Cümle Kur</button>
     <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
+    <button class="tab" onclick="switchTab('referans',this)">📚 Referans</button>
   </div>
 
   <!-- SÖZLÜK PANELİ -->
@@ -517,6 +535,57 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
 
   </div><!-- /tab-notlar -->
+
+  <!-- REFERANS PANELİ -->
+  <div class="tab-content" id="tab-referans">
+
+    <!-- Toolbar -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
+      <div style="position:relative;flex:1;min-width:200px">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--acc-d);font-size:16px">⌕</span>
+        <input type="text" id="refSearch" class="winput" placeholder="Referanslarda ara..." oninput="filterRef()" style="padding-left:42px">
+      </div>
+      <button class="abtn hl" onclick="showRefSectionModal()"><span>＋</span>Yeni Bölüm</button>
+    </div>
+
+    <!-- Sections -->
+    <div id="refSections"></div>
+
+  </div><!-- /tab-referans -->
+
+  <!-- Ref Section Modal -->
+  <div id="refSectionModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+    <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(480px,92vw);max-height:90vh;overflow-y:auto">
+      <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:20px">Bölüm Ekle / Düzenle</div>
+      <input type="hidden" id="refSectionId">
+      <div class="igroup" style="margin-bottom:16px">
+        <label class="ilabel">Başlık</label>
+        <input type="text" class="winput" id="refSectionTitle" placeholder="Örn: 🔤 Zamirler">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-p" onclick="saveRefSection()">Kaydet</button>
+        <button class="btn btn-s" onclick="closeRefSectionModal()">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ref Row Modal -->
+  <div id="refRowModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+    <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(480px,92vw)">
+      <div style="font-family:var(--fh);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acc);margin-bottom:20px">Satır Ekle / Düzenle</div>
+      <input type="hidden" id="refRowSectionId">
+      <input type="hidden" id="refRowIndex">
+      <div class="igrid" style="margin-bottom:14px">
+        <div class="igroup"><label class="ilabel">Türkçe</label><input type="text" class="winput" id="refRowTr" placeholder="Türkçe..."></div>
+        <div class="igroup"><label class="ilabel">Süryanice</label><input type="text" class="winput" id="refRowSy" placeholder="ܣܘܪܝܝܐ..."></div>
+        <div class="igroup"><label class="ilabel">Transliterasyon</label><input type="text" class="winput" id="refRowTl" placeholder="Transliterasyon..."></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-p" onclick="saveRefRow()">Kaydet</button>
+        <button class="btn btn-s" onclick="closeRefRowModal()">İptal</button>
+      </div>
+    </div>
+  </div>
 
 <div id="editModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
   <div style="background:var(--surf);border:1.5px solid var(--acc);border-radius:12px;padding:28px;width:min(520px,92vw);max-height:90vh;overflow-y:auto">
@@ -995,6 +1064,7 @@ function switchTab(id, el){
   document.getElementById('tab-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='cumle') renderPool();
+  if(id==='referans') renderRef();
 }
 
 /* ── CÜMLE KUR ────────────────────────────── */
@@ -1560,6 +1630,193 @@ async function fetchSyriac(){
     btn.textContent='ܐ Getir';btn.disabled=false;
   }
 }
+
+/* ── REFERANS ─────────────────────────────── */
+function toggleRef(id){
+  const body=document.querySelector('#ref-'+id+' .ref-body');
+  const arrow=document.querySelector('#ref-'+id+' .ref-arrow');
+  if(!body) return;
+  const closed=body.classList.toggle('closed');
+  arrow.style.transform=closed?'rotate(-90deg)':'rotate(0deg)';
+}
+
+function filterRef(){
+  const q=(document.getElementById('refSearch').value||'').toLowerCase().trim();
+  document.querySelectorAll('.ref-table tbody tr').forEach(row=>{
+    const text=row.textContent.toLowerCase();
+    const match=!q||text.includes(q);
+    row.style.display=match?'':'none';
+    row.querySelectorAll('td').forEach(td=>td.classList.remove('ref-highlight'));
+    if(match&&q){row.querySelectorAll('td').forEach(td=>{if(td.textContent.toLowerCase().includes(q))td.classList.add('ref-highlight');});}
+  });
+  // Auto-open sections with results
+  if(q){
+    document.querySelectorAll('.ref-section').forEach(sec=>{
+      const hasVisible=[...sec.querySelectorAll('tbody tr')].some(r=>r.style.display!=='none');
+      const body=sec.querySelector('.ref-body');
+      const arrow=sec.querySelector('.ref-arrow');
+      if(hasVisible){body.classList.remove('closed');arrow.style.transform='rotate(0deg)';}
+    });
+  }
+}
+
+/* ── REFERANS ─────────────────────────────── */
+const REF_KEY='sozluk_ref_v1';
+const DEFAULT_REF=[{"id": 1, "title": "🔤 Zamirler", "rows": [{"tr": "Ben", "sy": "ܐܢܐ", "translit": "Eno"}, {"tr": "Sen (e)", "sy": "ܐܢܬ", "translit": "At"}, {"tr": "Sen (d)", "sy": "ܐܢܬܝ", "translit": "At"}, {"tr": "O (e)", "sy": "ܗܘ", "translit": "Hu"}, {"tr": "O (d)", "sy": "ܗܝ", "translit": "Hi"}, {"tr": "Biz", "sy": "ܚܢܢ", "translit": "Ḥnan / Naḥnan"}, {"tr": "Siz (e)", "sy": "ܐܢܬܘܢ", "translit": "Atun"}, {"tr": "Siz (d)", "sy": "ܐܢܬܝܢ", "translit": "Atī̱n"}, {"tr": "Onlar (e)", "sy": "ܗܢܘܢ", "translit": "Henun"}, {"tr": "Onlar (d)", "sy": "ܗܢܝܢ", "translit": "Henī̱n"}]}, {"id": 2, "title": "❓ Soru Edatları", "rows": [{"tr": "Ne?", "sy": "ܡܢܐ", "translit": "Mono"}, {"tr": "Kim?", "sy": "ܡܢ", "translit": "Man"}, {"tr": "Ne zaman?", "sy": "ܐܡܬܝ", "translit": "Emati"}, {"tr": "Nerede?", "sy": "ܐܝܟܐ", "translit": "Ayko"}, {"tr": "Nasıl?", "sy": "ܐܝܟܢܐ", "translit": "Aykano"}, {"tr": "Neden? / Niçin?", "sy": "ܠܡܢܐ", "translit": "Lmono"}, {"tr": "Kaç? / Ne kadar?", "sy": "ܟܡܐ", "translit": "Kamo"}, {"tr": "Hangi?", "sy": "ܐܝܢܐ", "translit": "Ayno"}, {"tr": "Nereden?", "sy": "ܡܢ ܐܝܟܐ", "translit": "Men ayko"}, {"tr": "Orası mı?", "sy": "ܬܡܢ", "translit": "Tamon"}]}, {"id": 3, "title": "🔗 Bağlaçlar ve İlgeçler", "rows": [{"tr": "Ve", "sy": "ܘ", "translit": "W-"}, {"tr": "Ama / Fakat", "sy": "ܐܠܐ", "translit": "Elo"}, {"tr": "Çünkü / Zira", "sy": "ܡܛܠ", "translit": "Meṭul"}, {"tr": "Eğer", "sy": "ܐܢ", "translit": "En"}, {"tr": "Ki / Diye", "sy": "ܕ", "translit": "D-"}, {"tr": "Ya da / Veya", "sy": "ܐܘ", "translit": "Aw"}, {"tr": "Bile / Hatta", "sy": "ܐܦ", "translit": "Af"}, {"tr": "Değil", "sy": "ܠܐ", "translit": "Lo"}, {"tr": "Ne…ne de", "sy": "ܠܐ...ܘܠܐ", "translit": "Lo...wlo"}, {"tr": "İle / Birlikte", "sy": "ܥܡ", "translit": "ʿAm"}, {"tr": "Kadar / Dek", "sy": "ܥܕܡܐ", "translit": "ʿAdamo"}, {"tr": "Üzerine / Hakkında", "sy": "ܥܠ", "translit": "ʿAl"}, {"tr": "Sonra", "sy": "ܒܬܪ", "translit": "Baṯar"}, {"tr": "Önce", "sy": "ܩܕܡ", "translit": "Qadam"}, {"tr": "İçin / -den dolayı", "sy": "ܡܛܠܬ", "translit": "Meṭulat"}, {"tr": "Hem...hem de", "sy": "ܐܦ...ܐܦ", "translit": "Af...af"}]}, {"id": 4, "title": "🔢 Sayılar", "rows": [{"tr": "1 — Bir", "sy": "ܚܕ / ܚܕܐ", "translit": "Ḥad / Ḥda"}, {"tr": "2 — İki", "sy": "ܬܪܝܢ / ܬܪܬܝܢ", "translit": "Trein / Tartin"}, {"tr": "3 — Üç", "sy": "ܬܠܬܐ / ܬܠܬ", "translit": "Tloto / Tlat"}, {"tr": "4 — Dört", "sy": "ܐܪܒܥܐ / ܐܪܒܥ", "translit": "Arboʿo / Arbaʿ"}, {"tr": "5 — Beş", "sy": "ܚܡܫܐ / ܚܡܫ", "translit": "Ḥamšo / Ḥamš"}, {"tr": "6 — Altı", "sy": "ܫܬܐ / ܫܬ", "translit": "Eštto / Šat"}, {"tr": "7 — Yedi", "sy": "ܫܒܥܐ / ܫܒܥ", "translit": "Šabʿo / Šbaʿ"}, {"tr": "8 — Sekiz", "sy": "ܬܡܢܝܐ / ܬܡܢܐ", "translit": "Tmonyо / Tmone"}, {"tr": "9 — Dokuz", "sy": "ܬܫܥܐ / ܬܫܥ", "translit": "Tšʿo / Tšaʿ"}, {"tr": "10 — On", "sy": "ܥܣܪܐ / ܥܣܪ", "translit": "ʿSoro / ʿSar"}, {"tr": "11 — On Bir", "sy": "ܚܕܥܣܪ", "translit": "Ḥdaʿsar"}, {"tr": "12 — On İki", "sy": "ܬܪܥܣܪ", "translit": "Tarʿsar"}, {"tr": "13 — On Üç", "sy": "ܬܠܬܥܣܪ", "translit": "Tlataʿsar"}, {"tr": "14 — On Dört", "sy": "ܐܪܒܥܣܪ", "translit": "Arbaʿsar"}, {"tr": "15 — On Beş", "sy": "ܚܡܫܥܣܪ", "translit": "Ḥamšaʿsar"}, {"tr": "16 — On Altı", "sy": "ܫܬܥܣܪ", "translit": "Eštaʿsar"}, {"tr": "17 — On Yedi", "sy": "ܫܒܥܣܪ", "translit": "Šabʿaʿsar"}, {"tr": "18 — On Sekiz", "sy": "ܬܡܢܥܣܪ", "translit": "Tmanaʿsar"}, {"tr": "19 — On Dokuz", "sy": "ܬܫܥܣܪ", "translit": "Tšaʿsar"}, {"tr": "20 — Yirmi", "sy": "ܥܣܪܝܢ", "translit": "ʿSrin"}, {"tr": "30 — Otuz", "sy": "ܬܠܬܝܢ", "translit": "Tlatin"}, {"tr": "40 — Kırk", "sy": "ܐܪܒܥܝܢ", "translit": "Arbiʿin"}, {"tr": "50 — Elli", "sy": "ܚܡܫܝܢ", "translit": "Ḥamšin"}, {"tr": "60 — Altmış", "sy": "ܫܬܝܢ", "translit": "Eštin"}, {"tr": "70 — Yetmiş", "sy": "ܫܒܥܝܢ", "translit": "Šabʿin"}, {"tr": "80 — Seksen", "sy": "ܬܡܢܝܢ", "translit": "Tmanin"}, {"tr": "100 — Yüz", "sy": "ܡܐܐ", "translit": "Myo"}, {"tr": "1.000 — Bin", "sy": "ܐܠܦ", "translit": "Alf"}, {"tr": "1.000.000 — Milyon", "sy": "ܡܠܝܘܢ", "translit": "Milyun"}]}, {"id": 5, "title": "📅 Haftanın Günleri", "rows": [{"tr": "Pazar", "sy": "ܚܕ ܒܫܒܐ", "translit": "Ḥad bšabo"}, {"tr": "Pazartesi", "sy": "ܬܪܝܢ ܒܫܒܐ", "translit": "Trein bšabo"}, {"tr": "Salı", "sy": "ܬܠܬܐ ܒܫܒܐ", "translit": "Tloto bšabo"}, {"tr": "Çarşamba", "sy": "ܐܪܒܥܐ ܒܫܒܐ", "translit": "Arboʿo bšabo"}, {"tr": "Perşembe", "sy": "ܚܡܫܐ ܒܫܒܐ", "translit": "Ḥamšo bšabo"}, {"tr": "Cuma", "sy": "ܥܪܘܒܬܐ", "translit": "ʿArubto"}, {"tr": "Cumartesi", "sy": "ܫܒܬܐ", "translit": "Šabto"}]}, {"id": 6, "title": "🗓️ Aylar", "rows": [{"tr": "Ocak", "sy": "ܟܢܘܢ ܒ", "translit": "Konun B"}, {"tr": "Şubat", "sy": "ܫܒܛ", "translit": "Šbaṭ"}, {"tr": "Mart", "sy": "ܐܕܪ", "translit": "Odar"}, {"tr": "Nisan", "sy": "ܢܝܣܢ", "translit": "Nison"}, {"tr": "Mayıs", "sy": "ܐܝܪ", "translit": "Iyar"}, {"tr": "Haziran", "sy": "ܚܙܝܪܢ", "translit": "Ḥziran"}, {"tr": "Temmuz", "sy": "ܬܡܘܙ", "translit": "Tamuz"}, {"tr": "Ağustos", "sy": "ܐܒ", "translit": "Av"}, {"tr": "Eylül", "sy": "ܐܝܠܘܠ", "translit": "Ilul"}, {"tr": "Ekim", "sy": "ܬܫܪܝܢ ܐ", "translit": "Tešrin A"}, {"tr": "Kasım", "sy": "ܬܫܪܝܢ ܒ", "translit": "Tešrin B"}, {"tr": "Aralık", "sy": "ܟܢܘܢ ܐ", "translit": "Konun A"}]}];
+let refData=[], refNextId=10;
+
+function loadRef(){
+  try{const r=localStorage.getItem(REF_KEY);if(r){refData=JSON.parse(r);refNextId=Math.max(...refData.map(s=>s.id))+1;return;}}catch(e){}
+  refData=JSON.parse(JSON.stringify(DEFAULT_REF));
+  refNextId=refData.length+1;
+  saveRef();
+}
+function saveRef(){try{localStorage.setItem(REF_KEY,JSON.stringify(refData));}catch(e){}}
+
+function renderRef(){
+  const container=document.getElementById('refSections');
+  if(!container) return;
+  container.innerHTML='';
+  refData.forEach(sec=>{
+    const div=document.createElement('div');
+    div.className='ref-section';
+    div.id='ref-sec-'+sec.id;
+
+    const hdr=document.createElement('div');
+    hdr.className='ref-hdr';
+    hdr.innerHTML='<span class="ref-title">'+sec.title+'</span>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<button class="nebtn" onclick="editRefSection('+sec.id+')" title="Düzenle">✏️</button>'
+      +'<button class="ndbtn" onclick="deleteRefSection('+sec.id+')" title="Sil">✕</button>'
+      +'<span class="ref-arrow">▼</span></div>';
+    hdr.querySelector('.ref-arrow').onclick=function(){toggleRefSec(sec.id);};
+    hdr.querySelector('.ref-title').onclick=function(){toggleRefSec(sec.id);};
+    div.appendChild(hdr);
+
+    const body=document.createElement('div');
+    body.className='ref-body';
+    body.id='refbody-'+sec.id;
+
+    const table=document.createElement('table');
+    table.className='ref-table';
+    table.innerHTML='<thead><tr><th>Türkçe</th><th>Süryanice</th><th>Transliterasyon</th><th style="width:60px"></th></tr></thead>';
+    const tbody=document.createElement('tbody');
+
+    sec.rows.forEach((row,idx)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td>'+row.tr+'</td><td class="sy">'+row.sy+'</td><td class="tr2">'+row.translit+'</td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="ebtn" onclick="editRefRow('+sec.id+','+idx+')" title="Düzenle" style="opacity:.5">✏️</button>'
+        +'<button class="dbtn" onclick="deleteRefRow('+sec.id+','+idx+')" title="Sil" style="opacity:.5">✕</button>'
+        +'</td>';
+      tr.querySelector('.ebtn').onmouseenter=function(){this.style.opacity='1';};
+      tr.querySelector('.ebtn').onmouseleave=function(){this.style.opacity='.5';};
+      tr.querySelector('.dbtn').onmouseenter=function(){this.style.opacity='1';};
+      tr.querySelector('.dbtn').onmouseleave=function(){this.style.opacity='.5';};
+      tbody.appendChild(tr);
+    });
+
+    // Add row button
+    const addRow=document.createElement('tr');
+    addRow.innerHTML='<td colspan="4" style="padding:8px 16px">'
+      +'<button class="abtn" onclick="showRefRowModal('+sec.id+',-1)" style="font-size:9px;padding:5px 12px"><span>＋</span>Satır Ekle</button>'
+      +'</td>';
+    tbody.appendChild(addRow);
+    table.appendChild(tbody);
+    body.appendChild(table);
+    div.appendChild(body);
+    container.appendChild(div);
+  });
+}
+
+function toggleRefSec(id){
+  const body=document.getElementById('refbody-'+id);
+  const arrow=document.querySelector('#ref-sec-'+id+' .ref-arrow');
+  if(!body) return;
+  const closed=body.classList.toggle('closed');
+  arrow.style.transform=closed?'rotate(-90deg)':'rotate(0deg)';
+}
+
+/* Section CRUD */
+let editingRefSectionId=null;
+function showRefSectionModal(id){
+  editingRefSectionId=id||null;
+  const sec=id?refData.find(s=>s.id===id):null;
+  document.getElementById('refSectionTitle').value=sec?sec.title:'';
+  document.getElementById('refSectionModal').style.display='flex';
+  setTimeout(()=>document.getElementById('refSectionTitle').focus(),100);
+}
+function closeRefSectionModal(){document.getElementById('refSectionModal').style.display='none';}
+function editRefSection(id){showRefSectionModal(id);}
+function saveRefSection(){
+  const title=document.getElementById('refSectionTitle').value.trim();
+  if(!title){showToast('⚠ Başlık girin');return;}
+  if(editingRefSectionId){
+    const sec=refData.find(s=>s.id===editingRefSectionId);
+    if(sec) sec.title=title;
+  } else {
+    refData.push({id:refNextId++,title,rows:[]});
+  }
+  saveRef();renderRef();closeRefSectionModal();showToast('✦ Bölüm kaydedildi');
+}
+function deleteRefSection(id){
+  if(!confirm('Bu bölüm silinecek. Emin misiniz?')) return;
+  refData=refData.filter(s=>s.id!==id);
+  saveRef();renderRef();showToast('Bölüm silindi');
+}
+
+/* Row CRUD */
+let editingRefSid=null, editingRefIdx=-1;
+function showRefRowModal(sid,idx){
+  editingRefSid=sid; editingRefIdx=idx;
+  const sec=refData.find(s=>s.id===sid);
+  const row=idx>=0&&sec?sec.rows[idx]:null;
+  document.getElementById('refRowTr').value=row?row.tr:'';
+  document.getElementById('refRowSy').value=row?row.sy:'';
+  document.getElementById('refRowTl').value=row?row.translit:'';
+  document.getElementById('refRowModal').style.display='flex';
+  setTimeout(()=>document.getElementById('refRowTr').focus(),100);
+}
+function closeRefRowModal(){document.getElementById('refRowModal').style.display='none';}
+function editRefRow(sid,idx){showRefRowModal(sid,idx);}
+function saveRefRow(){
+  const tr=document.getElementById('refRowTr').value.trim();
+  const sy=document.getElementById('refRowSy').value.trim();
+  const translit=document.getElementById('refRowTl').value.trim();
+  if(!tr&&!sy){showToast('⚠ En az bir alan girin');return;}
+  const sec=refData.find(s=>s.id===editingRefSid);
+  if(!sec) return;
+  if(editingRefIdx>=0){sec.rows[editingRefIdx]={tr,sy,translit};}
+  else{sec.rows.push({tr,sy,translit});}
+  saveRef();renderRef();closeRefRowModal();showToast('✦ Satır kaydedildi');
+}
+function deleteRefRow(sid,idx){
+  const sec=refData.find(s=>s.id===sid);
+  if(!sec) return;
+  sec.rows.splice(idx,1);
+  saveRef();renderRef();showToast('Satır silindi');
+}
+
+function filterRef(){
+  const q=(document.getElementById('refSearch').value||'').toLowerCase().trim();
+  document.querySelectorAll('.ref-table tbody tr').forEach(row=>{
+    if(row.querySelector('.abtn')) return; // skip add row button
+    const text=row.textContent.toLowerCase();
+    row.style.display=!q||text.includes(q)?'':'none';
+  });
+  if(q){
+    document.querySelectorAll('.ref-section').forEach(sec=>{
+      const hasVisible=[...sec.querySelectorAll('tbody tr')].some(r=>!r.querySelector('.abtn')&&r.style.display!=='none');
+      const body=sec.querySelector('.ref-body');
+      const arrow=sec.querySelector('.ref-arrow');
+      if(hasVisible){body.classList.remove('closed');if(arrow)arrow.style.transform='rotate(0deg)';}
+    });
+  }
+}
+
+document.getElementById('refSectionModal').addEventListener('click',function(e){if(e.target===this)closeRefSectionModal();});
+document.getElementById('refRowModal').addEventListener('click',function(e){if(e.target===this)closeRefRowModal();});
+loadRef();renderRef();
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
