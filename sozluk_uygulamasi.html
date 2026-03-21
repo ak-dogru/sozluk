@@ -235,8 +235,12 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <span class="lbadge">English</span>
     </div>
     <div class="save-ind"><span class="save-dot"></span>Veriler tarayıcıda kalıcı kaydediliyor</div>
-    <div style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:12px">
-      <span id="userInfo" style="font-family:var(--fm);font-size:9px;color:#3a9a5a;letter-spacing:1px"></span>
+    <div style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+      <div id="userPanel" style="display:none;align-items:center;gap:8px;background:var(--surf2);border:1px solid var(--brd);border-radius:20px;padding:4px 12px 4px 8px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#3a9a5a;display:inline-block"></span>
+        <span id="userInfo" style="font-family:var(--fm);font-size:9px;color:var(--txt);letter-spacing:1px"></span>
+        <button onclick="signOut()" style="background:none;border:none;cursor:pointer;font-family:var(--fm);font-size:9px;color:var(--bad);letter-spacing:1px;padding:0 0 0 6px;border-left:1px solid var(--brd)">Çıkış</button>
+      </div>
       <button id="authBtn" onclick="showLoginModal()" class="abtn" style="padding:5px 14px;font-size:9px">🔐 Giriş</button>
     </div>
     <div class="save-ind" style="margin-top:4px"><span id="cloudInd" style="font-family:var(--fm);font-size:9px;letter-spacing:2px">☁ Buluta bağlanıyor...</span></div>
@@ -2018,11 +2022,16 @@ function setEditMode(on){
 function updateAuthUI(){
   const loginBtn=document.getElementById('authBtn');
   const userInfo=document.getElementById('userInfo');
-  if(loginBtn){
-    loginBtn.textContent=currentUser?'Çıkış':'🔐 Giriş';
-    loginBtn.onclick=currentUser?signOut:showLoginModal;
+  const userPanel=document.getElementById('userPanel');
+  if(currentUser){
+    if(loginBtn) loginBtn.style.display='none';
+    if(userPanel) userPanel.style.display='flex';
+    if(userInfo) userInfo.textContent=currentUser.email;
+  } else {
+    if(loginBtn) loginBtn.style.display='';
+    if(userPanel) userPanel.style.display='none';
+    if(userInfo) userInfo.textContent='';
   }
-  if(userInfo) userInfo.textContent=currentUser?('✓ '+currentUser.email):'';
 }
 
 function showLoginModal(){
