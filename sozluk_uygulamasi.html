@@ -720,7 +720,8 @@ async function askClaude(word){
 const SB_URL='https://nbjxzasnluytdszqsxys.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ianh6YXNubHV5dGRzenFzeHlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjMyMDYsImV4cCI6MjA4OTU5OTIwNn0.-tUgVySz45ejpmAGSA13zFUKXsVXxxQ3Auoqq1KUhZU';
 async function sbFetch(path,method='GET',body=null){
-  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}};
+  const token=localStorage.getItem('sb_access_token')||SB_KEY;
+  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation'}};
   if(body) opts.body=JSON.stringify(body);
   const r=await fetch(SB_URL+path,opts);
   if(!r.ok) throw new Error(await r.text());
