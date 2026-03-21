@@ -3126,7 +3126,7 @@ function renderDailyCards(){
   function wordCard(w, label){
     if(!w) return '<div class="daily-card"><div class="daily-card-label">'+label+'</div><div class="daily-card-en" style="opacity:.4">—</div></div>';
     const syScript=(w.sy||'').split('(')[0].trim();
-    const syTranslit=(w.sy||'').match(/\(([^)]+)\)/)?.[1]||'';
+    const syTranslit=(w.sy||'').replace(/^[^(]*/,'').replace(/[()]/g,'').trim();
     const color=(typeColors&&typeColors[w.type])||'#888';
     return '<div class="daily-card">'
       +'<div class="daily-card-label">'+label+'</div>'
