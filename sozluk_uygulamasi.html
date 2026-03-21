@@ -368,6 +368,28 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
 .wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
 .wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
+
+/* ── FAVORİLER ──────────────────────────────── */
+.fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
+.fav-btn:hover{opacity:.8;transform:scale(1.2)}
+.fav-btn.on{opacity:1;color:#f5a623}
+.fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
+.fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
+
+/* ── GÜNLÜK KARTLAR ─────────────────────────── */
+.daily-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px}
+@media(max-width:900px){.daily-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.daily-grid{grid-template-columns:1fr 1fr;gap:8px;padding:12px}}
+.daily-card{background:var(--surf2);border-radius:8px;padding:16px 14px;text-align:center;border:1px solid var(--brd-s);transition:background .2s}
+.daily-card-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px}
+.daily-card-sy{font-size:1.6rem;color:var(--acc);font-weight:700;margin-bottom:4px;direction:rtl;line-height:1.3}
+.daily-card-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);letter-spacing:1px;margin-bottom:8px}
+.daily-card-tr{font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:2px}
+.daily-card-en{font-size:0.8rem;color:var(--txt-d)}
+.daily-card-type{display:inline-block;padding:2px 10px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;margin-top:6px;border:1px solid transparent}
+.daily-card-rule{font-size:0.82rem;color:var(--txt-d);line-height:1.6;text-align:left;margin-top:4px}
+.daily-card-rule-title{font-size:0.88rem;font-weight:700;color:var(--txt);margin-bottom:6px;text-align:left}
+.daily-card-example{font-size:0.75rem;color:var(--acc-d);font-style:italic;margin-top:6px;text-align:left;border-left:2px solid var(--brd);padding-left:8px}
 </style>
 </head>
 <body data-theme="krem">
@@ -443,14 +465,14 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       </p>
     </div>
 
-    <!-- Kelime Günü -->
+    <!-- Günlük Kartlar -->
     <div class="tbl-wrap" style="margin-bottom:16px">
       <div class="tbl-hdr">
-        <span class="tbl-ttl">Günün Kelimesi</span>
+        <span class="tbl-ttl">Bugün</span>
         <span style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)" id="wotd-date"></span>
       </div>
-      <div id="wotd-card" style="padding:24px 20px;text-align:center">
-        <div style="color:var(--txt-d);font-size:0.85rem">Yükleniyor...</div>
+      <div class="daily-grid" id="daily-grid">
+        <div class="daily-card"><div class="daily-card-label">⏳ Yükleniyor...</div></div>
       </div>
     </div>
 
@@ -508,6 +530,8 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
         <div class="home-stat"><div class="home-stat-num" id="hs-ref">—</div><div class="home-stat-lbl">Referans Girişi</div></div>
         <div class="home-stat"><div class="home-stat-num" id="hs-week">—</div><div class="home-stat-lbl">Bu Hafta</div></div>
         <div class="home-stat"><div class="home-stat-num" id="hs-types">—</div><div class="home-stat-lbl">Kelime Türü</div></div>
+        <div class="home-stat"><div class="home-stat-num" id="hs-favs">—</div><div class="home-stat-lbl">Favori</div></div>
+        <div class="home-stat" style="grid-column:1/-1;background:transparent;border:1px solid var(--brd-s)"><div style="font-family:var(--fm);font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--acc-d);margin-bottom:4px">Son Güncelleme</div><div style="font-size:0.95rem;font-weight:700;color:var(--txt)" id="hs-lastupdate">—</div></div>
       </div>
     </div>
 
@@ -536,6 +560,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
   <div class="actions-row">
     <button class="abtn hl edit-only" onclick="toggleAdd()" style="display:none"><span>＋</span>Kelime Ekle</button>
     <button class="abtn" onclick="exportExcel()"><span>⬇</span>Excel İndir</button>
+    <button class="fav-filter-btn" id="favFilterBtn" onclick="toggleFavFilter()">⭐ Favoriler</button>
     <button class="abtn" onclick="showPdfModal()"><span>📄</span>PDF İndir</button>
     <button class="abtn edit-only" onclick="document.getElementById('imp').click()" style="display:none"><span>⬆</span>Excel Yükle</button>
     <input type="file" id="imp" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
@@ -1173,7 +1198,7 @@ async function initCloud(){
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
       document.getElementById('cloudInd').style.color='#3a9a5a';
-      render();renderNotes();renderHomeStats();renderWordOfTheDay();
+      render();renderNotes();renderHomeStats();renderDailyCards();
     }
   } catch(e){
     console.error('Cloud init error:',e);
@@ -3032,6 +3057,28 @@ function exportPDF(){
 .wotd-lang-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d)}
 .wotd-lang-val{font-size:1rem;font-weight:700;color:var(--txt)}
 .wotd-type{display:inline-block;padding:3px 12px;border-radius:20px;background:var(--surf2);font-family:var(--fm);font-size:0.7rem;color:var(--acc-d);margin-bottom:16px;border:1px solid var(--brd-s)}
+
+/* ── FAVORİLER ──────────────────────────────── */
+.fav-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;opacity:.3;transition:all .2s;line-height:1}
+.fav-btn:hover{opacity:.8;transform:scale(1.2)}
+.fav-btn.on{opacity:1;color:#f5a623}
+.fav-filter-btn{padding:5px 14px;font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--brd);background:transparent;border-radius:6px;color:var(--txt-d);transition:all .2s}
+.fav-filter-btn.on{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,.08)}
+
+/* ── GÜNLÜK KARTLAR ─────────────────────────── */
+.daily-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px}
+@media(max-width:900px){.daily-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.daily-grid{grid-template-columns:1fr 1fr;gap:8px;padding:12px}}
+.daily-card{background:var(--surf2);border-radius:8px;padding:16px 14px;text-align:center;border:1px solid var(--brd-s);transition:background .2s}
+.daily-card-label{font-family:var(--fm);font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px}
+.daily-card-sy{font-size:1.6rem;color:var(--acc);font-weight:700;margin-bottom:4px;direction:rtl;line-height:1.3}
+.daily-card-translit{font-family:var(--fm);font-size:0.72rem;color:var(--acc-d);letter-spacing:1px;margin-bottom:8px}
+.daily-card-tr{font-size:0.95rem;font-weight:700;color:var(--txt);margin-bottom:2px}
+.daily-card-en{font-size:0.8rem;color:var(--txt-d)}
+.daily-card-type{display:inline-block;padding:2px 10px;border-radius:20px;font-family:var(--fm);font-size:0.65rem;margin-top:6px;border:1px solid transparent}
+.daily-card-rule{font-size:0.82rem;color:var(--txt-d);line-height:1.6;text-align:left;margin-top:4px}
+.daily-card-rule-title{font-size:0.88rem;font-weight:700;color:var(--txt);margin-bottom:6px;text-align:left}
+.daily-card-example{font-size:0.75rem;color:var(--acc-d);font-style:italic;margin-top:6px;text-align:left;border-left:2px solid var(--brd);padding-left:8px}
 </style></head><body>`;
 
   html+=`<h1>ܡܠܬܐ · Sözcük · Word</h1><div class="subtitle">Türkçe — Süryanice — İngilizce Sözlük &nbsp;·&nbsp; ${dateStr}</div>`;
@@ -3104,38 +3151,107 @@ function renderHomeStats(){
   set('hs-ref', totalRef);
   set('hs-week', words.filter(w=>w.date>=thisWeek).length);
   set('hs-types', types);
+  set('hs-favs', favWords.size);
+  // Son güncelleme
+  const lastDate=words.reduce((max,w)=>w.date&&w.date>max?w.date:max,'');
+  if(lastDate){
+    const d=new Date(lastDate);
+    const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+    const diff=Math.floor((Date.now()-d.getTime())/(1000*60*60*24));
+    const diffStr=diff===0?'Bugün':diff===1?'Dün':diff+' gün önce';
+    set('hs-lastupdate', d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+' · '+diffStr);
+  }
 }
 
 /* ── GÜNÜN KELİMESİ ─────────────────────────── */
-function renderWordOfTheDay(){
-  const card=document.getElementById('wotd-card');
+function renderDailyCards(){
+  const grid=document.getElementById('daily-grid');
   const dateEl=document.getElementById('wotd-date');
-  if(!card||!words||!words.length) return;
+  if(!grid||!words||!words.length) return;
 
-  // Use date as seed so same word shows all day
   const today2=new Date();
-  const seed=today2.getFullYear()*10000+(today2.getMonth()+1)*100+today2.getDate();
-  const idx=seed % words.length;
-  const w=words[idx];
-
-  // Date label
   const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const seed=today2.getFullYear()*10000+(today2.getMonth()+1)*100+today2.getDate();
+
   if(dateEl) dateEl.textContent=today2.getDate()+' '+months[today2.getMonth()]+' '+today2.getFullYear();
 
-  // Syriac script only (without transliteration)
-  const syScript=(w.sy||'').split('(')[0].trim();
-  const syTranslit=(w.sy||'').match(/\(([^)]+)\)/)?.[1]||'';
-  const color=typeColors&&typeColors[w.type]?typeColors[w.type]:'#888';
+  // Helper: get word card html
+  function wordCard(w, label){
+    if(!w) return '<div class="daily-card"><div class="daily-card-label">'+label+'</div><div class="daily-card-en">—</div></div>';
+    const syScript=(w.sy||'').split('(')[0].trim();
+    const syTranslit=(w.sy||'').match(/\(([^)]+)\)/)?.[1]||'';
+    const color=typeColors&&typeColors[w.type]?typeColors[w.type]:'#888';
+    return '<div class="daily-card">'
+      +'<div class="daily-card-label">'+label+'</div>'
+      +(syScript?'<div class="daily-card-sy">'+syScript+'</div>':'')
+      +(syTranslit?'<div class="daily-card-translit">'+syTranslit+'</div>':'')
+      +'<div class="daily-card-tr">'+(w.tr||'—')+'</div>'
+      +'<div class="daily-card-en">'+(w.en||'')+'</div>'
+      +(w.type?'<div class="daily-card-type" style="background:'+color+'18;color:'+color+';border-color:'+color+'33">'+w.type+'</div>':'')
+      +'</div>';
+  }
 
-  card.innerHTML=
-    '<div class="wotd-sy">'+(syScript||'—')+'</div>'
-    +(syTranslit?'<div class="wotd-translit">'+syTranslit+'</div>':'')
-    +(w.type?'<div class="wotd-type" style="background:'+color+'18;color:'+color+';border-color:'+color+'33">'+w.type+'</div>':'')
-    +'<div class="wotd-langs">'
-    +'<div class="wotd-lang-item"><div class="wotd-lang-label">Türkçe</div><div class="wotd-lang-val">'+(w.tr||'—')+'</div></div>'
-    +'<div style="width:1px;background:var(--brd-s);align-self:stretch"></div>'
-    +'<div class="wotd-lang-item"><div class="wotd-lang-label">İngilizce</div><div class="wotd-lang-val">'+(w.en||'—')+'</div></div>'
-    +'</div>';
+  // 1. Günün Kelimesi — tarihe göre sabit
+  const dailyIdx=seed % words.length;
+  const dailyWord=words[dailyIdx];
+
+  // 2. Bu Ziyarette — rastgele
+  let visitIdx=Math.floor(Math.random()*words.length);
+  if(visitIdx===dailyIdx) visitIdx=(visitIdx+1)%words.length;
+  const visitWord=words[visitIdx];
+
+  // 3. Türe Göre — günün türü (fiil, isim, sıfat... döngüsel)
+  const typeOrder2=['isim','fiil','sıfat','zamir','zarf','bağlaç','edat'];
+  const todayType=typeOrder2[seed % typeOrder2.length];
+  const typeWords=words.filter(w=>w.type===todayType);
+  const typeWord=typeWords.length?typeWords[seed % typeWords.length]:null;
+  const typeLabels2={isim:'📦 Günün İsmi',fiil:'⚡ Günün Fiili',sıfat:'🎨 Günün Sıfatı',zamir:'👤 Günün Zamiri',zarf:'🔄 Günün Zarfı',bağlaç:'🔗 Günün Bağlacı',edat:'📍 Günün Edatı'};
+
+  // 4. Günün Kuralı — notlardan
+  let ruleHtml='<div class="daily-card"><div class="daily-card-label">📝 Günün Kuralı</div>';
+  if(notes&&notes.length){
+    const ruleIdx=seed % notes.length;
+    const rule=notes[ruleIdx];
+    ruleHtml+='<div class="daily-card-rule-title">'+(rule.title||'')+'</div>'
+      +'<div class="daily-card-rule">'+(rule.body||'').slice(0,120)+((rule.body||'').length>120?'...':'')+'</div>'
+      +(rule.example?'<div class="daily-card-example">'+rule.example.slice(0,80)+'</div>':'');
+  } else {
+    ruleHtml+='<div class="daily-card-en">Henüz kural eklenmemiş</div>';
+  }
+  ruleHtml+='</div>';
+
+  grid.innerHTML=
+    wordCard(dailyWord,'📖 Günün Kelimesi')
+    +wordCard(visitWord,'🔀 Bu Ziyarette')
+    +wordCard(typeWord, typeLabels2[todayType]||'🏷️ Türe Göre')
+    +ruleHtml;
+}
+
+// Backward compat
+function renderDailyCards(){renderDailyCards();}
+
+
+/* ── FAVORİLER ──────────────────────────────── */
+const FAV_KEY='sozluk_favs_v1';
+let favWords=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]'));
+let showOnlyFavs=false;
+
+function saveFavs(){
+  localStorage.setItem(FAV_KEY,JSON.stringify([...favWords]));
+}
+
+function toggleFav(id){
+  if(favWords.has(id)){favWords.delete(id);}
+  else{favWords.add(id);}
+  saveFavs();
+  render();
+}
+
+function toggleFavFilter(){
+  showOnlyFavs=!showOnlyFavs;
+  const btn=document.getElementById('favFilterBtn');
+  if(btn){btn.classList.toggle('on',showOnlyFavs);btn.textContent=showOnlyFavs?'⭐ Favoriler ✕':'⭐ Favoriler';}
+  render();
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
