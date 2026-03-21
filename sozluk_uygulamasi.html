@@ -141,6 +141,10 @@ h1{font-family:var(--fh);font-size:clamp(24px,5vw,42px);font-weight:700;color:va
 .mini-theme{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s;flex-shrink:0}
 .mini-theme:hover{transform:scale(1.15)}
 .mini-theme.active{border-color:var(--acc);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
+.icon-nav-btn{background:var(--surf2);border:1.5px solid var(--brd);color:var(--txt-d);width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0}
+.icon-nav-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+.icon-nav-btn.active{border-color:var(--acc);color:var(--acc);background:var(--pb)}
+
 .brow{display:flex;gap:8px;margin-top:14px}
 .btn{padding:10px 24px;border:none;cursor:pointer;font-family:var(--fh);font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s;border-radius:6px}
 .btn-p{background:var(--acc);color:var(--bg);font-weight:600}
@@ -296,7 +300,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
 
     <!-- Kompakt Ayar Çubuğu -->
-    <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+    <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
       <!-- Tema daireleri -->
       <div style="display:flex;align-items:center;gap:8px">
         <div class="mini-theme active" id="mt-gece" onclick="setTheme('gece',this)" title="Beyaz" style="background:linear-gradient(135deg,#f8f8f8 50%,#2c2c2c 50%)"></div>
@@ -312,6 +316,17 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
         <span class="fslbl" id="fsLabel">100%</span>
         <button class="fsbtn" onclick="changeFont(1)" title="Büyüt">A+</button>
       </div>
+      <!-- Ayırıcı -->
+      <div style="width:1px;height:20px;background:var(--brd)"></div>
+      <!-- İstatistik ve Flashcard ikonları -->
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="icon-nav-btn" id="inb-istatistik" onclick="switchToPage('istatistik',this)" title="İstatistik">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 16V12M12 16V8M17 16V11"/></svg>
+        </button>
+        <button class="icon-nav-btn" id="inb-flashcard" onclick="switchToPage('flashcard',this)" title="Flashcard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        </button>
+      </div>
     </div>
     <div class="save-ind" style="margin-top:4px"><span id="cloudInd" style="font-family:var(--fm);font-size:9px;letter-spacing:2px">☁ Buluta bağlanıyor...</span></div>
   </header>
@@ -322,8 +337,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <button class="tab" onclick="switchTab('cumle',this)">✏️ Cümle Kur</button>
     <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
     <button class="tab" onclick="switchTab('referans',this)">📚 Referans</button>
-    <button class="tab" onclick="switchTab('istatistik',this)">📊 İstatistik</button>
-    <button class="tab" onclick="switchTab('flashcard',this)">🃏 Flashcard</button>
   </div>
 
   <!-- SÖZLÜK PANELİ -->
@@ -1314,12 +1327,21 @@ async function importExcel(event){
 function switchTab(id, el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.icon-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   if(id==='cumle') renderPool();
   if(id==='referans') renderRef();
   if(id==='istatistik') renderIstatistik();
   if(id==='flashcard'){document.getElementById('fcArea').style.display='none';document.getElementById('fcResult').style.display='none';}
+  // Sync icon buttons
+  const iconBtn=document.getElementById('inb-'+id);
+  if(iconBtn) iconBtn.classList.add('active');
+}
+function switchToPage(id, el){
+  // Deactivate all tabs
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  switchTab(id, el);
 }
 
 /* ── CÜMLE KUR ────────────────────────────── */
