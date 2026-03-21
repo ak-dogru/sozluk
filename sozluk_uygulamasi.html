@@ -356,14 +356,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 @media(max-width:800px){}
 @media(max-width:480px){}
 
-
-/* -- GORSEL -- */
-.note-img{width:100%;max-height:260px;object-fit:contain;border-radius:6px;cursor:pointer;display:block;margin-top:10px;background:var(--surf2)}
-.note-img-wrap{padding:0 16px 14px}
-.img-lightbox{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);align-items:center;justify-content:center;cursor:zoom-out}
-.img-lightbox img{max-width:92vw;max-height:92vh;border-radius:8px;object-fit:contain}
-.img-upload-label{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:6px;cursor:pointer;font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);transition:all .2s;margin-top:8px}
-.img-upload-label:hover{border-color:var(--acc);color:var(--acc)}
 </style>
 </head>
 <body data-theme="krem">
@@ -805,19 +797,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
             <label class="ilabel">Örnek Kelime / Cümle</label>
             <textarea class="winput" id="note_example" rows="3" style="resize:vertical;line-height:1.6" placeholder="ܐܒܐ (Aba) — Baba / Father&#10;ܐܡܐ (Ema) — Anne / Mother"></textarea>
           </div>
-          <div class="igroup" style="margin-top:14px">
-            <label class="ilabel">Görsel (isteğe bağlı)</label>
-            <div id="noteImgPreview" style="display:none;margin-bottom:8px">
-              <img id="noteImgThumb" src="" style="max-height:100px;border-radius:6px;border:1px solid var(--brd-s);display:block">
-              <button type="button" onclick="clearNoteImg()" style="margin-top:4px;background:none;border:none;cursor:pointer;font-family:var(--fm);font-size:0.72rem;color:var(--bad)">✕ Kaldır</button>
-            </div>
-            <label class="img-upload-label" for="noteImgFile">
-              📎 Görsel Yükle
-            </label>
-            <input type="file" id="noteImgFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="uploadNoteImg(this)">
-            <div id="noteImgStatus" style="font-family:var(--fm);font-size:0.75rem;color:var(--acc-d);margin-top:4px;display:none"></div>
-            <input type="hidden" id="noteImgUrl" value="">
-          </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-p" onclick="saveNote()">Kaydet</button>
@@ -1106,7 +1085,6 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
   </div>
 </div>
-<div class="img-lightbox" id="imgLightbox" onclick="this.style.display='none'"><img id="imgLightboxImg" src="" alt=""></div>
 <div class="toast" id="toast"></div>
 <script>
 const SKEY='sozluk_v7';
@@ -2050,17 +2028,6 @@ function renderNotes(){
         ex.appendChild(document.createTextNode(n.example));
         card.appendChild(ex);
       }
-      if(n.img){
-        const iw=document.createElement('div');
-        iw.className='note-img-wrap';
-        const im=document.createElement('img');
-        im.className='note-img';
-        im.src=n.img;
-        im.alt='Görsel';
-        im.onclick=function(){openImgLightbox(n.img);};
-        iw.appendChild(im);
-        card.appendChild(iw);
-      }
       body.appendChild(card);
     });
 
@@ -2075,15 +2042,14 @@ function saveNote(){if(!requireAuth())return;
   const body=document.getElementById('note_body').value.trim();
   const cat=document.getElementById('note_cat').value||'Genel';
   const example=document.getElementById('note_example').value.trim();
-  const img=document.getElementById('noteImgUrl').value.trim();
   if(!title&&!body){showToast('⚠ Başlık veya açıklama girin');return;}
   if(editingNoteId){
     const n=notes.find(x=>x.id===editingNoteId);
-    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;n.img=img||'';}
+    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;}
     editingNoteId=null;
     document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   } else {
-    notes.push({id:noteNextId++,title,body,cat,example,img:img||''});
+    notes.push({id:noteNextId++,title,body,cat,example});
   }
   if(useCloud){
     if(editingNoteId){const n=notes.find(x=>x.id===editingNoteId);if(n&&n.sbId)sbUpdateNote(n.sbId,n).catch(e=>console.error(e));}
@@ -2105,12 +2071,6 @@ function editNote(id){
   document.getElementById('note_body').value=n.body;
   document.getElementById('note_cat').value=n.cat||'Genel';
   document.getElementById('note_example').value=n.example||'';
-  _noteImgUrl=n.img||'';
-  document.getElementById('noteImgUrl').value=_noteImgUrl;
-  var _t=document.getElementById('noteImgThumb');
-  var _p=document.getElementById('noteImgPreview');
-  if(_t) _t.src=_noteImgUrl;
-  if(_p) _p.style.display=_noteImgUrl?'block':'none';
   document.getElementById('noteFormTitle').textContent='Kural Düzenle';
   switchNTab('edit',document.getElementById('ntab-edit'));
 }
@@ -2129,7 +2089,6 @@ function cancelNoteEdit(){
   document.getElementById('note_body').value='';
   document.getElementById('note_cat').value='';
   document.getElementById('note_example').value='';
-  clearNoteImg();
   document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   switchNTab('list',document.getElementById('ntab-list'));
 }
@@ -2944,15 +2903,7 @@ function exportPDF(){
   html+='th{background:#333;color:#fff;padding:7px 10px;text-align:left;font-size:10px}';
   html+='td{padding:6px 10px;border-bottom:1px solid #eee}.sy{font-size:14px}';
   html+='tr:nth-child(even) td{background:#fafafa}.pill{display:inline-block;padding:1px 7px;border-radius:10px;background:#e8e8e8;font-size:9px}';
-  html+='
-/* -- GORSEL -- */
-.note-img{width:100%;max-height:260px;object-fit:contain;border-radius:6px;cursor:pointer;display:block;margin-top:10px;background:var(--surf2)}
-.note-img-wrap{padding:0 16px 14px}
-.img-lightbox{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);align-items:center;justify-content:center;cursor:zoom-out}
-.img-lightbox img{max-width:92vw;max-height:92vh;border-radius:8px;object-fit:contain}
-.img-upload-label{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:6px;cursor:pointer;font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);transition:all .2s;margin-top:8px}
-.img-upload-label:hover{border-color:var(--acc);color:var(--acc)}
-</style></head><body>';
+  html+='</style></head><body>';
   html+='<h1>Suryanice Sozluk</h1><div class="subtitle">Turkce - Suryanice - Ingilizce &nbsp; '+dateStr+'</div>';
   if(incSozluk){
     var filtered=typeFilter==='hepsi'?words:words.filter(function(w){return w.type===typeFilter;});
@@ -3107,63 +3058,6 @@ renderBiliyorMusun();
 renderGunKelimeCumle();
 initCloud();
 restoreSession();
-
-/* -- GORSEL FONKSIYONLARI -- */
-var _noteImgUrl = '';
-
-function uploadNoteImg(input) {
-  if (!input.files || !input.files[0]) return;
-  if (!editMode) { showToast('Gorsel yuklemek icin giris yapin'); return; }
-  var file = input.files[0];
-  if (file.size > 5 * 1024 * 1024) { showToast('Gorsel 5MB alti olmali'); return; }
-  var status = document.getElementById('noteImgStatus');
-  if (status) { status.style.display = 'block'; status.textContent = 'Yukleniyor...'; }
-  var token = localStorage.getItem('sb_access_token') || SB_KEY;
-  var ext = file.name.split('.').pop().toLowerCase();
-  var fname = 'note-' + Date.now() + '.' + ext;
-  var uploadUrl = SB_URL + '/storage/v1/object/note-images/' + fname;
-  fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': file.type,
-      'x-upsert': 'true'
-    },
-    body: file
-  }).then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    _noteImgUrl = SB_URL + '/storage/v1/object/public/note-images/' + fname;
-    document.getElementById('noteImgUrl').value = _noteImgUrl;
-    var thumb = document.getElementById('noteImgThumb');
-    var preview = document.getElementById('noteImgPreview');
-    if (thumb) thumb.src = _noteImgUrl;
-    if (preview) preview.style.display = 'block';
-    if (status) { status.style.display = 'none'; }
-    showToast('Gorsel yuklendi');
-  }).catch(function(e) {
-    if (status) { status.style.display = 'none'; }
-    showToast('Yukleme hatasi: ' + e.message);
-  });
-}
-
-function clearNoteImg() {
-  _noteImgUrl = '';
-  document.getElementById('noteImgUrl').value = '';
-  var thumb = document.getElementById('noteImgThumb');
-  var preview = document.getElementById('noteImgPreview');
-  var fileInput = document.getElementById('noteImgFile');
-  if (thumb) thumb.src = '';
-  if (preview) preview.style.display = 'none';
-  if (fileInput) fileInput.value = '';
-}
-
-function openImgLightbox(src) {
-  var lb = document.getElementById('imgLightbox');
-  var img = document.getElementById('imgLightboxImg');
-  if (lb && img) { img.src = src; lb.style.display = 'flex'; }
-}
-
 </script>
 </body>
 </html>
