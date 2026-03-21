@@ -1901,6 +1901,18 @@ function setCatFilter(el,cat){
   renderNotes();
 }
 
+
+/* Not bölüm aç/kapat */
+const noteSecOpen={};
+function toggleNoteSection(cat){
+  noteSecOpen[cat]=noteSecOpen[cat]===false?true:false;
+  const key=cat.replace(/\s/g,'-');
+  const body=document.getElementById('nsbody-'+key);
+  const arrow=document.getElementById('nsarrow-'+key);
+  if(body) body.classList.toggle('collapsed',!noteSecOpen[cat]);
+  if(arrow) arrow.style.transform=noteSecOpen[cat]?'rotate(0deg)':'rotate(-90deg)';
+}
+
 function renderNotes(){
   const list=document.getElementById('noteList');
   const empty=document.getElementById('noteEmpty');
@@ -1908,6 +1920,7 @@ function renderNotes(){
   const q=searchEl?searchEl.value.toLowerCase():'';
   const catRow=document.getElementById('catFilterRow');
 
+  // Category filter buttons
   if(catRow){
     const allCats=[...new Set(notes.map(n=>n.cat||'Genel'))];
     catRow.innerHTML='';
@@ -1928,6 +1941,9 @@ function renderNotes(){
     allCats.forEach(c=>makeBtn(c.replace(' Kuralları',''),c));
   }
 
+  // Auto-open all when searching
+  if(q){Object.keys(noteSecOpen).forEach(k=>{noteSecOpen[k]=true;});}
+
   const filtered=notes.filter(n=>{
     const matchCat=activeCatFilter==='hepsi'||(n.cat||'Genel')===activeCatFilter;
     const matchQ=!q||(n.title||'').toLowerCase().includes(q)||(n.body||'').toLowerCase().includes(q)||(n.example||'').toLowerCase().includes(q);
@@ -1938,49 +1954,62 @@ function renderNotes(){
   empty.style.display='none';
   list.innerHTML='';
 
+  // Group by category
   const cats={};
   filtered.forEach(n=>{const c=n.cat||'Genel';if(!cats[c])cats[c]=[];cats[c].push(n);});
 
-  Object.entries(cats).forEach(function(entry){
-    const cat=entry[0], items=entry[1];
+  Object.entries(cats).forEach(([cat,items])=>{
     const col=catColors[cat]||catColors.Genel;
-    const group=document.createElement('div');
-    group.style.marginBottom='20px';
-    const hd=document.createElement('div');
-    hd.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:'+col.text+';margin-bottom:10px;display:flex;align-items:center;gap:8px';
-    hd.innerHTML='<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block"></span>'+cat;
-    group.appendChild(hd);
-    items.forEach(function(n){
+
+    // Section wrap
+    const sec=document.createElement('div');
+    sec.className='tbl-wrap';
+    sec.style.marginBottom='10px';
+
+    // Header — clickable
+    const hdr=document.createElement('div');
+    hdr.className='tbl-hdr';
+    hdr.style.cursor='pointer';
+    const isOpen=noteSecOpen[cat]===true; // default closed
+    hdr.innerHTML='<div style="display:flex;align-items:center;gap:10px">'
+      +'<span style="width:10px;height:10px;border-radius:50%;background:'+col.border+';display:inline-block;flex-shrink:0"></span>'
+      +'<span class="tbl-ttl">'+cat+'</span>'
+      +'<span style="font-family:var(--fm);font-size:0.7rem;color:var(--acc-d)">'+items.length+'</span>'
+      +'</div>'
+      +'<span id="nsarrow-'+cat.replace(/\s/g,'-')+'" style="font-size:11px;color:var(--acc-d);transition:transform .3s;display:inline-block;transform:'+(isOpen?'rotate(0deg)':'rotate(-90deg)')+'">▼</span>';
+    hdr.onclick=function(){toggleNoteSection(cat);};
+    sec.appendChild(hdr);
+
+    // Body
+    const body=document.createElement('div');
+    body.id='nsbody-'+cat.replace(/\s/g,'-');
+    body.className='tscroll'+(isOpen?'':' collapsed');
+    body.style.padding='10px';
+    body.style.display='flex';
+    body.style.flexDirection='column';
+    body.style.gap='8px';
+
+    items.forEach(n=>{
       const card=document.createElement('div');
       card.className='note-card';
       card.style.borderLeftColor=col.border;
-      card.style.marginBottom='10px';
+
       const cardHdr=document.createElement('div');
       cardHdr.className='note-card-hdr';
-      const catBadge=document.createElement('span');
-      catBadge.className='note-card-cat';
-      catBadge.style.background=col.bg;
-      catBadge.style.color=col.text;
-      catBadge.textContent=cat;
       const titleSpan=document.createElement('span');
       titleSpan.className='note-card-title';
       titleSpan.textContent=n.title;
       const leftDiv=document.createElement('div');
       leftDiv.style.cssText='display:flex;align-items:center;gap:10px';
-      leftDiv.appendChild(catBadge);
       leftDiv.appendChild(titleSpan);
       const actions=document.createElement('div');
       actions.className='note-actions';
       if(editMode){
         const editBtn=document.createElement('button');
-        editBtn.className='nebtn';
-        editBtn.textContent='✏️';
-        editBtn.title='Düzenle';
+        editBtn.className='nebtn';editBtn.textContent='✏️';editBtn.title='Düzenle';
         editBtn.onclick=function(){editNote(n.id);};
         const delBtn=document.createElement('button');
-        delBtn.className='ndbtn';
-        delBtn.textContent='✕';
-        delBtn.title='Sil';
+        delBtn.className='ndbtn';delBtn.textContent='✕';delBtn.title='Sil';
         delBtn.onclick=function(){deleteNote(n.id);};
         actions.appendChild(editBtn);
         actions.appendChild(delBtn);
@@ -1988,21 +2017,22 @@ function renderNotes(){
       cardHdr.appendChild(leftDiv);
       cardHdr.appendChild(actions);
       card.appendChild(cardHdr);
-      if(n.body){const body=document.createElement('div');body.className='note-card-body';body.textContent=n.body;card.appendChild(body);}
+      if(n.body){const b=document.createElement('div');b.className='note-card-body';b.textContent=n.body;card.appendChild(b);}
       if(n.example){
         const ex=document.createElement('div');
         ex.className='note-card-example';
-        const exLabel=document.createElement('span');
-        exLabel.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px';
-        exLabel.textContent='ÖRNEK';
-        ex.appendChild(exLabel);
-        const exText=document.createTextNode(n.example);
-        ex.appendChild(exText);
+        const lbl=document.createElement('span');
+        lbl.style.cssText='font-family:var(--fm);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);display:block;margin-bottom:4px';
+        lbl.textContent='ÖRNEK';
+        ex.appendChild(lbl);
+        ex.appendChild(document.createTextNode(n.example));
         card.appendChild(ex);
       }
-      group.appendChild(card);
+      body.appendChild(card);
     });
-    list.appendChild(group);
+
+    sec.appendChild(body);
+    list.appendChild(sec);
   });
 }
 
