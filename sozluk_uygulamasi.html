@@ -970,6 +970,16 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 <div class="toast" id="toast"></div>
 <script>
 const SKEY='sozluk_v7';
+let currentUser=null;
+let editMode=false;
+function requireAuth(){
+  if(!editMode){
+    if(typeof showToast==='function') showToast('⚠ Düzenleme için giriş yapın');
+    if(typeof showLoginModal==='function') showLoginModal();
+    return false;
+  }
+  return true;
+}
 function getClaudeKey(){return localStorage.getItem('claude_api_key')||'';}
 async function askClaude(word){
   const CLAUDE_KEY=getClaudeKey();
@@ -1037,12 +1047,7 @@ async function initCloud(){
         notes=ns.map(n=>({id:n.id,sbId:n.id,title:n.title||'',body:n.body||'',cat:n.cat||'Genel',example:n.example||''}));
         noteNextId=Math.max(...notes.map(n=>n.id))+1;
         saveNotes();
-      } else if(notes.length>0){
-        for(const n of notes){
-          const res=await sbAddNote(n);
-          if(res&&res[0]) n.sbId=res[0].id;
-        }
-        saveNotes();
+        renderNotes();
       }
       useCloud=true;
       document.getElementById('cloudInd').textContent='☁ Bulut bağlı';
@@ -1280,9 +1285,6 @@ function onSearch(v){
   q=v;document.getElementById('clearBtn').classList.toggle('vis',v.length>0);acIdx=-1;
   if(v.length>=1)buildAc(v);else hideAc();render();
 }
-applyFont();
-initCloud();
-restoreSession();
 function buildAc(v){
   const vl=v.toLowerCase(),seen=new Set(),hits=[];
   const ll={tr:'Türkçe',sy:'Süryanice',en:'İngilizce'};
@@ -1393,10 +1395,10 @@ function switchTab(id, el){
   document.getElementById('tab-'+id).classList.add('active');
   if(el) el.classList.add('active');
   if(id==='cumle') renderPool();
-  if(id==='referans') renderRef();
+  if(id==='notlar') renderNotes();
+  if(id==='referans'){renderRef();}
   if(id==='istatistik') renderIstatistik();
   if(id==='flashcard'){document.getElementById('fcArea').style.display='none';document.getElementById('fcResult').style.display='none';}
-  // Sync icon buttons
   const iconBtn=document.getElementById('inb-'+id);
   if(iconBtn) iconBtn.classList.add('active');
 }
@@ -1908,7 +1910,6 @@ function cancelNoteEdit(){
   document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   switchNTab('list',document.getElementById('ntab-list'));
 }
-loadNotes();
 
 let poolOpen=false;
 function togglePool(){
@@ -2057,10 +2058,11 @@ const DEFAULT_REF=[{"id": 1, "title": "🔤 Zamirler", "rows": [{"tr": "Ben", "s
 let refData=[], refNextId=10;
 
 function loadRef(){
-  try{const r=localStorage.getItem(REF_KEY);if(r){refData=JSON.parse(r);refNextId=Math.max(...refData.map(s=>s.id))+1;return;}}catch(e){}
+  try{const r=localStorage.getItem(REF_KEY);if(r){refData=JSON.parse(r);refNextId=Math.max(...refData.map(s=>s.id))+1;renderRef();return;}}catch(e){}
   refData=JSON.parse(JSON.stringify(DEFAULT_REF));
   refNextId=refData.length+1;
   saveRef();
+  renderRef();
 }
 function saveRef(){try{localStorage.setItem(REF_KEY,JSON.stringify(refData));}catch(e){}}
 
@@ -2217,7 +2219,7 @@ function filterRef(){
 document.getElementById('refSectionModal').addEventListener('click',function(e){if(e.target===this)closeRefSectionModal();});
 document.getElementById('refRowModal').addEventListener('click',function(e){if(e.target===this)closeRefRowModal();});
 document.getElementById('loginModal').addEventListener('click',function(e){if(e.target===this)closeLoginModal();});
-loadRef();renderRef();
+loadRef();
 
 /* ── GRAMER HATIRLATICISI ─────────────────── */
 let gramHintOpen=true;
@@ -2308,21 +2310,20 @@ function toggleGramHint(){
 }
 
 /* ── AUTH ─────────────────────────────────── */
-let currentUser=null;
-let editMode=false;
 
 async function signIn(email,password){
   try{
     const r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{
       method:'POST',
-      headers:{'apikey':SB_KEY,'Content-Type':'application/json'},
-      body:JSON.stringify({email,password})
+      headers:{'apikey':SB_KEY,'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({email,password,gotrue_meta_security:{}})
     });
     const data=await r.json();
-    if(data.error) throw new Error(data.error_description||data.error);
+    if(!r.ok) throw new Error(data.error_description||data.msg||data.error||'Giriş başarısız');
+    if(!data.access_token) throw new Error('Geçersiz e-posta veya şifre');
     currentUser=data.user;
     localStorage.setItem('sb_access_token',data.access_token);
-    localStorage.setItem('sb_refresh_token',data.refresh_token);
+    localStorage.setItem('sb_refresh_token',data.refresh_token||'');
     return data;
   }catch(e){throw e;}
 }
@@ -2386,12 +2387,10 @@ function setEditMode(on){
   });
   const ntabEdit=document.getElementById('ntab-edit');
   if(ntabEdit) ntabEdit.style.display=on?'':'none';
-  // Re-render sections that are currently visible to update edit buttons
-  const noteList=document.getElementById('noteList');
-  if(noteList&&noteList.innerHTML) renderNotes();
-  const refSec=document.getElementById('refSections');
-  if(refSec&&refSec.innerHTML) renderRef();
   updateAuthUI();
+  // Re-render only if tab is active
+  if(document.getElementById('tab-notlar')&&document.getElementById('tab-notlar').classList.contains('active')) renderNotes();
+  if(document.getElementById('tab-referans')&&document.getElementById('tab-referans').classList.contains('active')) renderRef();
 }
 
 function updateAuthUI(){
@@ -2936,17 +2935,16 @@ function exportPDF(){
   closePdfModal();
   showToast('✦ PDF hazırlanıyor...');
 }
-function requireAuth(){
-  if(!editMode){showToast('⚠ Düzenleme için giriş yapın');showLoginModal();return false;}
-  return true;
-}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
   if(e.key==='Escape'){clearSearch();document.getElementById('addWrap').classList.remove('open');}
 });
-render();
-
+// ── STARTUP ──────────────────────────────────render();
+loadNotes();
+loadRef();
+initCloud();
+restoreSession();
 </script>
 </body>
 </html>
