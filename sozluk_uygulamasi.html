@@ -255,26 +255,88 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 .cb-actions{display:flex;gap:8px;margin-top:14px}
 
 
-@media(max-width:600px){
-  .app{padding:0 12px 48px}
+@media(max-width:640px){
+  /* Genel */
+  .app{padding:0 10px 48px}
+  h1{font-size:1.3rem}
+  .sub{font-size:0.85rem}
+  .lang-row{gap:4px}
+  .lbadge{font-size:7px;padding:2px 8px}
+
+  /* Ayar çubuğu */
+  .mini-theme{width:22px;height:22px}
+  .icon-nav-btn{width:30px;height:30px}
+  .fsbtn{padding:5px 10px;font-size:10px}
+
+  /* Sekmeler */
+  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .tab{padding:8px 12px;font-size:8px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
+
+  /* İstatistik kartları */
   .stats-row{gap:8px}
-  .stat-card{min-width:80px;padding:12px}
-  .stat-num{font-size:1.6rem}
+  .stat-card{min-width:70px;padding:10px 12px}
+  .stat-num{font-size:1.4rem}
+  .stat-lbl{font-size:8px}
+
+  /* Butonlar */
   .actions-row{gap:6px}
-  .abtn{padding:7px 12px;font-size:8px}
+  .abtn{padding:7px 10px;font-size:8px;gap:4px}
+  .abtn span{font-size:12px}
+  .btn{padding:8px 16px;font-size:9px}
+
+  /* Form */
   .igrid{grid-template-columns:1fr}
-  table{font-size:0.85rem}
-  td,th{padding:7px 8px}
-  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
-  .tab{padding:8px 14px;font-size:8px;letter-spacing:1px;white-space:nowrap}
-  #fcCard{padding:20px;min-height:180px}
-  #fcFrontText{font-size:1.4rem}
-  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
-  .word-pool{gap:6px}
+  .add-inner{padding:14px}
+  .char-btns{gap:2px}
+  .chbtn{padding:2px 4px;font-size:10px}
+
+  /* Tablo */
+  table{font-size:0.8rem}
+  td,th{padding:6px 8px}
+  td:first-child{width:28px}
+
+  /* Sözlük */
+  .tbl-hdr{padding:10px 14px}
+  .search-sec{margin-bottom:16px}
+  #searchInput{font-size:0.95rem}
+
+  /* Cümle kur */
+  .lang-tabs{gap:4px}
+  .lang-tab{font-size:8px;padding:5px 8px}
+  .lang-tag{display:none}
+  .tense-btn{padding:5px 10px;font-size:8px}
+  .slot-row{min-height:40px;padding:8px}
+  .slot-word{padding:5px 10px;font-size:0.85rem}
+  .word-pool{gap:5px}
   .pool-word{padding:5px 10px;font-size:0.85rem}
-  .lang-tabs{flex-direction:row;flex-wrap:wrap}
-  .lang-tab{font-size:8px;padding:5px 10px}
-  h1{font-size:1.4rem}
+  #livePreview{font-size:0.9rem;padding:8px}
+
+  /* Flashcard */
+  #fcCard{padding:20px 16px;min-height:190px;max-width:100%}
+  #fcFrontText{font-size:1.3rem}
+  #fcBtns{gap:10px;max-width:100%}
+  #fcBtns .btn{padding:10px 20px;font-size:0.9rem}
+
+  /* Notlar */
+  .ntabs{gap:4px}
+  .ntab{padding:5px 12px;font-size:8px}
+  .note-card-body{font-size:0.85rem}
+  .note-card-hdr{padding:10px 12px}
+  .note-card-title{font-size:0.9rem}
+
+  /* Referans */
+  .ref-hdr{padding:10px 14px}
+  .ref-title{font-size:0.85rem}
+  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
+  .ref-table td.sy{font-size:0.95rem}
+
+  /* İstatistik */
+  #istatCards{grid-template-columns:1fr 1fr}
+  .istat-bar-label{min-width:80px;font-size:0.8rem}
+  .istat-recent-row{flex-wrap:wrap;gap:4px}
+
+  /* Gramer kutusu */
+  .gram-hint-item-body{font-size:0.8rem}
 }
 </style>
 </head>
@@ -1175,7 +1237,7 @@ function insChar(ch){
   el.selectionStart=el.selectionEnd=s+ch.length;
   el.focus();
 }
-function addWord(){
+function addWord(){if(!requireAuth())return;
   const tr=document.getElementById('inp_tr').value.trim();
   const syRaw=document.getElementById('inp_sy').value.trim();
   const tr2=document.getElementById('inp_tr2').value.trim();
@@ -1208,7 +1270,7 @@ function changeFont(dir){
   fontSize=Math.min(180,Math.max(60,fontSize+dir*10));
   applyFont();
 }
-function deleteWord(id){
+function deleteWord(id){if(!requireAuth())return;
   const w=words.find(x=>x.id===id);
   if(w&&useCloud&&w.sbId) sbDeleteWord(w.sbId).catch(e=>console.error(e));
   words=words.filter(x=>x.id!==id);save();render();showToast('Kelime silindi');
@@ -1592,7 +1654,7 @@ function closeEdit(){
   document.getElementById('editModal').style.display='none';
   editingId=null;
 }
-function saveEdit(){
+function saveEdit(){if(!requireAuth())return;
   if(!editingId) return;
   const w=words.find(x=>x.id===editingId);
   if(!w) return;
@@ -1706,18 +1768,20 @@ function renderNotes(){
       leftDiv.appendChild(titleSpan);
       const actions=document.createElement('div');
       actions.className='note-actions';
-      const editBtn=document.createElement('button');
-      editBtn.className='nebtn';
-      editBtn.textContent='✏️';
-      editBtn.title='Düzenle';
-      editBtn.onclick=function(){editNote(n.id);};
-      const delBtn=document.createElement('button');
-      delBtn.className='ndbtn';
-      delBtn.textContent='✕';
-      delBtn.title='Sil';
-      delBtn.onclick=function(){deleteNote(n.id);};
-      actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
+      if(editMode){
+        const editBtn=document.createElement('button');
+        editBtn.className='nebtn';
+        editBtn.textContent='✏️';
+        editBtn.title='Düzenle';
+        editBtn.onclick=function(){editNote(n.id);};
+        const delBtn=document.createElement('button');
+        delBtn.className='ndbtn';
+        delBtn.textContent='✕';
+        delBtn.title='Sil';
+        delBtn.onclick=function(){deleteNote(n.id);};
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+      }
       cardHdr.appendChild(leftDiv);
       cardHdr.appendChild(actions);
       card.appendChild(cardHdr);
@@ -1740,7 +1804,7 @@ function renderNotes(){
 }
 
 
-function saveNote(){
+function saveNote(){if(!requireAuth())return;
   const title=document.getElementById('note_title').value.trim();
   const body=document.getElementById('note_body').value.trim();
   const cat=document.getElementById('note_cat').value||'Genel';
@@ -1778,7 +1842,7 @@ function editNote(id){
   switchNTab('edit',document.getElementById('ntab-edit'));
 }
 
-function deleteNote(id){
+function deleteNote(id){if(!requireAuth())return;
   if(!confirm('Bu kural silinecek. Emin misiniz?')) return;
   const dn=notes.find(x=>x.id===id);
   if(dn&&useCloud&&dn.sbId) sbDeleteNote(dn.sbId).catch(e=>console.error(e));
@@ -1962,15 +2026,18 @@ function renderRef(){
 
     const hdr=document.createElement('div');
     hdr.className='ref-hdr';
+    const editBtns=editMode
+      ?'<button class="nebtn" title="Düzenle">✏️</button><button class="ndbtn" title="Sil">✕</button>'
+      :'';
     hdr.innerHTML='<span class="ref-title">'+sec.title+'</span>'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<button class="nebtn" onclick="editRefSection('+sec.id+')" title="Düzenle">✏️</button>'
-      +'<button class="ndbtn" onclick="deleteRefSection('+sec.id+')" title="Sil">✕</button>'
-      +'<span class="ref-arrow">▼</span></div>';
+      +'<div style="display:flex;align-items:center;gap:8px">'+editBtns+'<span class="ref-arrow">▼</span></div>';
     hdr.querySelector('.ref-arrow').onclick=function(){toggleRefSec(sec.id);};
     hdr.querySelector('.ref-title').onclick=function(){toggleRefSec(sec.id);};
-    // Set arrow to closed position initially
     hdr.querySelector('.ref-arrow').style.transform='rotate(-90deg)';
+    if(editMode){
+      hdr.querySelectorAll('.nebtn,.ndbtn')[0].onclick=function(){editRefSection(sec.id);};
+      hdr.querySelectorAll('.nebtn,.ndbtn')[1].onclick=function(){deleteRefSection(sec.id);};
+    }
     div.appendChild(hdr);
 
     const body=document.createElement('div');
@@ -1997,11 +2064,13 @@ function renderRef(){
     });
 
     // Add row button
-    const addRow=document.createElement('tr');
-    addRow.innerHTML='<td colspan="4" style="padding:8px 16px">'
-      +'<button class="abtn" onclick="showRefRowModal('+sec.id+',-1)" style="font-size:9px;padding:5px 12px"><span>＋</span>Satır Ekle</button>'
-      +'</td>';
-    tbody.appendChild(addRow);
+    if(editMode){
+      const addRow=document.createElement('tr');
+      addRow.innerHTML='<td colspan="4" style="padding:8px 16px">'
+        +'<button class="abtn" onclick="showRefRowModal('+sec.id+',-1)" style="font-size:9px;padding:5px 12px"><span>＋</span>Satır Ekle</button>'
+        +'</td>';
+      tbody.appendChild(addRow);
+    }
     table.appendChild(tbody);
     body.appendChild(table);
     div.appendChild(body);
@@ -2028,7 +2097,7 @@ function showRefSectionModal(id){
 }
 function closeRefSectionModal(){document.getElementById('refSectionModal').style.display='none';}
 function editRefSection(id){showRefSectionModal(id);}
-function saveRefSection(){
+function saveRefSection(){if(!requireAuth())return;
   const title=document.getElementById('refSectionTitle').value.trim();
   if(!title){showToast('⚠ Başlık girin');return;}
   if(editingRefSectionId){
@@ -2039,7 +2108,7 @@ function saveRefSection(){
   }
   saveRef();renderRef();closeRefSectionModal();showToast('✦ Bölüm kaydedildi');
 }
-function deleteRefSection(id){
+function deleteRefSection(id){if(!requireAuth())return;
   if(!confirm('Bu bölüm silinecek. Emin misiniz?')) return;
   refData=refData.filter(s=>s.id!==id);
   saveRef();renderRef();showToast('Bölüm silindi');
@@ -2059,7 +2128,7 @@ function showRefRowModal(sid,idx){
 }
 function closeRefRowModal(){document.getElementById('refRowModal').style.display='none';}
 function editRefRow(sid,idx){showRefRowModal(sid,idx);}
-function saveRefRow(){
+function saveRefRow(){if(!requireAuth())return;
   const tr=document.getElementById('refRowTr').value.trim();
   const sy=document.getElementById('refRowSy').value.trim();
   const translit=document.getElementById('refRowTl').value.trim();
@@ -2070,7 +2139,7 @@ function saveRefRow(){
   else{sec.rows.push({tr,sy,translit});}
   saveRef();renderRef();closeRefRowModal();showToast('✦ Satır kaydedildi');
 }
-function deleteRefRow(sid,idx){
+function deleteRefRow(sid,idx){if(!requireAuth())return;
   const sec=refData.find(s=>s.id===sid);
   if(!sec) return;
   sec.rows.splice(idx,1);
@@ -2261,10 +2330,15 @@ async function restoreSession(){
 
 function setEditMode(on){
   editMode=on;
-  // Show/hide all edit buttons
   document.querySelectorAll('.edit-only').forEach(el=>{
-    el.style.display=on?'':'none';
+    el.style.display=on?(el.dataset.flex?'flex':''):'none';
   });
+  // Notes edit tab
+  const ntabEdit=document.getElementById('ntab-edit');
+  if(ntabEdit) ntabEdit.style.display=on?'':'none';
+  // Ref section/row add buttons — hide dynamically in renderRef
+  renderRef();
+  renderNotes();
   updateAuthUI();
 }
 
@@ -2670,26 +2744,88 @@ function exportPDF(){
     .cat-title::after{content:'';flex:1;height:1px;background:#ddd}
     @media print{@page{margin:15mm} h2{page-break-before:auto}}
   
-@media(max-width:600px){
-  .app{padding:0 12px 48px}
+@media(max-width:640px){
+  /* Genel */
+  .app{padding:0 10px 48px}
+  h1{font-size:1.3rem}
+  .sub{font-size:0.85rem}
+  .lang-row{gap:4px}
+  .lbadge{font-size:7px;padding:2px 8px}
+
+  /* Ayar çubuğu */
+  .mini-theme{width:22px;height:22px}
+  .icon-nav-btn{width:30px;height:30px}
+  .fsbtn{padding:5px 10px;font-size:10px}
+
+  /* Sekmeler */
+  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .tab{padding:8px 12px;font-size:8px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
+
+  /* İstatistik kartları */
   .stats-row{gap:8px}
-  .stat-card{min-width:80px;padding:12px}
-  .stat-num{font-size:1.6rem}
+  .stat-card{min-width:70px;padding:10px 12px}
+  .stat-num{font-size:1.4rem}
+  .stat-lbl{font-size:8px}
+
+  /* Butonlar */
   .actions-row{gap:6px}
-  .abtn{padding:7px 12px;font-size:8px}
+  .abtn{padding:7px 10px;font-size:8px;gap:4px}
+  .abtn span{font-size:12px}
+  .btn{padding:8px 16px;font-size:9px}
+
+  /* Form */
   .igrid{grid-template-columns:1fr}
-  table{font-size:0.85rem}
-  td,th{padding:7px 8px}
-  .tabs{gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
-  .tab{padding:8px 14px;font-size:8px;letter-spacing:1px;white-space:nowrap}
-  #fcCard{padding:20px;min-height:180px}
-  #fcFrontText{font-size:1.4rem}
-  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
-  .word-pool{gap:6px}
+  .add-inner{padding:14px}
+  .char-btns{gap:2px}
+  .chbtn{padding:2px 4px;font-size:10px}
+
+  /* Tablo */
+  table{font-size:0.8rem}
+  td,th{padding:6px 8px}
+  td:first-child{width:28px}
+
+  /* Sözlük */
+  .tbl-hdr{padding:10px 14px}
+  .search-sec{margin-bottom:16px}
+  #searchInput{font-size:0.95rem}
+
+  /* Cümle kur */
+  .lang-tabs{gap:4px}
+  .lang-tab{font-size:8px;padding:5px 8px}
+  .lang-tag{display:none}
+  .tense-btn{padding:5px 10px;font-size:8px}
+  .slot-row{min-height:40px;padding:8px}
+  .slot-word{padding:5px 10px;font-size:0.85rem}
+  .word-pool{gap:5px}
   .pool-word{padding:5px 10px;font-size:0.85rem}
-  .lang-tabs{flex-direction:row;flex-wrap:wrap}
-  .lang-tab{font-size:8px;padding:5px 10px}
-  h1{font-size:1.4rem}
+  #livePreview{font-size:0.9rem;padding:8px}
+
+  /* Flashcard */
+  #fcCard{padding:20px 16px;min-height:190px;max-width:100%}
+  #fcFrontText{font-size:1.3rem}
+  #fcBtns{gap:10px;max-width:100%}
+  #fcBtns .btn{padding:10px 20px;font-size:0.9rem}
+
+  /* Notlar */
+  .ntabs{gap:4px}
+  .ntab{padding:5px 12px;font-size:8px}
+  .note-card-body{font-size:0.85rem}
+  .note-card-hdr{padding:10px 12px}
+  .note-card-title{font-size:0.9rem}
+
+  /* Referans */
+  .ref-hdr{padding:10px 14px}
+  .ref-title{font-size:0.85rem}
+  .ref-table th,.ref-table td{padding:6px 8px;font-size:0.8rem}
+  .ref-table td.sy{font-size:0.95rem}
+
+  /* İstatistik */
+  #istatCards{grid-template-columns:1fr 1fr}
+  .istat-bar-label{min-width:80px;font-size:0.8rem}
+  .istat-recent-row{flex-wrap:wrap;gap:4px}
+
+  /* Gramer kutusu */
+  .gram-hint-item-body{font-size:0.8rem}
 }
 </style></head><body>`;
 
@@ -2747,6 +2883,10 @@ function exportPDF(){
   };
   closePdfModal();
   showToast('✦ PDF hazırlanıyor...');
+}
+function requireAuth(){
+  if(!editMode){showToast('⚠ Düzenleme için giriş yapın');showLoginModal();return false;}
+  return true;
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
