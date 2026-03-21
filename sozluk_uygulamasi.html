@@ -356,6 +356,17 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
 @media(max-width:800px){}
 @media(max-width:480px){}
 
+
+/* ── GÖRSEL ─────────────────────────────────── */
+.note-img{width:100%;max-height:260px;object-fit:contain;border-radius:6px;cursor:pointer;display:block;margin-top:10px;background:var(--surf2)}
+.note-img-wrap{position:relative;margin:10px 16px 14px}
+.note-img-del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.note-img-wrap:hover .note-img-del{opacity:1}
+.img-lightbox{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;cursor:zoom-out}
+.img-lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain}
+.img-upload-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:6px;cursor:pointer;font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);transition:all .2s;margin-top:6px}
+.img-upload-btn:hover{border-color:var(--acc);color:var(--acc)}
+.img-upload-progress{font-family:var(--fm);font-size:0.75rem;color:var(--acc-d);margin-top:4px;display:none}
 </style>
 </head>
 <body data-theme="krem">
@@ -797,6 +808,19 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
             <label class="ilabel">Örnek Kelime / Cümle</label>
             <textarea class="winput" id="note_example" rows="3" style="resize:vertical;line-height:1.6" placeholder="ܐܒܐ (Aba) — Baba / Father&#10;ܐܡܐ (Ema) — Anne / Mother"></textarea>
           </div>
+          <div class="igroup" style="margin-top:14px">
+            <label class="ilabel">Görsel</label>
+            <div id="note_img_preview" style="display:none;margin-bottom:8px">
+              <img id="note_img_thumb" src="" style="max-height:120px;border-radius:6px;border:1px solid var(--brd-s)">
+              <button type="button" onclick="clearNoteImg()" style="display:block;margin-top:4px;background:none;border:none;cursor:pointer;font-family:var(--fm);font-size:0.72rem;color:var(--bad)">✕ Görseli Kaldır</button>
+            </div>
+            <label class="img-upload-btn" for="note_img_file">
+              📎 Görsel Yükle
+              <input type="file" id="note_img_file" accept="image/*" style="display:none" onchange="uploadNoteImg(this)">
+            </label>
+            <div class="img-upload-progress" id="note_img_progress">Yükleniyor...</div>
+            <input type="hidden" id="note_img_url" value="">
+          </div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-p" onclick="saveNote()">Kaydet</button>
@@ -1084,6 +1108,9 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
       <button class="btn btn-s" onclick="closePdfModal()">İptal</button>
     </div>
   </div>
+</div>
+<div class="img-lightbox" id="imgLightbox" onclick="closeLightbox()">
+  <img id="imgLightboxImg" src="" alt="">
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -2028,6 +2055,17 @@ function renderNotes(){
         ex.appendChild(document.createTextNode(n.example));
         card.appendChild(ex);
       }
+      if(n.img){
+        const imgWrap=document.createElement('div');
+        imgWrap.className='note-img-wrap';
+        const imgEl=document.createElement('img');
+        imgEl.className='note-img';
+        imgEl.src=n.img;
+        imgEl.alt='Kural görseli';
+        imgEl.onclick=function(){openLightbox(n.img);};
+        imgWrap.appendChild(imgEl);
+        card.appendChild(imgWrap);
+      }
       body.appendChild(card);
     });
 
@@ -2042,14 +2080,15 @@ function saveNote(){if(!requireAuth())return;
   const body=document.getElementById('note_body').value.trim();
   const cat=document.getElementById('note_cat').value||'Genel';
   const example=document.getElementById('note_example').value.trim();
+  const img=document.getElementById('note_img_url').value.trim();
   if(!title&&!body){showToast('⚠ Başlık veya açıklama girin');return;}
   if(editingNoteId){
     const n=notes.find(x=>x.id===editingNoteId);
-    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;}
+    if(n){n.title=title;n.body=body;n.cat=cat;n.example=example;n.img=img;}
     editingNoteId=null;
     document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   } else {
-    notes.push({id:noteNextId++,title,body,cat,example});
+    notes.push({id:noteNextId++,title,body,cat,example,img});
   }
   if(useCloud){
     if(editingNoteId){const n=notes.find(x=>x.id===editingNoteId);if(n&&n.sbId)sbUpdateNote(n.sbId,n).catch(e=>console.error(e));}
@@ -2071,6 +2110,12 @@ function editNote(id){
   document.getElementById('note_body').value=n.body;
   document.getElementById('note_cat').value=n.cat||'Genel';
   document.getElementById('note_example').value=n.example||'';
+  noteImgUrl=n.img||'';
+  document.getElementById('note_img_url').value=noteImgUrl;
+  const thumb=document.getElementById('note_img_thumb');
+  const preview=document.getElementById('note_img_preview');
+  if(thumb) thumb.src=noteImgUrl;
+  if(preview) preview.style.display=noteImgUrl?'block':'none';
   document.getElementById('noteFormTitle').textContent='Kural Düzenle';
   switchNTab('edit',document.getElementById('ntab-edit'));
 }
@@ -2089,6 +2134,7 @@ function cancelNoteEdit(){
   document.getElementById('note_body').value='';
   document.getElementById('note_cat').value='';
   document.getElementById('note_example').value='';
+  clearNoteImg();
   document.getElementById('noteFormTitle').textContent='Yeni Kural Ekle';
   switchNTab('list',document.getElementById('ntab-list'));
 }
@@ -2903,7 +2949,18 @@ function exportPDF(){
   html+='th{background:#333;color:#fff;padding:7px 10px;text-align:left;font-size:10px}';
   html+='td{padding:6px 10px;border-bottom:1px solid #eee}.sy{font-size:14px}';
   html+='tr:nth-child(even) td{background:#fafafa}.pill{display:inline-block;padding:1px 7px;border-radius:10px;background:#e8e8e8;font-size:9px}';
-  html+='</style></head><body>';
+  html+='
+/* ── GÖRSEL ─────────────────────────────────── */
+.note-img{width:100%;max-height:260px;object-fit:contain;border-radius:6px;cursor:pointer;display:block;margin-top:10px;background:var(--surf2)}
+.note-img-wrap{position:relative;margin:10px 16px 14px}
+.note-img-del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.note-img-wrap:hover .note-img-del{opacity:1}
+.img-lightbox{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;cursor:zoom-out}
+.img-lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;object-fit:contain}
+.img-upload-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:6px;cursor:pointer;font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);transition:all .2s;margin-top:6px}
+.img-upload-btn:hover{border-color:var(--acc);color:var(--acc)}
+.img-upload-progress{font-family:var(--fm);font-size:0.75rem;color:var(--acc-d);margin-top:4px;display:none}
+</style></head><body>';
   html+='<h1>Suryanice Sozluk</h1><div class="subtitle">Turkce - Suryanice - Ingilizce &nbsp; '+dateStr+'</div>';
   if(incSozluk){
     var filtered=typeFilter==='hepsi'?words:words.filter(function(w){return w.type===typeFilter;});
@@ -3011,6 +3068,64 @@ function renderGunKelimeCumle(){
 
 /* -- BUNU BILIYOR MUSUN -- */
 
+
+
+/* ── GÖRSEL ─────────────────────────────────── */
+let noteImgUrl = '';
+
+async function uploadNoteImg(input){
+  if(!input.files||!input.files[0]) return;
+  if(!editMode){showToast('⚠ Giriş yapın');return;}
+  const file=input.files[0];
+  if(file.size>5*1024*1024){showToast('⚠ Görsel 5MB altında olmalı');return;}
+  const progress=document.getElementById('note_img_progress');
+  if(progress) progress.style.display='block';
+  try{
+    const token=localStorage.getItem('sb_access_token')||SB_KEY;
+    const ext=file.name.split('.').pop();
+    const fname='note-'+Date.now()+'.'+ext;
+    const url=SB_URL+'/storage/v1/object/note-images/'+fname;
+    const r=await fetch(url,{
+      method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':file.type,'x-upsert':'true'},
+      body:file
+    });
+    if(!r.ok) throw new Error('Yükleme hatası: '+r.status);
+    noteImgUrl=SB_URL+'/storage/v1/object/public/note-images/'+fname;
+    document.getElementById('note_img_url').value=noteImgUrl;
+    const thumb=document.getElementById('note_img_thumb');
+    const preview=document.getElementById('note_img_preview');
+    if(thumb) thumb.src=noteImgUrl;
+    if(preview) preview.style.display='block';
+    showToast('✦ Görsel yüklendi');
+  }catch(e){
+    showToast('⚠ '+e.message);
+    console.error(e);
+  }finally{
+    if(progress) progress.style.display='none';
+  }
+}
+
+function clearNoteImg(){
+  noteImgUrl='';
+  document.getElementById('note_img_url').value='';
+  const thumb=document.getElementById('note_img_thumb');
+  const preview=document.getElementById('note_img_preview');
+  const fileInput=document.getElementById('note_img_file');
+  if(thumb) thumb.src='';
+  if(preview) preview.style.display='none';
+  if(fileInput) fileInput.value='';
+}
+
+function openLightbox(src){
+  const lb=document.getElementById('imgLightbox');
+  const img=document.getElementById('imgLightboxImg');
+  if(lb&&img){img.src=src;lb.style.display='flex';}
+}
+function closeLightbox(){
+  const lb=document.getElementById('imgLightbox');
+  if(lb) lb.style.display='none';
+}
 
 function renderBiliyorMusun(){
   var el=document.getElementById('biliyormusun-icerik');
