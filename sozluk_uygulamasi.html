@@ -266,6 +266,7 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     <button class="tab" onclick="switchTab('notlar',this)">📝 Notlar</button>
     <button class="tab" onclick="switchTab('referans',this)">📚 Referans</button>
     <button class="tab" onclick="switchTab('istatistik',this)">📊 İstatistik</button>
+    <button class="tab" onclick="switchTab('flashcard',this)">🃏 Flashcard</button>
   </div>
 
   <!-- SÖZLÜK PANELİ -->
@@ -618,6 +619,83 @@ mark{background:var(--pb);color:var(--acc);border-radius:2px;padding:0 1px;font-
     </div>
 
   </div><!-- /tab-istatistik -->
+
+  <!-- FLASHCARD PANELİ -->
+  <div class="tab-content" id="tab-flashcard">
+
+    <!-- Ayarlar -->
+    <div class="cb-section" style="margin-bottom:16px">
+      <div class="cb-title">Kart Ayarları</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;align-items:flex-end">
+        <div>
+          <div style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">Ön Yüz</div>
+          <div class="lang-tabs" style="gap:6px">
+            <button class="lang-tab active" id="fc-front-tr" onclick="setFcFront('tr',this)">Türkçe</button>
+            <button class="lang-tab" id="fc-front-sy" onclick="setFcFront('sy',this)">Süryanice</button>
+            <button class="lang-tab" id="fc-front-en" onclick="setFcFront('en',this)">İngilizce</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:6px">Filtre</div>
+          <select class="wsel" id="fcTypeFilter" onchange="initFlashcard()" style="min-width:140px">
+            <option value="hepsi">Tüm Kelimeler</option>
+            <option value="isim">İsimler</option>
+            <option value="fiil">Fiiller</option>
+            <option value="sıfat">Sıfatlar</option>
+            <option value="zamir">Zamirler</option>
+            <option value="zarf">Zarflar</option>
+          </select>
+        </div>
+        <button class="abtn hl" onclick="initFlashcard()"><span>▶</span>Başla</button>
+      </div>
+    </div>
+
+    <!-- Kart Alanı -->
+    <div id="fcArea" style="display:none">
+      <!-- İlerleme -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span id="fcProgress" style="font-family:var(--fm);font-size:0.8rem;color:var(--txt-d)"></span>
+        <div style="display:flex;gap:8px">
+          <span id="fcCorrect" style="font-family:var(--fm);font-size:0.8rem;color:#3a9a5a">✓ 0</span>
+          <span id="fcWrong" style="font-family:var(--fm);font-size:0.8rem;color:var(--bad)">✗ 0</span>
+        </div>
+      </div>
+      <div id="fcBar" style="height:4px;background:var(--surf2);border-radius:2px;margin-bottom:20px">
+        <div id="fcBarFill" style="height:100%;background:var(--acc);border-radius:2px;transition:width .4s;width:0%"></div>
+      </div>
+
+      <!-- Kart -->
+      <div id="fcCard" onclick="flipCard()" style="cursor:pointer;min-height:220px;background:var(--surf);border:2px solid var(--brd);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;transition:all .3s;user-select:none;margin-bottom:16px">
+        <div id="fcFrontLabel" style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt-d);margin-bottom:16px"></div>
+        <div id="fcFrontText" style="font-size:1.8rem;font-weight:600;color:var(--txt);margin-bottom:8px"></div>
+        <div id="fcHint" style="font-family:var(--fm);font-size:0.75rem;color:var(--txt-d);opacity:.5;margin-top:12px">👆 Cevabı görmek için tıkla</div>
+
+        <!-- Arka yüz (gizli) -->
+        <div id="fcBack" style="display:none;width:100%">
+          <div style="width:60px;height:1px;background:var(--brd);margin:16px auto"></div>
+          <div id="fcBackLabel" style="font-family:var(--fm);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--acc-d);margin-bottom:10px"></div>
+          <div id="fcBackText" style="font-size:1.4rem;color:var(--acc);margin-bottom:6px"></div>
+          <div id="fcBackExtra" style="font-size:1rem;color:var(--txt-d)"></div>
+        </div>
+      </div>
+
+      <!-- Butonlar -->
+      <div id="fcBtns" style="display:none;justify-content:center;gap:16px">
+        <button class="btn" onclick="fcAnswer(false)" style="background:rgba(204,51,51,.1);color:var(--bad);border:2px solid var(--bad);padding:12px 32px;font-size:1rem">✗ Bilmedim</button>
+        <button class="btn" onclick="fcAnswer(true)" style="background:rgba(58,154,90,.1);color:#3a9a5a;border:2px solid #3a9a5a;padding:12px 32px;font-size:1rem">✓ Bildim</button>
+      </div>
+    </div>
+
+    <!-- Sonuç -->
+    <div id="fcResult" style="display:none" class="cb-section">
+      <div class="cb-title">Sonuç</div>
+      <div id="fcResultContent" style="text-align:center;padding:20px"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn btn-p" onclick="initFlashcard()">Tekrar Başla</button>
+      </div>
+    </div>
+
+  </div><!-- /tab-flashcard -->
 
   <!-- Ref Section Modal -->
   <div id="refSectionModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center">
@@ -1160,6 +1238,7 @@ function switchTab(id, el){
   if(id==='cumle') renderPool();
   if(id==='referans') renderRef();
   if(id==='istatistik') renderIstatistik();
+  if(id==='flashcard'){document.getElementById('fcArea').style.display='none';document.getElementById('fcResult').style.display='none';}
 }
 
 /* ── CÜMLE KUR ────────────────────────────── */
@@ -2232,6 +2311,130 @@ function renderIstatistik(){
     });
   }
 }
+
+/* ── FLASHCARD ───────────────────────────────── */
+let fcWords=[], fcIndex=0, fcFront='tr', fcFlipped=false;
+let fcCorrectCount=0, fcWrongCount=0;
+
+function setFcFront(lang, el){
+  fcFront=lang;
+  document.querySelectorAll('#fc-front-tr,#fc-front-sy,#fc-front-en').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function initFlashcard(){
+  const filter=document.getElementById('fcTypeFilter').value;
+  let pool=filter==='hepsi'?[...words]:words.filter(w=>w.type===filter);
+  if(!pool.length){showToast('⚠ Bu filtrede kelime yok');return;}
+
+  // Shuffle
+  for(let i=pool.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  fcWords=pool;
+  fcIndex=0;
+  fcCorrectCount=0;
+  fcWrongCount=0;
+
+  document.getElementById('fcArea').style.display='block';
+  document.getElementById('fcResult').style.display='none';
+  showFcCard();
+}
+
+function showFcCard(){
+  if(fcIndex>=fcWords.length){showFcResult();return;}
+  const w=fcWords[fcIndex];
+  const total=fcWords.length;
+  fcFlipped=false;
+
+  document.getElementById('fcProgress').textContent=(fcIndex+1)+' / '+total;
+  document.getElementById('fcCorrect').textContent='✓ '+fcCorrectCount;
+  document.getElementById('fcWrong').textContent='✗ '+fcWrongCount;
+  document.getElementById('fcBarFill').style.width=(fcIndex/total*100)+'%';
+
+  const langLabels={tr:'Türkçe',sy:'Süryanice',en:'İngilizce'};
+  const backLangs=fcFront==='tr'?['sy','en']:fcFront==='sy'?['tr','en']:['tr','sy'];
+
+  // Front
+  document.getElementById('fcFrontLabel').textContent=langLabels[fcFront];
+  document.getElementById('fcFrontText').textContent=getFcText(w,fcFront);
+  document.getElementById('fcHint').style.display='block';
+
+  // Back (hidden)
+  document.getElementById('fcBack').style.display='none';
+  document.getElementById('fcBackLabel').textContent=langLabels[backLangs[0]];
+  document.getElementById('fcBackText').textContent=getFcText(w,backLangs[0]);
+  document.getElementById('fcBackExtra').textContent=backLangs[1]?getFcText(w,backLangs[1]):'';
+
+  // Card style reset
+  const card=document.getElementById('fcCard');
+  card.style.borderColor='var(--brd)';
+  card.style.background='var(--surf)';
+  document.getElementById('fcBtns').style.display='none';
+
+  // Type badge
+  if(w.type){
+    const color=typeColors[w.type]||'#bdbdbd';
+    document.getElementById('fcFrontLabel').innerHTML=langLabels[fcFront]
+      +' <span style="margin-left:8px;padding:2px 8px;border-radius:20px;background:'+color+'22;color:'+color+';font-size:0.7rem">'+w.type+'</span>';
+  }
+}
+
+function getFcText(w,lang){
+  if(lang==='tr') return w.tr||'—';
+  if(lang==='en') return w.en||'—';
+  if(lang==='sy') return w.sy||'—';
+  return '—';
+}
+
+function flipCard(){
+  if(fcFlipped) return;
+  fcFlipped=true;
+  document.getElementById('fcBack').style.display='block';
+  document.getElementById('fcHint').style.display='none';
+  document.getElementById('fcBtns').style.display='flex';
+  document.getElementById('fcCard').style.borderColor='var(--acc)';
+}
+
+function fcAnswer(correct){
+  if(correct) fcCorrectCount++;
+  else fcWrongCount++;
+
+  const card=document.getElementById('fcCard');
+  card.style.background=correct?'rgba(58,154,90,.08)':'rgba(204,51,51,.08)';
+  card.style.borderColor=correct?'#3a9a5a':'var(--bad)';
+
+  setTimeout(()=>{
+    fcIndex++;
+    showFcCard();
+  }, 400);
+}
+
+function showFcResult(){
+  document.getElementById('fcArea').style.display='none';
+  document.getElementById('fcResult').style.display='block';
+  const total=fcWords.length;
+  const pct=total?Math.round(fcCorrectCount/total*100):0;
+  const emoji=pct>=80?'🎉':pct>=60?'👍':pct>=40?'💪':'📚';
+  document.getElementById('fcResultContent').innerHTML=
+    '<div style="font-size:3rem;margin-bottom:16px">'+emoji+'</div>'
+    +'<div style="font-size:1.5rem;font-weight:700;color:var(--acc);margin-bottom:8px">%'+pct+' Başarı</div>'
+    +'<div style="font-size:1rem;color:var(--txt-d);margin-bottom:16px">'+total+' karttan '+fcCorrectCount+' doğru, '+fcWrongCount+' yanlış</div>'
+    +'<div style="display:flex;justify-content:center;gap:24px">'
+    +'<span style="color:#3a9a5a;font-size:1.1rem">✓ '+fcCorrectCount+' Bildim</span>'
+    +'<span style="color:var(--bad);font-size:1.1rem">✗ '+fcWrongCount+' Bilmedim</span>'
+    +'</div>';
+}
+
+// Keyboard shortcuts for flashcard
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('tab-flashcard')&&document.getElementById('tab-flashcard').classList.contains('active')){
+    if(e.key===' '||e.key==='Enter') flipCard();
+    if(e.key==='ArrowRight'||e.key==='1') {if(fcFlipped)fcAnswer(true);}
+    if(e.key==='ArrowLeft'||e.key==='0') {if(fcFlipped)fcAnswer(false);}
+  }
+});
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('addWrap').classList.contains('open'))addWord();
